@@ -112,11 +112,26 @@ export default function Bio() {
                 Susie believes deeply in a team approach to equine wellness. She works collaboratively alongside owners, trainers, farriers, and veterinarians. While her work may profoundly support a horse's comfort and muscular health, she is clear about her role: she provides wellness support, not medical diagnosis or treatment.
               </p>
 
-              <div className="bg-muted p-8 rounded-xl my-10 border-l-4 border-primary">
-                <p className="italic text-foreground m-0">
-                  "When we understand how the horse is designed to move, we can better support them when they struggle. It's about giving them the tools to balance their own bodies, relieving tension before it becomes a major obstacle."
-                </p>
-              </div>
+              <motion.div
+                initial={{ opacity: 0.4, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                className="bg-muted p-8 rounded-xl my-10 border-l-4 border-primary not-prose"
+              >
+                <LineReveal
+                  text='"When we understand how the horse is designed to move, we can better support them when they struggle.'
+                  as="span"
+                  delay={0.15}
+                  className="block italic text-foreground"
+                />
+                <LineReveal
+                  text={`It's about giving them the tools to balance their own bodies, relieving tension before it becomes a major obstacle."`}
+                  as="span"
+                  delay={0.55}
+                  className="block italic text-foreground mt-2"
+                />
+              </motion.div>
 
               <p>
                 Outside of sessions, Susie is continually expanding her knowledge, staying current with the latest research in equine biomechanics, and maintaining her own connection to the horses that inspire her work every day.

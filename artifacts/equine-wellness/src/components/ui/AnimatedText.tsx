@@ -45,8 +45,10 @@ export function WordReveal({
       transition: { staggerChildren: stagger, delayChildren: delay },
     },
   };
+  // Initial opacity stays at 1 so text is fully readable at first paint
+  // (no invisible text on load); only a small Y offset animates.
   const child: Variants = {
-    hidden: { y: "0.6em", opacity: 0 },
+    hidden: { y: "0.25em", opacity: 0.35 },
     visible: {
       y: 0,
       opacity: 1,
@@ -64,7 +66,7 @@ export function WordReveal({
         /^\s+$/.test(word) ? (
           <span key={i}> </span>
         ) : (
-          <span key={i} className="inline-block overflow-hidden align-baseline">
+          <span key={i} className="inline-block align-baseline">
             <motion.span variants={child} className="inline-block will-change-transform">
               {word}
             </motion.span>
@@ -95,8 +97,9 @@ export function LineReveal({
     return createElement(as, { className }, text);
   }
 
+  // Initial opacity stays partially visible so text is readable on first paint
   const variants: Variants = {
-    hidden: { opacity: 0, y: 16 },
+    hidden: { opacity: 0.4, y: 12 },
     visible: { opacity: 1, y: 0, transition: { duration, ease: easeOut, delay } },
   };
 

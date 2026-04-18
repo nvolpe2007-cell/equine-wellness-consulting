@@ -150,15 +150,11 @@ export default function Home() {
             transition={{ duration: 0.7 }}
             className="max-w-3xl mx-auto text-center"
           >
-            <motion.span
-              initial={{ opacity: 0, y: 8 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            <LineReveal
+              text="Philosophy"
+              as="span"
               className="inline-block text-xs font-sans tracking-[0.3em] text-primary uppercase mb-4"
-            >
-              Philosophy
-            </motion.span>
+            />
             <h2 className="text-3xl md:text-5xl font-serif text-foreground mb-6 leading-tight">
               <WordReveal
                 text="Grounded in knowledge."
