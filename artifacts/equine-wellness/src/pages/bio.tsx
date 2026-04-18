@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import horsePortrait from "@assets/stock_images/horse-portrait.jpg";
+import horsePortrait from "@assets/20260401_140719_1776529313797.jpg";
 
 export default function Bio() {
   return (
@@ -37,7 +37,7 @@ export default function Bio() {
             >
               <img 
                 src={horsePortrait} 
-                alt="A horse in a quiet moment" 
+                alt="Susie on-site between sessions" 
                 className="w-full h-full object-cover"
               />
             </motion.div>
