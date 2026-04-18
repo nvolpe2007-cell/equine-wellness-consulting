@@ -48,7 +48,7 @@ export function WordReveal({
   // Initial opacity stays at 1 so text is fully readable at first paint
   // (no invisible text on load); only a small Y offset animates.
   const child: Variants = {
-    hidden: { y: "0.25em", opacity: 0.35 },
+    hidden: { y: "0.25em", opacity: 0.7 },
     visible: {
       y: 0,
       opacity: 1,
@@ -99,7 +99,7 @@ export function LineReveal({
 
   // Initial opacity stays partially visible so text is readable on first paint
   const variants: Variants = {
-    hidden: { opacity: 0.4, y: 12 },
+    hidden: { opacity: 0.7, y: 10 },
     visible: { opacity: 1, y: 0, transition: { duration, ease: easeOut, delay } },
   };
 
