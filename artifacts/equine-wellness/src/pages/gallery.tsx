@@ -1,15 +1,18 @@
 import { motion } from "framer-motion";
+import susieWithHorse from "@assets/20260401_140719_1776528664269.jpg";
+import horseOnPad from "@assets/20260320_141245_1776528671943.jpg";
+import pemfRear from "@assets/20260407_112708_1776528693859.jpg";
+import pemfWhiteHorse from "@assets/20260407_121449_1776528702902.jpg";
+import redLightLeg from "@assets/20260319_191731_1776528710545.jpg";
 
 export default function Gallery() {
   const images = [
-    { src: "/images/hero-barn.png", alt: "Warm morning light in the stable", colSpan: "col-span-1 md:col-span-2" },
-    { src: "/images/gallery-hands.png", alt: "Equine bodywork hand massage", colSpan: "col-span-1" },
-    { src: "/images/gallery-redlight.png", alt: "Red light session", colSpan: "col-span-1" },
-    { src: "/images/gallery-massage.png", alt: "Equine massage session", colSpan: "col-span-1 md:col-span-2" },
-    { src: "/images/gallery-pemf.png", alt: "PEMF session with Magnawave", colSpan: "col-span-1 md:col-span-2" },
-    { src: "/images/gallery-pasture.png", alt: "Horse relaxing in pasture", colSpan: "col-span-1" },
-    { src: "/images/bio-stable.png", alt: "Professional credentials", colSpan: "col-span-1" },
-    { src: "/images/gallery-aisle.png", alt: "Quiet stable aisle", colSpan: "col-span-1 md:col-span-2" },
+    { src: susieWithHorse, alt: "Susie on-site preparing for a session", colSpan: "col-span-1 md:col-span-2" },
+    { src: redLightLeg, alt: "Red light session on the lower leg", colSpan: "col-span-1" },
+    { src: horseOnPad, alt: "A calm bay standing on the PEMF pad", colSpan: "col-span-1" },
+    { src: pemfWhiteHorse, alt: "PEMF session in the stall with a relaxed grey", colSpan: "col-span-1 md:col-span-2" },
+    { src: pemfRear, alt: "Magnawave PEMF loops in use during a session", colSpan: "col-span-1 md:col-span-2" },
+    { src: susieWithHorse, alt: "A quiet moment between sessions", colSpan: "col-span-1" },
   ];
 
   return (
@@ -44,6 +47,7 @@ export default function Gallery() {
               viewport={{ once: true }}
               transition={{ delay: index * 0.05, duration: 0.5 }}
               className={`relative group overflow-hidden rounded-xl bg-muted ${image.colSpan}`}
+              data-testid={`img-gallery-${index}`}
             >
               <img 
                 src={image.src} 
