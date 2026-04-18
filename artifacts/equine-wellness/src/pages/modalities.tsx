@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Info, Plus, Minus } from "lucide-react";
 import { useState } from "react";
+import { WordReveal, LineReveal, AnimatedHeading } from "@/components/ui/AnimatedText";
 import massageHands from "@assets/0629_LOC_Horse02_CBH_t1170_1776529181857.jpg";
 import horseStall from "@assets/stock_images/horse-stall.jpg";
 import pemfWhiteHorse from "@assets/20260407_121449_1776528702902.jpg";
@@ -120,21 +121,20 @@ export default function Modalities() {
       {/* Header */}
       <div className="bg-card py-20 border-b">
         <div className="container mx-auto px-4 text-center max-w-4xl">
-          <motion.h1 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+          <WordReveal
+            text="Wellness Modalities"
+            as="h1"
             className="text-4xl md:text-5xl font-serif text-foreground mb-6"
-          >
-            Wellness Modalities
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
+            delay={0.1}
+            stagger={0.07}
+          />
+          <LineReveal
+            text="A multi-faceted approach to equine comfort. Every session is customized to your horse's unique biomechanical needs."
+            as="p"
+            whileInView={false}
+            delay={0.5}
             className="text-xl text-muted-foreground font-light leading-relaxed"
-          >
-            A multi-faceted approach to equine comfort. Every session is customized to your horse's unique biomechanical needs.
-          </motion.p>
+          />
         </div>
       </div>
 
@@ -174,12 +174,13 @@ export default function Modalities() {
               </div>
               <div className="w-full lg:w-1/2 space-y-6">
                 <div>
-                  <h3 className="text-sm font-sans tracking-widest text-primary uppercase mb-2">
-                    {modality.subtitle}
-                  </h3>
-                  <h2 className="text-3xl md:text-4xl font-serif text-foreground">
-                    {modality.title}
-                  </h2>
+                  <AnimatedHeading
+                    eyebrow={modality.subtitle}
+                    eyebrowClassName="block text-sm font-sans tracking-widest text-primary uppercase mb-2"
+                    text={modality.title}
+                    as="h2"
+                    className="text-3xl md:text-4xl font-serif text-foreground"
+                  />
                 </div>
                 <motion.div
                   initial={{ scaleX: 0 }}
@@ -207,8 +208,13 @@ export default function Modalities() {
             transition={{ duration: 0.6 }}
             className="text-center mb-12"
           >
-            <span className="inline-block text-xs font-sans tracking-[0.3em] text-primary uppercase mb-3">FAQ</span>
-            <h2 className="text-3xl md:text-4xl font-serif text-foreground">Common questions about equine bodywork</h2>
+            <AnimatedHeading
+              eyebrow="FAQ"
+              eyebrowClassName="inline-block text-xs font-sans tracking-[0.3em] text-primary uppercase mb-3"
+              text="Common questions about equine bodywork"
+              as="h2"
+              className="text-3xl md:text-4xl font-serif text-foreground"
+            />
           </motion.div>
           <div>
             {faqs.map((f, i) => (

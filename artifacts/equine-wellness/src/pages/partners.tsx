@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { ExternalLink } from "lucide-react";
+import { WordReveal, LineReveal } from "@/components/ui/AnimatedText";
 
 export default function Partners() {
   const partners = [
@@ -33,21 +34,20 @@ export default function Partners() {
     <div className="min-h-screen bg-background">
       <div className="bg-card py-20 border-b">
         <div className="container mx-auto px-4 text-center max-w-4xl">
-          <motion.h1 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+          <WordReveal
+            text="Trusted Partners"
+            as="h1"
             className="text-4xl md:text-5xl font-serif text-foreground mb-6"
-          >
-            Trusted Partners
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
+            delay={0.1}
+            stagger={0.07}
+          />
+          <LineReveal
+            text="The tools, brands, and equipment I trust to support your horse's wellness."
+            as="p"
+            whileInView={false}
+            delay={0.45}
             className="text-xl text-muted-foreground font-light leading-relaxed"
-          >
-            The tools, brands, and equipment I trust to support your horse's wellness.
-          </motion.p>
+          />
         </div>
       </div>
 

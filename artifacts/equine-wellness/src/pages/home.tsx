@@ -2,6 +2,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { Link } from "wouter";
 import { ArrowRight, CheckCircle2, Sparkles, Phone } from "lucide-react";
 import { useRef } from "react";
+import { WordReveal, LineReveal, AnimatedHeading, AccentFlourish } from "@/components/ui/AnimatedText";
 import barnHero from "@assets/stock_images/barn-hero.jpg";
 import barnExterior from "@assets/stock_images/barn-exterior.jpg";
 import horsePortrait from "@assets/stock_images/horse-portrait.jpg";
@@ -53,10 +54,27 @@ export default function Home() {
               <Sparkles className="h-3.5 w-3.5 text-accent" />
               <span className="text-white/90 font-sans tracking-widest uppercase text-xs">Susie H. Lytal, MS · Equine Biomechanist</span>
             </motion.div>
-            <motion.h1 variants={fadeUp} transition={{ duration: 0.7 }} className="text-5xl md:text-7xl font-serif text-white mb-6 leading-[1.05]">
-              Elevating equine performance<br />
-              <span className="italic text-accent/90">through science and care.</span>
-            </motion.h1>
+            <h1 className="text-5xl md:text-7xl font-serif text-white mb-6 leading-[1.05]">
+              <WordReveal
+                text="Elevating equine performance"
+                as="span"
+                className="block"
+                delay={0.25}
+                stagger={0.07}
+                duration={0.8}
+              />
+              <span className="relative inline-block">
+                <WordReveal
+                  text="through science and care."
+                  as="span"
+                  className="italic text-accent/90 inline-block"
+                  delay={0.85}
+                  stagger={0.06}
+                  duration={0.8}
+                />
+                <AccentFlourish delay={1.6} />
+              </span>
+            </h1>
             <motion.p variants={fadeUp} transition={{ duration: 0.6 }} className="text-lg md:text-xl text-white/85 mb-10 font-light max-w-2xl mx-auto leading-relaxed">
               Professional equine bodywork and wellness consulting, grounded in graduate-level biomechanics expertise.
             </motion.p>
@@ -132,8 +150,31 @@ export default function Home() {
             transition={{ duration: 0.7 }}
             className="max-w-3xl mx-auto text-center"
           >
-            <span className="inline-block text-xs font-sans tracking-[0.3em] text-primary uppercase mb-4">Philosophy</span>
-            <h2 className="text-3xl md:text-5xl font-serif text-foreground mb-6 leading-tight">Grounded in knowledge.<br /><span className="italic">Delivered with compassion.</span></h2>
+            <motion.span
+              initial={{ opacity: 0, y: 8 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="inline-block text-xs font-sans tracking-[0.3em] text-primary uppercase mb-4"
+            >
+              Philosophy
+            </motion.span>
+            <h2 className="text-3xl md:text-5xl font-serif text-foreground mb-6 leading-tight">
+              <WordReveal
+                text="Grounded in knowledge."
+                as="span"
+                whileInView
+                delay={0.18}
+                className="block"
+              />
+              <WordReveal
+                text="Delivered with compassion."
+                as="span"
+                whileInView
+                delay={0.55}
+                className="block italic"
+              />
+            </h2>
             <p className="text-lg text-muted-foreground leading-relaxed mb-10">
               Every horse is a complex athlete, whether they are performing at the highest levels of competition or carrying you safely down the trail. My approach to equine wellness combines a deep, scientific understanding of biomechanics with highly attuned, hands-on application. We don't just look at the symptoms; we support the whole horse.
             </p>
@@ -159,8 +200,13 @@ export default function Home() {
               transition={{ duration: 0.6 }}
               className="max-w-2xl"
             >
-              <span className="inline-block text-xs font-sans tracking-[0.3em] text-primary uppercase mb-3">What I Offer</span>
-              <h2 className="text-3xl md:text-5xl font-serif text-foreground mb-4 leading-tight">Wellness sessions, tailored.</h2>
+              <AnimatedHeading
+                eyebrow="What I Offer"
+                eyebrowClassName="inline-block text-xs font-sans tracking-[0.3em] text-primary uppercase mb-3"
+                text="Wellness sessions, tailored."
+                as="h2"
+                className="text-3xl md:text-5xl font-serif text-foreground mb-4 leading-tight"
+              />
               <p className="text-muted-foreground text-lg">
                 A comprehensive approach to equine comfort. Each session is tailored to your horse's unique biomechanical needs, drawing from a range of modalities to support optimal movement and well-being.
               </p>
@@ -248,8 +294,13 @@ export default function Home() {
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.7 }}
             >
-              <span className="inline-block text-xs font-sans tracking-[0.3em] text-accent uppercase mb-3">The Difference</span>
-              <h2 className="text-3xl md:text-5xl font-serif mb-6 text-white leading-tight">The Biomechanical Advantage</h2>
+              <AnimatedHeading
+                eyebrow="The Difference"
+                eyebrowClassName="inline-block text-xs font-sans tracking-[0.3em] text-accent uppercase mb-3"
+                text="The Biomechanical Advantage"
+                as="h2"
+                className="text-3xl md:text-5xl font-serif mb-6 text-white leading-tight"
+              />
               <p className="text-primary-foreground/85 text-lg mb-8 leading-relaxed">
                 Working with an Equine Biomechanist means looking beyond the surface. It involves analyzing how the horse moves, identifying compensatory patterns, and applying specific modalities to support more efficient, comfortable movement.
               </p>
@@ -310,7 +361,12 @@ export default function Home() {
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.7 }}
           >
-            <h2 className="text-4xl md:text-5xl font-serif text-foreground mb-6">Ready to support your horse's wellness?</h2>
+            <WordReveal
+              text="Ready to support your horse's wellness?"
+              as="h2"
+              whileInView
+              className="text-4xl md:text-5xl font-serif text-foreground mb-6"
+            />
             <p className="text-lg text-muted-foreground mb-10">
               Reach out to discuss your horse's needs and schedule a session. We'll develop a personalized plan to support their comfort and performance.
             </p>

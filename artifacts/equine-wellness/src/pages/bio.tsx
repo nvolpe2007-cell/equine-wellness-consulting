@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { WordReveal, LineReveal } from "@/components/ui/AnimatedText";
 import horsePortrait from "@assets/20260401_140719_1776529313797.jpg";
 
 export default function Bio() {
@@ -7,21 +8,20 @@ export default function Bio() {
       {/* Header */}
       <div className="bg-card py-20 border-b">
         <div className="container mx-auto px-4 text-center max-w-4xl">
-          <motion.h1 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+          <WordReveal
+            text="Meet Susie H. Lytal, MS"
+            as="h1"
             className="text-4xl md:text-5xl font-serif text-foreground mb-6"
-          >
-            Meet Susie H. Lytal, MS
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
+            delay={0.1}
+            stagger={0.07}
+          />
+          <LineReveal
+            text="Equine Biomechanist & Certified Equine Sports Massage Therapist"
+            as="p"
+            whileInView={false}
+            delay={0.55}
             className="text-xl text-muted-foreground font-light"
-          >
-            Equine Biomechanist & Certified Equine Sports Massage Therapist
-          </motion.p>
+          />
         </div>
       </div>
 
@@ -74,11 +74,20 @@ export default function Bio() {
               transition={{ delay: 0.3 }}
               className="prose prose-lg prose-stone dark:prose-invert max-w-none"
             >
-              <h2 className="font-serif text-3xl text-foreground mt-0">A Passion Built on Science and Care</h2>
-              
-              <p className="lead text-xl text-muted-foreground mb-8">
-                "My goal is simple: to help horses move more comfortably, perform more efficiently, and live happier lives through informed, compassionate bodywork."
-              </p>
+              <WordReveal
+                text="A Passion Built on Science and Care"
+                as="h2"
+                whileInView
+                className="font-serif text-3xl text-foreground mt-0 mb-6"
+                stagger={0.05}
+              />
+
+              <LineReveal
+                text='"My goal is simple: to help horses move more comfortably, perform more efficiently, and live happier lives through informed, compassionate bodywork."'
+                as="p"
+                delay={0.25}
+                className="lead text-xl text-muted-foreground mb-8 not-prose"
+              />
 
               <p>
                 With a Master's degree in Biomechanics, Susie brings a rigorous, scientific understanding of anatomy and movement to her work with horses. This academic foundation, paired with her extensive hands-on certification as an Equine Sports Massage Therapist, allows her to evaluate and support the equine athlete holistically.
@@ -88,7 +97,13 @@ export default function Bio() {
                 Susie founded <strong>Equine Bodywork and Wellness Consulting</strong> to bridge the gap between academic biomechanics and practical barn-aisle care. She recognizes that every horse—from the elite competitor to the beloved pasture companion—has unique structural needs and compensatory patterns.
               </p>
 
-              <h3 className="font-serif text-2xl text-foreground mt-12 mb-6">The Philosophy</h3>
+              <WordReveal
+                text="The Philosophy"
+                as="h3"
+                whileInView
+                className="font-serif text-2xl text-foreground mt-12 mb-6"
+                stagger={0.06}
+              />
               <p>
                 A session with Susie is never a one-size-fits-all routine. Because she understands the complex kinetic chains of the equine body, she can tailor her modalities to address specific areas of tension or restriction. 
               </p>

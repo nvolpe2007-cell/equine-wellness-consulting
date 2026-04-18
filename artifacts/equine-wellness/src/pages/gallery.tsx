@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { WordReveal, LineReveal } from "@/components/ui/AnimatedText";
 import susieWithHorse from "@assets/20260401_140719_1776528664269.jpg";
 import horseOnPad from "@assets/20260320_141245_1776528671943.jpg";
 import pemfRear from "@assets/20260407_112708_1776528693859.jpg";
@@ -19,21 +20,20 @@ export default function Gallery() {
     <div className="min-h-screen bg-background">
       <div className="bg-card py-20 border-b">
         <div className="container mx-auto px-4 text-center max-w-4xl">
-          <motion.h1 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+          <WordReveal
+            text="Gallery"
+            as="h1"
             className="text-4xl md:text-5xl font-serif text-foreground mb-6"
-          >
-            Gallery
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
+            delay={0.1}
+            stagger={0.08}
+          />
+          <LineReveal
+            text="Glimpses of sessions, serene spaces, and the incredible animals we serve."
+            as="p"
+            whileInView={false}
+            delay={0.45}
             className="text-xl text-muted-foreground font-light leading-relaxed"
-          >
-            Glimpses of sessions, serene spaces, and the incredible animals we serve.
-          </motion.p>
+          />
         </div>
       </div>
 
