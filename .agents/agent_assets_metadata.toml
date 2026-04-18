@@ -1,0 +1,50 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "z1tRhTL9yGIJJG1Dq1D9R"
+uri = "file://artifacts/equine-wellness/public/images/hero-barn.png"
+type = "image"
+title = "Warm barn interior morning light"
+
+[[generated]]
+id = "YbDSoo8sVTgJ6MzxMndwF"
+uri = "file://artifacts/equine-wellness/public/images/gallery-hands.png"
+type = "image"
+title = "Equine bodywork hand massage"
+
+[[generated]]
+id = "rMU2Qy4tRuHnD3JDc18OD"
+uri = "file://artifacts/equine-wellness/public/images/gallery-pasture.png"
+type = "image"
+title = "Horse relaxing in pasture"
+
+[[generated]]
+id = "dtHQLCa646BQ5k-PZt8Pt"
+uri = "file://artifacts/equine-wellness/public/images/gallery-redlight.png"
+type = "image"
+title = "Red light session horse"
+
+[[generated]]
+id = "UdSGtVwxIbfED49oPLUmA"
+uri = "file://artifacts/equine-wellness/public/images/bio-stable.png"
+type = "image"
+title = "Framed degree in stable"
+
+[[generated]]
+id = "Rq-LbLoDGhF5nKxLi1dPp"
+uri = "file://artifacts/equine-wellness/public/images/gallery-pemf.png"
+type = "image"
+title = "Equine PEMF session"
+
+[[generated]]
+id = "SKnpV4OozCWbeGhT6ibnT"
+uri = "file://artifacts/equine-wellness/public/images/gallery-massage.png"
+type = "image"
+title = "Equine massage shoulder"
+
+[[generated]]
+id = "HUsCpOAYsdI27U5Guxwyl"
+uri = "file://artifacts/equine-wellness/public/images/gallery-aisle.png"
+type = "image"
+title = "Quiet stable aisle"
