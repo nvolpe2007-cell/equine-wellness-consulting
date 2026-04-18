@@ -4,7 +4,7 @@ import { ArrowRight, CheckCircle2 } from "lucide-react";
 import barnHero from "@assets/stock_images/barn-hero.jpg";
 import barnExterior from "@assets/stock_images/barn-exterior.jpg";
 import horsePortrait from "@assets/stock_images/horse-portrait.jpg";
-import massageHands from "@assets/stock_images/massage-hands.jpg";
+import massageHands from "@assets/0629_LOC_Horse02_CBH_t1170_1776529181857.jpg";
 import pemfWhiteHorse from "@assets/20260407_121449_1776528702902.jpg";
 import redLightLeg from "@assets/20260319_191731_1776528710545.jpg";
 

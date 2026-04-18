@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Info } from "lucide-react";
-import massageHands from "@assets/stock_images/massage-hands.jpg";
+import massageHands from "@assets/0629_LOC_Horse02_CBH_t1170_1776529181857.jpg";
 import horseStall from "@assets/stock_images/horse-stall.jpg";
 import pemfWhiteHorse from "@assets/20260407_121449_1776528702902.jpg";
 import pemfRear from "@assets/20260407_112708_1776528693859.jpg";
