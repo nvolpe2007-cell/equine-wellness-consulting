@@ -1,6 +1,7 @@
 import { Link, useLocation } from "wouter";
-import { Menu, X } from "lucide-react";
-import { useState } from "react";
+import { Menu, X, Phone } from "lucide-react";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 const links = [
@@ -14,37 +15,58 @@ const links = [
 export function Navbar() {
   const [location] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4 h-20 flex items-center justify-between">
-        <Link href="/" className="flex flex-col items-start gap-1" data-testid="link-home-logo">
-          <span className="font-serif text-xl font-medium text-foreground">Equine Bodywork and Wellness Consulting</span>
-          <span className="text-xs font-sans text-muted-foreground uppercase tracking-widest">Susie H. Lytal, MS</span>
+    <motion.header
+      initial={{ y: -24, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className={cn(
+        "sticky top-0 z-50 w-full border-b backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300",
+        scrolled ? "bg-background/90 border-border shadow-sm" : "bg-background/60 border-transparent"
+      )}
+    >
+      <div className={cn(
+        "container mx-auto px-4 flex items-center justify-between transition-all duration-300",
+        scrolled ? "h-16" : "h-20"
+      )}>
+        <Link href="/" className="flex flex-col items-start gap-0.5 group" data-testid="link-home-logo">
+          <span className="font-serif text-xl font-medium text-foreground transition-colors group-hover:text-primary">Equine Bodywork and Wellness Consulting</span>
+          <span className="text-[0.65rem] font-sans text-muted-foreground uppercase tracking-[0.2em]">Susie H. Lytal, MS</span>
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-7">
           {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               className={cn(
-                "text-sm font-medium transition-colors hover:text-primary",
+                "nav-underline text-sm font-medium transition-colors hover:text-primary",
                 location === link.href ? "text-primary" : "text-muted-foreground"
               )}
+              data-active={location === link.href}
               data-testid={`link-nav-${link.label.toLowerCase().replace(/\s+/g, '-')}`}
             >
               {link.label}
             </Link>
           ))}
-          <Link
-            href="/#contact"
-            className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+          <a
+            href="tel:+13104884389"
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             data-testid="link-nav-contact"
           >
-            Contact
-          </Link>
+            <Phone className="h-3.5 w-3.5" />
+            (310) 488-4389
+          </a>
         </nav>
 
         {/* Mobile Nav Toggle */}
@@ -52,6 +74,7 @@ export function Navbar() {
           className="md:hidden p-2 text-foreground"
           onClick={() => setIsOpen(!isOpen)}
           data-testid="button-mobile-menu"
+          aria-label="Toggle menu"
         >
           {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
@@ -59,7 +82,12 @@ export function Navbar() {
 
       {/* Mobile Nav */}
       {isOpen && (
-        <div className="md:hidden border-t bg-background px-4 py-6 flex flex-col gap-4 shadow-lg absolute w-full">
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2 }}
+          className="md:hidden border-t bg-background px-4 py-6 flex flex-col gap-4 shadow-lg absolute w-full"
+        >
           {links.map((link) => (
             <Link
               key={link.href}
@@ -75,17 +103,18 @@ export function Navbar() {
             </Link>
           ))}
           <div className="pt-4 mt-2 border-t">
-            <Link
-              href="/#contact"
-              className="inline-flex w-full h-12 items-center justify-center rounded-md bg-primary px-6 py-2 text-base font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            <a
+              href="tel:+13104884389"
+              className="inline-flex w-full h-12 items-center justify-center gap-2 rounded-full bg-primary px-6 py-2 text-base font-medium text-primary-foreground transition-colors hover:bg-primary/90"
               onClick={() => setIsOpen(false)}
               data-testid="link-mobile-nav-contact"
             >
-              Contact
-            </Link>
+              <Phone className="h-4 w-4" />
+              Call (310) 488-4389
+            </a>
           </div>
-        </div>
+        </motion.div>
       )}
-    </header>
+    </motion.header>
   );
 }

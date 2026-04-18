@@ -1,6 +1,7 @@
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { Link } from "wouter";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowRight, CheckCircle2, Sparkles, Phone } from "lucide-react";
+import { useRef } from "react";
 import barnHero from "@assets/stock_images/barn-hero.jpg";
 import barnExterior from "@assets/stock_images/barn-exterior.jpg";
 import horsePortrait from "@assets/stock_images/horse-portrait.jpg";
@@ -8,50 +9,115 @@ import massageHands from "@assets/0629_LOC_Horse02_CBH_t1170_1776529181857.jpg";
 import pemfWhiteHorse from "@assets/20260407_121449_1776528702902.jpg";
 import redLightLeg from "@assets/20260319_191731_1776528710545.jpg";
 
+const fadeUp = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0 },
+};
+
+const stagger = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.08 } },
+};
+
 export default function Home() {
+  const heroRef = useRef<HTMLElement | null>(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+  const heroY = useTransform(scrollYProgress, [0, 1], [0, 120]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 1], [1, 0.4]);
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Hero Section */}
-      <section className="relative h-[90vh] min-h-[600px] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
+      <section ref={heroRef} className="relative h-[92vh] min-h-[640px] flex items-center justify-center overflow-hidden">
+        <motion.div style={{ y: heroY, opacity: heroOpacity }} className="absolute inset-0 z-0">
           <img 
             src={barnHero} 
             alt="Warm barn interior morning light" 
-            className="w-full h-full object-cover object-center"
+            className="w-full h-full object-cover object-center animate-ken-burns"
           />
-          <div className="absolute inset-0 bg-black/40 mix-blend-multiply" />
-        </div>
-        
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/70" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]" />
+        </motion.div>
+
         <div className="container relative z-10 mx-auto px-4 text-center">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            variants={stagger}
+            initial="hidden"
+            animate="visible"
             className="max-w-3xl mx-auto"
           >
-            <h2 className="text-primary-foreground/90 font-sans tracking-widest uppercase text-sm mb-6">Susie H. Lytal, MS • Equine Biomechanist</h2>
-            <h1 className="text-5xl md:text-7xl font-serif text-white mb-6 leading-tight">
-              Elevating equine performance through science and care.
-            </h1>
-            <p className="text-lg md:text-xl text-white/90 mb-10 font-light max-w-2xl mx-auto leading-relaxed">
+            <motion.div variants={fadeUp} transition={{ duration: 0.6 }} className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 backdrop-blur-sm mb-8">
+              <Sparkles className="h-3.5 w-3.5 text-accent" />
+              <span className="text-white/90 font-sans tracking-widest uppercase text-xs">Susie H. Lytal, MS · Equine Biomechanist</span>
+            </motion.div>
+            <motion.h1 variants={fadeUp} transition={{ duration: 0.7 }} className="text-5xl md:text-7xl font-serif text-white mb-6 leading-[1.05]">
+              Elevating equine performance<br />
+              <span className="italic text-accent/90">through science and care.</span>
+            </motion.h1>
+            <motion.p variants={fadeUp} transition={{ duration: 0.6 }} className="text-lg md:text-xl text-white/85 mb-10 font-light max-w-2xl mx-auto leading-relaxed">
               Professional equine bodywork and wellness consulting, grounded in graduate-level biomechanics expertise.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            </motion.p>
+            <motion.div variants={fadeUp} transition={{ duration: 0.6 }} className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 href="/modalities"
-                className="inline-flex h-12 items-center justify-center rounded-md bg-primary px-8 text-base font-medium text-primary-foreground transition-colors hover:bg-primary/90 w-full sm:w-auto"
+                className="group inline-flex h-12 items-center justify-center rounded-full bg-primary px-8 text-base font-medium text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-xl hover:-translate-y-0.5 w-full sm:w-auto"
                 data-testid="link-hero-modalities"
               >
                 Explore Modalities
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
               <Link
                 href="/bio"
-                className="inline-flex h-12 items-center justify-center rounded-md bg-white/10 px-8 text-base font-medium text-white backdrop-blur-sm transition-colors hover:bg-white/20 w-full sm:w-auto border border-white/20"
+                className="inline-flex h-12 items-center justify-center rounded-full bg-white/10 px-8 text-base font-medium text-white backdrop-blur-md transition-all hover:bg-white/20 hover:-translate-y-0.5 w-full sm:w-auto border border-white/20"
                 data-testid="link-hero-bio"
               >
                 Meet Susie
               </Link>
-            </div>
+            </motion.div>
+          </motion.div>
+        </div>
+
+        {/* Scroll cue */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2, duration: 0.8 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
+        >
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            className="h-10 w-6 rounded-full border-2 border-white/40 flex items-start justify-center pt-2"
+          >
+            <div className="h-1.5 w-1 rounded-full bg-white/70" />
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* Stats Strip */}
+      <section className="bg-primary text-primary-foreground py-10 border-y border-primary/20">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            variants={stagger}
+            className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center"
+          >
+            {[
+              { num: "MS", label: "Master of Science, Biomechanics" },
+              { num: "6", label: "Wellness Modalities Offered" },
+              { num: "Certified", label: "Equine Sports Massage Therapist" },
+              { num: "100%", label: "Customized to Each Horse" },
+            ].map((stat, i) => (
+              <motion.div key={i} variants={fadeUp} transition={{ duration: 0.5 }}>
+                <div className="text-3xl md:text-4xl font-serif text-white mb-1">{stat.num}</div>
+                <div className="text-xs md:text-sm text-white/75 uppercase tracking-wider leading-tight">{stat.label}</div>
+              </motion.div>
+            ))}
           </motion.div>
         </div>
       </section>
@@ -59,26 +125,46 @@ export default function Home() {
       {/* Intro / Philosophy */}
       <section className="py-24 bg-card">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-serif text-foreground mb-6">Grounded in Knowledge. Delivered with Compassion.</h2>
-            <p className="text-lg text-muted-foreground leading-relaxed mb-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.7 }}
+            className="max-w-3xl mx-auto text-center"
+          >
+            <span className="inline-block text-xs font-sans tracking-[0.3em] text-primary uppercase mb-4">Philosophy</span>
+            <h2 className="text-3xl md:text-5xl font-serif text-foreground mb-6 leading-tight">Grounded in knowledge.<br /><span className="italic">Delivered with compassion.</span></h2>
+            <p className="text-lg text-muted-foreground leading-relaxed mb-10">
               Every horse is a complex athlete, whether they are performing at the highest levels of competition or carrying you safely down the trail. My approach to equine wellness combines a deep, scientific understanding of biomechanics with highly attuned, hands-on application. We don't just look at the symptoms; we support the whole horse.
             </p>
-            <img src={barnExterior} alt="Stable" className="w-full h-auto max-h-[400px] object-cover rounded-xl shadow-lg" />
-          </div>
+            <motion.div
+              whileHover={{ scale: 1.01 }}
+              transition={{ duration: 0.4 }}
+              className="overflow-hidden rounded-2xl shadow-xl"
+            >
+              <img src={barnExterior} alt="Stable" className="w-full h-auto max-h-[420px] object-cover" />
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
       {/* Services Preview */}
       <section className="py-24 bg-background">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
-            <div className="max-w-2xl">
-              <h2 className="text-3xl md:text-4xl font-serif text-foreground mb-4">Wellness Sessions</h2>
-              <p className="text-muted-foreground">
-                A comprehensive approach to equine comfort. Each session is tailored to your horse's unique biomechanical needs, utilizing a range of modalities to support optimal movement and well-being.
+          <div className="flex flex-col md:flex-row justify-between items-end mb-14 gap-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="max-w-2xl"
+            >
+              <span className="inline-block text-xs font-sans tracking-[0.3em] text-primary uppercase mb-3">What I Offer</span>
+              <h2 className="text-3xl md:text-5xl font-serif text-foreground mb-4 leading-tight">Wellness sessions, tailored.</h2>
+              <p className="text-muted-foreground text-lg">
+                A comprehensive approach to equine comfort. Each session is tailored to your horse's unique biomechanical needs, drawing from a range of modalities to support optimal movement and well-being.
               </p>
-            </div>
+            </motion.div>
             <Link
               href="/modalities"
               className="group inline-flex items-center text-primary font-medium hover:text-primary/80 transition-colors"
@@ -89,58 +175,82 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            variants={stagger}
+            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+          >
             {[
               {
                 title: "Equine Sports Massage",
                 desc: "Targeted hands-on techniques that may support muscular relaxation, flexibility, and overall comfort.",
-                img: massageHands
+                img: massageHands,
+                tag: "Certified Application"
               },
               {
                 title: "PEMF Sessions",
                 desc: "Pulsed Electromagnetic Field application using Magnawave to support cellular function and recovery.",
-                img: pemfWhiteHorse
+                img: pemfWhiteHorse,
+                tag: "Featuring Magnawave"
               },
               {
                 title: "Red Light Application",
                 desc: "Utilizing RevitaVet equipment to deliver targeted light that may contribute to comfort and tissue health.",
-                img: redLightLeg
+                img: redLightLeg,
+                tag: "Featuring RevitaVet"
               }
-            ].map((service, i) => (
+            ].map((service) => (
               <motion.div 
                 key={service.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.5 }}
-                className="bg-card rounded-xl overflow-hidden border shadow-sm group"
+                variants={fadeUp}
+                transition={{ duration: 0.6 }}
+                whileHover={{ y: -6 }}
+                className="bg-card rounded-2xl overflow-hidden border shadow-sm hover:shadow-xl transition-shadow duration-500 group flex flex-col"
               >
-                <div className="h-64 overflow-hidden">
+                <div className="h-64 overflow-hidden relative">
                   <img 
                     src={service.img} 
                     alt={service.title} 
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    className="w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 </div>
-                <div className="p-8">
+                <div className="p-8 flex-1 flex flex-col">
+                  <span className="text-[0.65rem] font-sans tracking-[0.2em] text-accent uppercase mb-2">{service.tag}</span>
                   <h3 className="text-xl font-serif text-foreground mb-3">{service.title}</h3>
-                  <p className="text-muted-foreground mb-6 leading-relaxed">
+                  <p className="text-muted-foreground leading-relaxed flex-1">
                     {service.desc}
                   </p>
+                  <Link
+                    href="/modalities"
+                    className="mt-6 inline-flex items-center text-sm font-medium text-primary group/link"
+                  >
+                    Learn more
+                    <ArrowRight className="ml-1.5 h-3.5 w-3.5 transition-transform group-hover/link:translate-x-1" />
+                  </Link>
                 </div>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* The Difference Section */}
-      <section className="py-24 bg-primary text-primary-foreground">
-        <div className="container mx-auto px-4">
+      <section className="py-24 bg-primary text-primary-foreground relative overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)", backgroundSize: "24px 24px" }} />
+        <div className="container mx-auto px-4 relative">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-serif mb-6 text-white">The Biomechanical Advantage</h2>
-              <p className="text-primary-foreground/90 text-lg mb-8 leading-relaxed">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.7 }}
+            >
+              <span className="inline-block text-xs font-sans tracking-[0.3em] text-accent uppercase mb-3">The Difference</span>
+              <h2 className="text-3xl md:text-5xl font-serif mb-6 text-white leading-tight">The Biomechanical Advantage</h2>
+              <p className="text-primary-foreground/85 text-lg mb-8 leading-relaxed">
                 Working with an Equine Biomechanist means looking beyond the surface. It involves analyzing how the horse moves, identifying compensatory patterns, and applying specific modalities to support more efficient, comfortable movement.
               </p>
               
@@ -151,19 +261,32 @@ export default function Home() {
                   "Comprehensive multi-modality approach",
                   "Collaborative relationship with veterinary professionals"
                 ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-3">
+                  <motion.li
+                    key={i}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1, duration: 0.5 }}
+                    className="flex items-start gap-3"
+                  >
                     <CheckCircle2 className="h-6 w-6 text-accent shrink-0" />
                     <span className="text-white/90">{item}</span>
-                  </li>
+                  </motion.li>
                 ))}
               </ul>
-            </div>
-            <div className="relative">
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.7 }}
+              className="relative"
+            >
               <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl relative z-10">
                 <img src={horsePortrait} alt="A horse close up" className="w-full h-full object-cover" />
               </div>
               <div className="absolute -bottom-6 -left-6 w-full h-full border-2 border-accent rounded-2xl z-0" />
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -179,21 +302,29 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section id="contact" className="py-24 bg-card border-t">
-        <div className="container mx-auto px-4 text-center max-w-3xl">
-          <h2 className="text-4xl font-serif text-foreground mb-6">Ready to support your horse's wellness?</h2>
-          <p className="text-lg text-muted-foreground mb-10">
-            Reach out to discuss your horse's needs and schedule a session. We'll develop a personalized plan to support their comfort and performance.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <a 
-              href="tel:+13104884389" 
-              className="inline-flex h-12 items-center justify-center rounded-md bg-primary px-8 text-base font-medium text-primary-foreground transition-colors hover:bg-primary/90 shadow-sm"
-              data-testid="link-cta-phone"
-            >
-              Call (310) 488-4389
-            </a>
-          </div>
+      <section id="contact" className="py-24 bg-card border-t relative overflow-hidden">
+        <div className="container mx-auto px-4 text-center max-w-3xl relative">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.7 }}
+          >
+            <h2 className="text-4xl md:text-5xl font-serif text-foreground mb-6">Ready to support your horse's wellness?</h2>
+            <p className="text-lg text-muted-foreground mb-10">
+              Reach out to discuss your horse's needs and schedule a session. We'll develop a personalized plan to support their comfort and performance.
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <a 
+                href="tel:+13104884389" 
+                className="group inline-flex h-14 items-center justify-center gap-2 rounded-full bg-primary px-10 text-base font-medium text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-xl hover:-translate-y-0.5 shadow-md"
+                data-testid="link-cta-phone"
+              >
+                <Phone className="h-4 w-4" />
+                Call (310) 488-4389
+              </a>
+            </div>
+          </motion.div>
         </div>
       </section>
     </div>

@@ -1,5 +1,7 @@
-import { Switch, Route, Router as WouterRouter } from "wouter";
+import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
@@ -15,19 +17,51 @@ import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
 
+const titles: Record<string, string> = {
+  "/": "Equine Bodywork and Wellness Consulting | Susie H. Lytal, MS",
+  "/bio": "About Susie H. Lytal, MS — Equine Biomechanist",
+  "/modalities": "Wellness Modalities for Horses — Sports Massage, PEMF, Red Light & More",
+  "/gallery": "Gallery — Sessions in the Barn Aisle",
+  "/partners": "Trusted Partners — Magnawave, RevitaVet, TrueStim, BeneFab",
+};
+
+function PageWrapper({ children }: { children: React.ReactNode }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -8 }}
+      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 function Router() {
+  const [location] = useLocation();
+
+  useEffect(() => {
+    document.title = titles[location] ?? titles["/"];
+    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+  }, [location]);
+
   return (
     <div className="flex flex-col min-h-[100dvh]">
       <Navbar />
       <main className="flex-1">
-        <Switch>
-          <Route path="/" component={Home} />
-          <Route path="/bio" component={Bio} />
-          <Route path="/modalities" component={Modalities} />
-          <Route path="/partners" component={Partners} />
-          <Route path="/gallery" component={Gallery} />
-          <Route component={NotFound} />
-        </Switch>
+        <AnimatePresence mode="wait" initial={false}>
+          <PageWrapper key={location}>
+            <Switch location={location}>
+              <Route path="/" component={Home} />
+              <Route path="/bio" component={Bio} />
+              <Route path="/modalities" component={Modalities} />
+              <Route path="/partners" component={Partners} />
+              <Route path="/gallery" component={Gallery} />
+              <Route component={NotFound} />
+            </Switch>
+          </PageWrapper>
+        </AnimatePresence>
       </main>
       <Footer />
     </div>

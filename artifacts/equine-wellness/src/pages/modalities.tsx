@@ -1,11 +1,73 @@
 import { motion } from "framer-motion";
-import { Info } from "lucide-react";
+import { Info, Plus, Minus } from "lucide-react";
+import { useState } from "react";
 import massageHands from "@assets/0629_LOC_Horse02_CBH_t1170_1776529181857.jpg";
 import horseStall from "@assets/stock_images/horse-stall.jpg";
 import pemfWhiteHorse from "@assets/20260407_121449_1776528702902.jpg";
 import pemfRear from "@assets/20260407_112708_1776528693859.jpg";
 import redLightLeg from "@assets/20260319_191731_1776528710545.jpg";
 import susieWithHorse from "@assets/20260401_140719_1776528664269.jpg";
+
+const faqs = [
+  {
+    q: "What is equine bodywork?",
+    a: "Equine bodywork is a non-invasive, hands-on approach designed to support a horse's muscular comfort, flexibility, and overall well-being. It draws on a combination of techniques — including sports massage and complementary modalities such as PEMF, red light, cold laser, TENS, and TECAR — and is offered as wellness support, not medical care."
+  },
+  {
+    q: "Is this a substitute for veterinary care?",
+    a: "No. Susie H. Lytal is an Equine Biomechanist and Certified Equine Sports Massage Therapist — not a veterinarian. Wellness sessions do not diagnose, treat, cure, or prescribe for any medical condition. We work alongside your primary veterinarian as part of a team approach to your horse's health."
+  },
+  {
+    q: "How long does a session take?",
+    a: "A typical session lasts approximately 60 to 90 minutes, depending on the horse and the modalities included. Susie tailors each session to the individual horse's needs, often combining hands-on massage with one or more complementary modalities."
+  },
+  {
+    q: "Which modalities are offered?",
+    a: "Six modalities are offered: Equine Sports Massage, PEMF (Magnawave), Red Light (RevitaVet), Cold Laser, TENS (TrueStim), and TECAR. Each is integrated thoughtfully based on the horse's response and biomechanical needs."
+  },
+  {
+    q: "How often should my horse have a session?",
+    a: "Frequency depends on the horse's workload, age, and goals. Performance horses in heavy training often benefit from regular sessions, while companion horses may do well with periodic maintenance sessions. Susie can recommend a cadence after the first session."
+  },
+  {
+    q: "How do I book a session?",
+    a: "Call or text Susie directly at (310) 488-4389 to discuss your horse's needs and schedule a visit."
+  }
+];
+
+function FaqItem({ q, a, index }: { q: string; a: string; index: number }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: index * 0.05, duration: 0.5 }}
+      className="border-b border-border last:border-b-0"
+    >
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between gap-6 py-6 text-left group"
+        aria-expanded={open}
+      >
+        <h3 className="text-lg md:text-xl font-serif text-foreground group-hover:text-primary transition-colors">
+          {q}
+        </h3>
+        <span className="shrink-0 h-9 w-9 rounded-full border border-border flex items-center justify-center text-primary transition-all group-hover:border-primary group-hover:bg-primary/5">
+          {open ? <Minus className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+        </span>
+      </button>
+      <motion.div
+        initial={false}
+        animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        className="overflow-hidden"
+      >
+        <p className="text-muted-foreground leading-relaxed pb-6 pr-12 max-w-3xl">{a}</p>
+      </motion.div>
+    </motion.div>
+  );
+}
 
 export default function Modalities() {
   const modalities = [
@@ -87,7 +149,7 @@ export default function Modalities() {
       </div>
 
       <div className="container mx-auto px-4 py-20">
-        <div className="space-y-24">
+        <div className="space-y-28">
           {modalities.map((modality, index) => (
             <motion.div 
               key={modality.id}
@@ -98,13 +160,17 @@ export default function Modalities() {
               className={`flex flex-col ${index % 2 === 1 ? 'lg:flex-row-reverse' : 'lg:flex-row'} gap-12 lg:gap-20 items-center`}
             >
               <div className="w-full lg:w-1/2">
-                <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-lg border">
+                <motion.div
+                  whileHover={{ scale: 1.015 }}
+                  transition={{ duration: 0.5 }}
+                  className="aspect-[4/3] rounded-2xl overflow-hidden shadow-lg border group"
+                >
                   <img 
                     src={modality.image} 
                     alt={modality.title} 
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-105"
                   />
-                </div>
+                </motion.div>
               </div>
               <div className="w-full lg:w-1/2 space-y-6">
                 <div>
@@ -115,7 +181,13 @@ export default function Modalities() {
                     {modality.title}
                   </h2>
                 </div>
-                <div className="w-12 h-1 bg-accent rounded-full" />
+                <motion.div
+                  initial={{ scaleX: 0 }}
+                  whileInView={{ scaleX: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                  className="w-12 h-1 bg-accent rounded-full origin-left"
+                />
                 <p className="text-lg text-muted-foreground leading-relaxed">
                   {modality.description}
                 </p>
@@ -124,6 +196,27 @@ export default function Modalities() {
           ))}
         </div>
       </div>
+
+      {/* FAQ */}
+      <section className="bg-card border-t py-24">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-12"
+          >
+            <span className="inline-block text-xs font-sans tracking-[0.3em] text-primary uppercase mb-3">FAQ</span>
+            <h2 className="text-3xl md:text-4xl font-serif text-foreground">Common questions about equine bodywork</h2>
+          </motion.div>
+          <div>
+            {faqs.map((f, i) => (
+              <FaqItem key={f.q} q={f.q} a={f.a} index={i} />
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
