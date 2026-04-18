@@ -35,15 +35,9 @@ export function Footer() {
         <div>
           <h3 className="font-serif text-lg mb-4 text-primary-foreground">Contact</h3>
           <ul className="space-y-3 text-sm text-muted">
-            <li>Serving [Region/Area - to be updated]</li>
             <li>
-              <a href="mailto:contact@example.com" className="hover:text-white transition-colors" data-testid="link-footer-email">
-                contact@example.com
-              </a>
-            </li>
-            <li>
-              <a href="tel:+1234567890" className="hover:text-white transition-colors" data-testid="link-footer-phone">
-                (123) 456-7890
+              <a href="tel:+13104884389" className="hover:text-white transition-colors" data-testid="link-footer-phone">
+                (310) 488-4389
               </a>
             </li>
           </ul>

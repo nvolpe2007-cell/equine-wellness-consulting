@@ -1,6 +1,12 @@
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
+import barnHero from "@assets/stock_images/barn-hero.jpg";
+import barnExterior from "@assets/stock_images/barn-exterior.jpg";
+import horsePortrait from "@assets/stock_images/horse-portrait.jpg";
+import massageHands from "@assets/stock_images/massage-hands.jpg";
+import pemfWhiteHorse from "@assets/20260407_121449_1776528702902.jpg";
+import redLightLeg from "@assets/20260319_191731_1776528710545.jpg";
 
 export default function Home() {
   return (
@@ -9,7 +15,7 @@ export default function Home() {
       <section className="relative h-[90vh] min-h-[600px] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
-            src="/images/hero-barn.png" 
+            src={barnHero} 
             alt="Warm barn interior morning light" 
             className="w-full h-full object-cover object-center"
           />
@@ -58,7 +64,7 @@ export default function Home() {
             <p className="text-lg text-muted-foreground leading-relaxed mb-8">
               Every horse is a complex athlete, whether they are performing at the highest levels of competition or carrying you safely down the trail. My approach to equine wellness combines a deep, scientific understanding of biomechanics with highly attuned, hands-on application. We don't just look at the symptoms; we support the whole horse.
             </p>
-            <img src="/images/bio-stable.png" alt="Stable" className="w-full h-auto max-h-[400px] object-cover rounded-xl shadow-lg" />
+            <img src={barnExterior} alt="Stable" className="w-full h-auto max-h-[400px] object-cover rounded-xl shadow-lg" />
           </div>
         </div>
       </section>
@@ -88,17 +94,17 @@ export default function Home() {
               {
                 title: "Equine Sports Massage",
                 desc: "Targeted hands-on techniques that may support muscular relaxation, flexibility, and overall comfort.",
-                img: "/images/gallery-hands.png"
+                img: massageHands
               },
               {
                 title: "PEMF Sessions",
                 desc: "Pulsed Electromagnetic Field application using Magnawave to support cellular function and recovery.",
-                img: "/images/gallery-pemf.png"
+                img: pemfWhiteHorse
               },
               {
                 title: "Red Light Application",
                 desc: "Utilizing RevitaVet equipment to deliver targeted light that may contribute to comfort and tissue health.",
-                img: "/images/gallery-redlight.png"
+                img: redLightLeg
               }
             ].map((service, i) => (
               <motion.div 
@@ -154,7 +160,7 @@ export default function Home() {
             </div>
             <div className="relative">
               <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl relative z-10">
-                <img src="/images/gallery-massage.png" alt="Equine massage" className="w-full h-full object-cover" />
+                <img src={horsePortrait} alt="A horse close up" className="w-full h-full object-cover" />
               </div>
               <div className="absolute -bottom-6 -left-6 w-full h-full border-2 border-accent rounded-2xl z-0" />
             </div>
@@ -181,18 +187,11 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <a 
-              href="mailto:contact@example.com" 
+              href="tel:+13104884389" 
               className="inline-flex h-12 items-center justify-center rounded-md bg-primary px-8 text-base font-medium text-primary-foreground transition-colors hover:bg-primary/90 shadow-sm"
-              data-testid="link-cta-email"
-            >
-              Email Susie
-            </a>
-            <a 
-              href="tel:+1234567890" 
-              className="inline-flex h-12 items-center justify-center rounded-md border border-input bg-background px-8 text-base font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground shadow-sm"
               data-testid="link-cta-phone"
             >
-              Call (123) 456-7890
+              Call (310) 488-4389
             </a>
           </div>
         </div>

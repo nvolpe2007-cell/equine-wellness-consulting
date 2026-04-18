@@ -1,5 +1,4 @@
 uploads = []
-outputs = []
 
 [[generated]]
 id = "z1tRhTL9yGIJJG1Dq1D9R"
@@ -48,3 +47,39 @@ id = "HUsCpOAYsdI27U5Guxwyl"
 uri = "file://artifacts/equine-wellness/public/images/gallery-aisle.png"
 type = "image"
 title = "Quiet stable aisle"
+
+[[outputs]]
+id = "d6cQ7vaXnt55vYlG-2Ulh"
+uri = "file://attached_assets/stock_images/massage-hands.jpg"
+type = "image"
+title = "person hands massage horse muscle"
+
+[[outputs]]
+id = "yLp2fIX0nkZaQanKXmFWr"
+uri = "file://attached_assets/stock_images/barn-hero.jpg"
+type = "image"
+title = "horse barn interior morning light stable aisle"
+
+[[outputs]]
+id = "QDH-4rW-DKpqZskgbVPM4"
+uri = "file://attached_assets/stock_images/horse-portrait.jpg"
+type = "image"
+title = "brown horse portrait close up gentle eyes"
+
+[[outputs]]
+id = "scdK_82oEaHJ8sI-iqK4P"
+uri = "file://attached_assets/stock_images/barn-exterior.jpg"
+type = "image"
+title = "wooden horse stable barn exterior countryside"
+
+[[outputs]]
+id = "sKecnB6h3XbXRP5q6gV8y"
+uri = "file://attached_assets/stock_images/horse-pasture.jpg"
+type = "image"
+title = "horse standing in green pasture peaceful"
+
+[[outputs]]
+id = "e4b8ii5N4rvYDePiOqnjz"
+uri = "file://attached_assets/stock_images/horse-stall.jpg"
+type = "image"
+title = "horse in stall calm relaxed wellness"

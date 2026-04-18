@@ -1,5 +1,11 @@
 import { motion } from "framer-motion";
 import { Info } from "lucide-react";
+import massageHands from "@assets/stock_images/massage-hands.jpg";
+import horseStall from "@assets/stock_images/horse-stall.jpg";
+import pemfWhiteHorse from "@assets/20260407_121449_1776528702902.jpg";
+import pemfRear from "@assets/20260407_112708_1776528693859.jpg";
+import redLightLeg from "@assets/20260319_191731_1776528710545.jpg";
+import susieWithHorse from "@assets/20260401_140719_1776528664269.jpg";
 
 export default function Modalities() {
   const modalities = [
@@ -8,42 +14,42 @@ export default function Modalities() {
       title: "Equine Sports Massage",
       subtitle: "Certified Application",
       description: "A focused, hands-on session designed to support muscular relaxation, enhance flexibility, and promote overall comfort. As a Certified Equine Sports Massage Therapist, Susie applies specific techniques to address areas of tension, which may help the horse move more freely and comfortably.",
-      image: "/images/gallery-massage.png",
+      image: massageHands,
     },
     {
       id: "pemf",
       title: "PEMF (Pulsed Electromagnetic Field)",
       subtitle: "Featuring Magnawave Equipment",
       description: "PEMF uses electromagnetic fields to support cellular health. During a session, a large loop is gently placed over the horse's body. This non-invasive modality may contribute to natural recovery processes, support relaxation, and promote a general sense of well-being.",
-      image: "/images/gallery-pemf.png",
+      image: pemfWhiteHorse,
     },
     {
       id: "red-light",
       title: "Red Light Application",
       subtitle: "Featuring RevitaVet Equipment",
       description: "Targeted red and infrared light is applied to specific areas of the horse's body. This modality is commonly used to support soft tissue health and may assist in maintaining comfort and flexibility. It is a quiet, deeply relaxing experience for the horse.",
-      image: "/images/gallery-redlight.png",
+      image: redLightLeg,
     },
     {
       id: "cold-laser",
       title: "Cold Laser",
       subtitle: "Low-Level Light Application",
       description: "Cold laser utilizes specific wavelengths of light to interact with tissue. Used selectively during sessions, it may support the body's natural response mechanisms and contribute to overall muscular comfort without generating heat.",
-      image: "/images/gallery-pasture.png", // Using a serene image here
+      image: horseStall,
     },
     {
       id: "tens",
       title: "TENS (Transcutaneous Electrical Nerve Stimulation)",
       subtitle: "Featuring TrueStim Equipment",
       description: "TENS involves the delivery of mild electrical impulses to support comfort. When integrated into a session, it can be used to help the horse relax tense muscles and may support an improved range of motion.",
-      image: "/images/gallery-hands.png",
+      image: susieWithHorse,
     },
     {
       id: "tecar",
       title: "TECAR",
       subtitle: "Transfer of Energy Capacitive and Resistive",
       description: "TECAR utilizes radiofrequency energy to support tissue health from within. It is applied smoothly over the horse's body and may contribute to enhanced circulation, localized comfort, and muscular relaxation.",
-      image: "/images/gallery-aisle.png",
+      image: pemfRear,
     }
   ];
 

@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import horsePortrait from "@assets/stock_images/horse-portrait.jpg";
 
 export default function Bio() {
   return (
@@ -35,8 +36,8 @@ export default function Bio() {
               className="rounded-2xl overflow-hidden shadow-xl aspect-[3/4]"
             >
               <img 
-                src="/images/bio-stable.png" 
-                alt="Susie's Credentials in stable" 
+                src={horsePortrait} 
+                alt="A horse in a quiet moment" 
                 className="w-full h-full object-cover"
               />
             </motion.div>
