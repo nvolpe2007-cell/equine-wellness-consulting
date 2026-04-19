@@ -14,6 +14,7 @@ import Modalities from "@/pages/modalities";
 import Partners from "@/pages/partners";
 import Gallery from "@/pages/gallery";
 import News from "@/pages/news";
+import AdminNewsletter from "@/pages/admin-newsletter";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
@@ -50,6 +51,10 @@ const pageMeta: Record<string, PageMeta> = {
     title: "The Worthy Horse News — Newsletter for Thoughtful Horse Owners",
     description:
       "Subscribe to The Worthy Horse News: a monthly dispatch covering legislation, state law, petitions, and seasonal care for thoughtful horse owners.",
+  },
+  "/admin/newsletter": {
+    title: "Newsletter Admin",
+    description: "Compose and send The Worthy Horse News.",
   },
 };
 
@@ -99,6 +104,7 @@ function Router() {
               <Route path="/partners" component={Partners} />
               <Route path="/gallery" component={Gallery} />
               <Route path="/news" component={News} />
+              <Route path="/admin/newsletter" component={AdminNewsletter} />
               <Route component={NotFound} />
             </Switch>
           </PageWrapper>
