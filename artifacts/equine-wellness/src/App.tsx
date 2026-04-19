@@ -13,6 +13,7 @@ import Bio from "@/pages/bio";
 import Modalities from "@/pages/modalities";
 import Partners from "@/pages/partners";
 import Gallery from "@/pages/gallery";
+import News from "@/pages/news";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ const titles: Record<string, string> = {
   "/modalities": "Wellness Modalities for Horses — Sports Massage, PEMF, Red Light & More",
   "/gallery": "Gallery — Sessions in the Barn Aisle",
   "/partners": "Trusted Partners — Magnawave, RevitaVet, TrueStim, BeneFab",
+  "/news": "The Worthy Horse News — Newsletter for Thoughtful Horse Owners",
 };
 
 function PageWrapper({ children }: { children: React.ReactNode }) {
@@ -58,6 +60,7 @@ function Router() {
               <Route path="/modalities" component={Modalities} />
               <Route path="/partners" component={Partners} />
               <Route path="/gallery" component={Gallery} />
+              <Route path="/news" component={News} />
               <Route component={NotFound} />
             </Switch>
           </PageWrapper>

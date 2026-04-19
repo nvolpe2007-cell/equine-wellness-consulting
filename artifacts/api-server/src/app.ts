@@ -6,6 +6,10 @@ import { logger } from "./lib/logger";
 
 const app: Express = express();
 
+// Trust the Replit reverse proxy so `req.ip` reflects the real client IP
+// (used by per-IP rate limiting in routes such as /api/newsletter/subscribe).
+app.set("trust proxy", true);
+
 app.use(
   pinoHttp({
     logger,
