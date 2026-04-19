@@ -1,19 +1,8 @@
 import { Link } from "wouter";
-import { NewsletterSignup } from "@/components/NewsletterSignup";
 
 export function Footer() {
   return (
     <footer className="bg-foreground text-background py-16 mt-20">
-      <div className="container mx-auto px-4 mb-12 pb-12 border-b border-white/10">
-        <div className="max-w-2xl">
-          <NewsletterSignup
-            variant="footer"
-            source="footer"
-            heading="The Worthy Horse News"
-            subheading="A monthly dispatch on equine wellness and biomechanics. One thoughtful note a month."
-          />
-        </div>
-      </div>
       <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12">
         <div className="col-span-1 md:col-span-2">
           <h2 className="font-serif text-2xl mb-4 text-primary-foreground">Equine Bodywork and Wellness Consulting</h2>

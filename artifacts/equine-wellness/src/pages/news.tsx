@@ -2,7 +2,6 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Calendar, Tag, ChevronDown, ChevronUp } from "lucide-react";
 import { WordReveal, LineReveal } from "@/components/ui/AnimatedText";
-import { NewsletterSignup } from "@/components/NewsletterSignup";
 import { newsletterPosts, formatPostDate, type NewsletterPost } from "@/content/newsletter-posts";
 
 const sortedPosts: NewsletterPost[] = [...newsletterPosts].sort(
@@ -98,7 +97,7 @@ export default function News() {
             The Worthy Horse News
           </p>
           <WordReveal
-            text="A monthly dispatch for thoughtful horse owners."
+            text="Notes for thoughtful horse owners."
             as="h1"
             className="text-3xl md:text-5xl font-serif text-foreground mb-6 leading-tight"
             delay={0.1}
@@ -114,18 +113,8 @@ export default function News() {
         </div>
       </div>
 
-      {/* Hero signup */}
-      <div className="container mx-auto px-4 -mt-10 mb-20 max-w-2xl relative z-10">
-        <NewsletterSignup
-          variant="hero"
-          source="news_hero"
-          heading="Subscribe to The Worthy Horse News"
-          subheading="One thoughtful email a month. No spam. Unsubscribe any time."
-        />
-      </div>
-
       {/* Posts */}
-      <div className="container mx-auto px-4 pb-24 max-w-3xl">
+      <div className="container mx-auto px-4 py-20 max-w-3xl">
         <div className="mb-12">
           <h2 className="font-serif text-2xl md:text-3xl text-foreground mb-2">
             Recent dispatches
@@ -139,19 +128,6 @@ export default function News() {
           {sortedPosts.map((post, idx) => (
             <PostCard key={post.id} post={post} index={idx} />
           ))}
-        </div>
-
-        {/* Footer signup */}
-        <div className="mt-20 bg-primary rounded-2xl p-8 md:p-12 text-center">
-          <h3 className="font-serif text-2xl md:text-3xl text-primary-foreground mb-3">
-            Don't miss the next dispatch.
-          </h3>
-          <p className="text-primary-foreground/80 mb-8 max-w-xl mx-auto">
-            Join other thoughtful owners getting The Worthy Horse News delivered once a month.
-          </p>
-          <div className="max-w-lg mx-auto">
-            <NewsletterSignup variant="footer" source="news_footer" />
-          </div>
         </div>
       </div>
     </div>

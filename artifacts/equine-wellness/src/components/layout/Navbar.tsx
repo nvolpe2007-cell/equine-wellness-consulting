@@ -9,7 +9,7 @@ const links = [
   { href: "/bio", label: "About Susie" },
   { href: "/modalities", label: "Modalities" },
   { href: "/gallery", label: "Gallery" },
-  { href: "/news", label: "News" },
+  { href: "/news", label: "Newsletter" },
   { href: "/partners", label: "Trusted Partners" },
 ];
 
