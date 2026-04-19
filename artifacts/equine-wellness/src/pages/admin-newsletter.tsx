@@ -1,5 +1,16 @@
-import { useEffect, useState } from "react";
-import { Loader2, Send, Lock, Mail, RefreshCw, Sparkles } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  Loader2,
+  Send,
+  Lock,
+  Mail,
+  RefreshCw,
+  Sparkles,
+  Calendar,
+  Save,
+  Trash2,
+  Plus,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const TOKEN_KEY = "twh_admin_token";
@@ -14,6 +25,26 @@ type SendResult = {
   total?: number;
   error?: string;
 };
+
+type DispatchStatus = "draft" | "scheduled" | "sending" | "sent" | "failed";
+
+type Dispatch = {
+  id: number;
+  subject: string;
+  preheader: string | null;
+  body: string;
+  status: DispatchStatus;
+  scheduledFor: string | null;
+  sentAt: string | null;
+  sentCount: number;
+  failedCount: number;
+  totalCount: number;
+  errorMessage: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type SaveMode = "draft" | "scheduled";
 
 function authHeaders(token: string): HeadersInit {
   return {
@@ -32,6 +63,43 @@ async function fetchStats(token: string): Promise<Stats | null> {
   return { total: data.total, active: data.active, unsubscribed: data.unsubscribed };
 }
 
+async function fetchDispatches(token: string): Promise<Dispatch[]> {
+  const res = await fetch("/api/newsletter/admin/dispatches", {
+    headers: authHeaders(token),
+  });
+  if (!res.ok) return [];
+  const data = (await res.json()) as { ok: boolean; dispatches: Dispatch[] };
+  return data.ok ? data.dispatches : [];
+}
+
+// HTML datetime-local needs "YYYY-MM-DDTHH:mm" in the user's local time.
+function toLocalDateTimeInput(iso: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function fromLocalDateTimeInput(value: string): string | null {
+  if (!value) return null;
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toISOString();
+}
+
+function formatWhen(iso: string | null): string {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return d.toLocaleString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
 export default function AdminNewsletter() {
   const [token, setToken] = useState<string>(() => {
     if (typeof window === "undefined") return "";
@@ -42,26 +110,33 @@ export default function AdminNewsletter() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [statsLoading, setStatsLoading] = useState(false);
 
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [subject, setSubject] = useState("");
   const [preheader, setPreheader] = useState("");
   const [body, setBody] = useState("");
+  const [scheduledFor, setScheduledFor] = useState("");
   const [testEmail, setTestEmail] = useState("");
-  const [busy, setBusy] = useState<"idle" | "test" | "broadcast">("idle");
+  const [busy, setBusy] = useState<"idle" | "test" | "broadcast" | "save" | "delete">("idle");
+  const [savingMode, setSavingMode] = useState<SaveMode | null>(null);
   const [result, setResult] = useState<SendResult | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [drafting, setDrafting] = useState(false);
   const [draftError, setDraftError] = useState<string | null>(null);
   const [draftSources, setDraftSources] = useState<{ title: string; url: string }[]>([]);
+  const [dispatches, setDispatches] = useState<Dispatch[]>([]);
+  const [dispatchesLoading, setDispatchesLoading] = useState(false);
 
   useEffect(() => {
     if (!token) return;
     let cancelled = false;
     (async () => {
       setStatsLoading(true);
-      const s = await fetchStats(token);
+      setDispatchesLoading(true);
+      const [s, d] = await Promise.all([fetchStats(token), fetchDispatches(token)]);
       if (cancelled) return;
       if (s) {
         setStats(s);
+        setDispatches(d);
         setAuthError(null);
       } else {
         setStats(null);
@@ -70,18 +145,22 @@ export default function AdminNewsletter() {
         sessionStorage.removeItem(TOKEN_KEY);
       }
       setStatsLoading(false);
+      setDispatchesLoading(false);
     })();
     return () => {
       cancelled = true;
     };
   }, [token]);
 
-  async function refreshStats() {
+  async function refreshAll() {
     if (!token) return;
     setStatsLoading(true);
-    const s = await fetchStats(token);
+    setDispatchesLoading(true);
+    const [s, d] = await Promise.all([fetchStats(token), fetchDispatches(token)]);
     if (s) setStats(s);
+    setDispatches(d);
     setStatsLoading(false);
+    setDispatchesLoading(false);
   }
 
   async function handleAuth(e: React.FormEvent) {
@@ -91,6 +170,31 @@ export default function AdminNewsletter() {
     sessionStorage.setItem(TOKEN_KEY, tokenInput.trim());
     setToken(tokenInput.trim());
     setTokenInput("");
+  }
+
+  function startNew() {
+    setEditingId(null);
+    setSubject("");
+    setPreheader("");
+    setBody("");
+    setScheduledFor("");
+    setDraftSources([]);
+    setDraftError(null);
+    setResult(null);
+  }
+
+  function loadDispatch(d: Dispatch) {
+    setEditingId(d.id);
+    setSubject(d.subject);
+    setPreheader(d.preheader ?? "");
+    setBody(d.body);
+    setScheduledFor(toLocalDateTimeInput(d.scheduledFor));
+    setDraftSources([]);
+    setDraftError(null);
+    setResult(null);
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   }
 
   async function generateDraft() {
@@ -130,18 +234,115 @@ export default function AdminNewsletter() {
     }
   }
 
-  async function send(mode: "test" | "broadcast") {
+  async function saveDispatch(mode: SaveMode): Promise<Dispatch | null> {
+    if (!token) return null;
+    if (!subject.trim() || !body.trim()) {
+      setResult({ ok: false, error: "Subject and body are required." });
+      return null;
+    }
+    if (mode === "scheduled" && !scheduledFor) {
+      setResult({ ok: false, error: "Pick a date and time to schedule for." });
+      return null;
+    }
+    setBusy("save");
+    setSavingMode(mode);
+    setResult(null);
+    try {
+      const payload = {
+        subject: subject.trim(),
+        body,
+        preheader: preheader.trim() || undefined,
+        status: mode,
+        scheduledFor: mode === "scheduled" ? fromLocalDateTimeInput(scheduledFor) : null,
+      };
+      const url = editingId
+        ? `/api/newsletter/admin/dispatches/${editingId}`
+        : "/api/newsletter/admin/dispatches";
+      const res = await fetch(url, {
+        method: editingId ? "PATCH" : "POST",
+        headers: authHeaders(token),
+        body: JSON.stringify(payload),
+      });
+      const data = (await res.json().catch(() => null)) as
+        | { ok: boolean; dispatch?: Dispatch; error?: string }
+        | null;
+      if (!res.ok || !data?.ok || !data.dispatch) {
+        setResult({ ok: false, error: data?.error ?? "Save failed." });
+        return null;
+      }
+      setEditingId(data.dispatch.id);
+      await refreshAll();
+      setResult({ ok: true });
+      return data.dispatch;
+    } catch {
+      setResult({ ok: false, error: "Network error." });
+      return null;
+    } finally {
+      setBusy("idle");
+      setSavingMode(null);
+    }
+  }
+
+  async function deleteDispatch(id: number) {
+    if (!token) return;
+    if (!confirm("Delete this dispatch? This can't be undone.")) return;
+    setBusy("delete");
+    try {
+      const res = await fetch(`/api/newsletter/admin/dispatches/${id}`, {
+        method: "DELETE",
+        headers: authHeaders(token),
+      });
+      const data = (await res.json().catch(() => null)) as { ok: boolean; error?: string } | null;
+      if (!res.ok || !data?.ok) {
+        setResult({ ok: false, error: data?.error ?? "Delete failed." });
+      } else if (editingId === id) {
+        startNew();
+      }
+      await refreshAll();
+    } finally {
+      setBusy("idle");
+    }
+  }
+
+  async function sendNow() {
+    if (!token) return;
+    // Save first (creating or updating) so the row exists in history.
+    const saved = await saveDispatch("draft");
+    if (!saved) return;
+    setBusy("broadcast");
+    setResult(null);
+    try {
+      const res = await fetch(`/api/newsletter/admin/dispatches/${saved.id}/send`, {
+        method: "POST",
+        headers: authHeaders(token),
+      });
+      const data = (await res.json().catch(() => null)) as SendResult | null;
+      if (!res.ok || !data?.ok) {
+        setResult({ ok: false, error: data?.error ?? "Send failed." });
+      } else {
+        setResult({ ...data, mode: "broadcast" });
+      }
+      await refreshAll();
+    } catch {
+      setResult({ ok: false, error: "Network error." });
+    } finally {
+      setBusy("idle");
+      setConfirmOpen(false);
+    }
+  }
+
+  async function sendTest() {
     if (!token) return;
     if (!subject.trim() || !body.trim()) {
       setResult({ ok: false, error: "Subject and body are required." });
       return;
     }
-    if (mode === "test" && !testEmail.trim()) {
+    if (!testEmail.trim()) {
       setResult({ ok: false, error: "Enter a test email address first." });
       return;
     }
+    setBusy("test");
     setResult(null);
-    setBusy(mode);
     try {
       const res = await fetch("/api/newsletter/admin/dispatch", {
         method: "POST",
@@ -150,25 +351,38 @@ export default function AdminNewsletter() {
           subject: subject.trim(),
           body,
           preheader: preheader.trim() || undefined,
-          testEmail: mode === "test" ? testEmail.trim() : undefined,
+          testEmail: testEmail.trim(),
         }),
       });
       const data = (await res.json().catch(() => null)) as SendResult | null;
       if (!res.ok || !data?.ok) {
-        setResult({ ok: false, error: data?.error ?? "Send failed." });
+        setResult({ ok: false, error: data?.error ?? "Test send failed." });
       } else {
         setResult(data);
-        if (mode === "broadcast") {
-          await refreshStats();
-        }
       }
     } catch {
       setResult({ ok: false, error: "Network error." });
     } finally {
       setBusy("idle");
-      setConfirmOpen(false);
     }
   }
+
+  const grouped = useMemo(() => {
+    const drafts: Dispatch[] = [];
+    const scheduled: Dispatch[] = [];
+    const past: Dispatch[] = [];
+    for (const d of dispatches) {
+      if (d.status === "draft") drafts.push(d);
+      else if (d.status === "scheduled" || d.status === "sending") scheduled.push(d);
+      else past.push(d);
+    }
+    scheduled.sort((a, b) => {
+      const ax = a.scheduledFor ? new Date(a.scheduledFor).getTime() : 0;
+      const bx = b.scheduledFor ? new Date(b.scheduledFor).getTime() : 0;
+      return ax - bx;
+    });
+    return { drafts, scheduled, past };
+  }, [dispatches]);
 
   if (!token) {
     return (
@@ -213,6 +427,9 @@ export default function AdminNewsletter() {
 
   const broadcastDisabled =
     busy !== "idle" || !subject.trim() || !body.trim() || (stats?.active ?? 0) === 0;
+  const editingLabel = editingId
+    ? `Editing dispatch #${editingId}`
+    : "New dispatch";
 
   return (
     <div className="min-h-screen bg-background py-12">
@@ -256,28 +473,42 @@ export default function AdminNewsletter() {
         <div className="bg-card border border-border rounded-2xl p-6 md:p-8 space-y-5 shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 -mt-1 mb-1">
             <div>
-              <h2 className="font-serif text-lg text-foreground">Compose this month's dispatch</h2>
+              <h2 className="font-serif text-lg text-foreground" data-testid="editor-title">
+                {editingLabel}
+              </h2>
               <p className="text-sm text-muted-foreground">
-                Let the assistant pull together recent industry news, or write it yourself.
+                Save as draft, schedule a send date, or send immediately.
               </p>
             </div>
-            <button
-              onClick={generateDraft}
-              disabled={drafting || busy !== "idle"}
-              className={cn(
-                "inline-flex h-10 items-center justify-center gap-2 rounded-full px-5 text-sm font-medium",
-                "bg-primary/10 text-primary hover:bg-primary/15 border border-primary/20",
-                "disabled:opacity-60 disabled:cursor-not-allowed",
+            <div className="flex items-center gap-2">
+              {editingId && (
+                <button
+                  onClick={startNew}
+                  className="inline-flex h-9 items-center justify-center gap-1.5 rounded-full px-3 text-xs font-medium border border-border bg-background hover:bg-muted"
+                  data-testid="button-new-dispatch"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  New
+                </button>
               )}
-              data-testid="button-ai-draft"
-            >
-              {drafting ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Sparkles className="h-4 w-4" />
-              )}
-              {drafting ? "Researching news…" : "Draft with AI"}
-            </button>
+              <button
+                onClick={generateDraft}
+                disabled={drafting || busy !== "idle"}
+                className={cn(
+                  "inline-flex h-10 items-center justify-center gap-2 rounded-full px-5 text-sm font-medium",
+                  "bg-primary/10 text-primary hover:bg-primary/15 border border-primary/20",
+                  "disabled:opacity-60 disabled:cursor-not-allowed",
+                )}
+                data-testid="button-ai-draft"
+              >
+                {drafting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Sparkles className="h-4 w-4" />
+                )}
+                {drafting ? "Researching news…" : "Draft with AI"}
+              </button>
+            </div>
           </div>
 
           {draftError && (
@@ -364,6 +595,64 @@ export default function AdminNewsletter() {
             </p>
           </div>
 
+          <div className="border-t border-border pt-5 grid sm:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="schedule" className="block text-sm font-medium mb-1.5">
+                <Calendar className="inline h-3.5 w-3.5 mr-1 -mt-0.5" />
+                Schedule for
+              </label>
+              <input
+                id="schedule"
+                type="datetime-local"
+                value={scheduledFor}
+                onChange={(e) => setScheduledFor(e.target.value)}
+                className="w-full h-11 px-4 rounded-md border border-border bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                data-testid="input-scheduled-for"
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                Leave blank to save as a draft. The scheduler runs every minute.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 sm:items-end sm:justify-end">
+              <div className="flex gap-2 w-full sm:w-auto">
+                <button
+                  onClick={() => saveDispatch("draft")}
+                  disabled={busy !== "idle" || !subject.trim() || !body.trim()}
+                  className={cn(
+                    "inline-flex h-11 items-center justify-center gap-2 rounded-full border border-border bg-background px-5 text-sm font-medium flex-1",
+                    "hover:bg-muted disabled:opacity-60 disabled:cursor-not-allowed",
+                  )}
+                  data-testid="button-save-draft"
+                >
+                  {busy === "save" && savingMode === "draft" ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Save className="h-4 w-4" />
+                  )}
+                  Save draft
+                </button>
+                <button
+                  onClick={() => saveDispatch("scheduled")}
+                  disabled={
+                    busy !== "idle" || !subject.trim() || !body.trim() || !scheduledFor
+                  }
+                  className={cn(
+                    "inline-flex h-11 items-center justify-center gap-2 rounded-full bg-primary/10 text-primary border border-primary/20 px-5 text-sm font-medium flex-1",
+                    "hover:bg-primary/15 disabled:opacity-60 disabled:cursor-not-allowed",
+                  )}
+                  data-testid="button-save-scheduled"
+                >
+                  {busy === "save" && savingMode === "scheduled" ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Calendar className="h-4 w-4" />
+                  )}
+                  Schedule
+                </button>
+              </div>
+            </div>
+          </div>
+
           <div className="border-t border-border pt-5 space-y-4">
             <div>
               <label htmlFor="test" className="block text-sm font-medium mb-1.5">
@@ -380,7 +669,7 @@ export default function AdminNewsletter() {
                   data-testid="input-test-email"
                 />
                 <button
-                  onClick={() => send("test")}
+                  onClick={sendTest}
                   disabled={busy !== "idle" || !subject.trim() || !body.trim()}
                   className={cn(
                     "inline-flex h-11 items-center justify-center gap-2 rounded-full border border-border bg-background px-5 text-sm font-medium",
@@ -409,7 +698,8 @@ export default function AdminNewsletter() {
                 data-testid="button-send-broadcast"
               >
                 <Send className="h-4 w-4" />
-                Send to {stats?.active ?? 0} subscriber{(stats?.active ?? 0) === 1 ? "" : "s"}
+                Send now to {stats?.active ?? 0} subscriber
+                {(stats?.active ?? 0) === 1 ? "" : "s"}
               </button>
             </div>
 
@@ -427,11 +717,13 @@ export default function AdminNewsletter() {
                 {result.ok ? (
                   result.mode === "test" ? (
                     <span>Test email sent.</span>
-                  ) : (
+                  ) : result.mode === "broadcast" ? (
                     <span>
                       Sent to {result.sent ?? 0} of {result.total ?? 0} subscribers
                       {result.failed ? ` (${result.failed} failed)` : ""}.
                     </span>
+                  ) : (
+                    <span>Saved.</span>
                   )
                 ) : (
                   <span>{result.error ?? "Send failed."}</span>
@@ -441,14 +733,45 @@ export default function AdminNewsletter() {
           </div>
         </div>
 
+        <DispatchList
+          title="Scheduled"
+          emptyText="Nothing on the calendar yet."
+          dispatches={grouped.scheduled}
+          loading={dispatchesLoading}
+          editingId={editingId}
+          onEdit={loadDispatch}
+          onDelete={deleteDispatch}
+          showWhen="scheduled"
+        />
+        <DispatchList
+          title="Drafts"
+          emptyText="No drafts saved."
+          dispatches={grouped.drafts}
+          loading={dispatchesLoading}
+          editingId={editingId}
+          onEdit={loadDispatch}
+          onDelete={deleteDispatch}
+          showWhen="updated"
+        />
+        <DispatchList
+          title="Past dispatches"
+          emptyText="Nothing has been sent yet."
+          dispatches={grouped.past}
+          loading={dispatchesLoading}
+          editingId={editingId}
+          onEdit={loadDispatch}
+          onDelete={deleteDispatch}
+          showWhen="sent"
+        />
+
         <div className="mt-6 flex items-center justify-end">
           <button
-            onClick={refreshStats}
+            onClick={refreshAll}
             className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
             data-testid="button-refresh-stats"
           >
             <RefreshCw className="h-3.5 w-3.5" />
-            Refresh stats
+            Refresh
           </button>
         </div>
       </div>
@@ -474,7 +797,7 @@ export default function AdminNewsletter() {
                 Cancel
               </button>
               <button
-                onClick={() => send("broadcast")}
+                onClick={sendNow}
                 disabled={busy !== "idle"}
                 className="h-10 px-5 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 inline-flex items-center gap-2"
                 data-testid="button-confirm-broadcast"
@@ -520,5 +843,126 @@ function StatCard({
         {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : value}
       </div>
     </div>
+  );
+}
+
+function StatusPill({ status }: { status: DispatchStatus }) {
+  const styles: Record<DispatchStatus, string> = {
+    draft: "bg-muted text-muted-foreground",
+    scheduled: "bg-primary/10 text-primary",
+    sending: "bg-amber-100 text-amber-800",
+    sent: "bg-emerald-100 text-emerald-800",
+    failed: "bg-destructive/10 text-destructive",
+  };
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center px-2 py-0.5 rounded-full text-[10px] uppercase tracking-wider font-medium",
+        styles[status],
+      )}
+    >
+      {status}
+    </span>
+  );
+}
+
+function DispatchList({
+  title,
+  emptyText,
+  dispatches,
+  loading,
+  editingId,
+  onEdit,
+  onDelete,
+  showWhen,
+}: {
+  title: string;
+  emptyText: string;
+  dispatches: Dispatch[];
+  loading: boolean;
+  editingId: number | null;
+  onEdit: (d: Dispatch) => void;
+  onDelete: (id: number) => void;
+  showWhen: "scheduled" | "sent" | "updated";
+}) {
+  return (
+    <section className="mt-8" data-testid={`section-${title.toLowerCase().replace(/\s+/g, "-")}`}>
+      <h3 className="font-serif text-xl text-foreground mb-3">{title}</h3>
+      {loading ? (
+        <div className="text-sm text-muted-foreground flex items-center gap-2">
+          <Loader2 className="h-4 w-4 animate-spin" /> Loading…
+        </div>
+      ) : dispatches.length === 0 ? (
+        <p className="text-sm text-muted-foreground italic">{emptyText}</p>
+      ) : (
+        <ul className="space-y-2">
+          {dispatches.map((d) => {
+            const when =
+              showWhen === "scheduled"
+                ? formatWhen(d.scheduledFor)
+                : showWhen === "sent"
+                  ? formatWhen(d.sentAt ?? d.updatedAt)
+                  : formatWhen(d.updatedAt);
+            const whenLabel =
+              showWhen === "scheduled"
+                ? "Scheduled for"
+                : showWhen === "sent"
+                  ? d.status === "sent"
+                    ? "Sent"
+                    : "Last try"
+                  : "Updated";
+            return (
+              <li
+                key={d.id}
+                className={cn(
+                  "border border-border rounded-xl p-3 bg-card flex items-start gap-3",
+                  editingId === d.id && "ring-2 ring-primary/40",
+                )}
+                data-testid={`dispatch-row-${d.id}`}
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <button
+                      onClick={() => onEdit(d)}
+                      className="text-sm font-medium text-foreground hover:underline truncate text-left"
+                      data-testid={`button-edit-dispatch-${d.id}`}
+                    >
+                      {d.subject || "(no subject)"}
+                    </button>
+                    <StatusPill status={d.status} />
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    {whenLabel}: {when}
+                    {d.status === "sent" && (
+                      <>
+                        {" · "}
+                        Sent to {d.sentCount} of {d.totalCount}
+                        {d.failedCount ? ` (${d.failedCount} failed)` : ""}
+                      </>
+                    )}
+                    {d.status === "failed" && d.errorMessage && (
+                      <>
+                        {" · "}
+                        <span className="text-destructive">{d.errorMessage}</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+                {d.status !== "sending" && d.status !== "sent" && (
+                  <button
+                    onClick={() => onDelete(d.id)}
+                    className="text-muted-foreground hover:text-destructive p-1"
+                    aria-label="Delete dispatch"
+                    data-testid={`button-delete-dispatch-${d.id}`}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
   );
 }

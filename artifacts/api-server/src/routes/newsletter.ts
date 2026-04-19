@@ -1,8 +1,13 @@
 import { Router, type IRouter, type Request, type Response, type NextFunction } from "express";
 import { z } from "zod";
 import { randomBytes, timingSafeEqual } from "node:crypto";
-import { and, isNull, eq } from "drizzle-orm";
-import { db, subscribersTable, type Subscriber } from "@workspace/db";
+import { and, isNull, eq, desc } from "drizzle-orm";
+import {
+  db,
+  subscribersTable,
+  dispatchesTable,
+  type Subscriber,
+} from "@workspace/db";
 import { getUncachableResendClient } from "../lib/resend";
 import {
   buildWelcomeEmail,
@@ -10,6 +15,7 @@ import {
   buildUnsubscribeConfirmationPage,
 } from "../lib/newsletter-emails";
 import { draftNewsletter } from "../lib/draft-newsletter";
+import { sendDispatch } from "../lib/send-dispatch";
 
 const router: IRouter = Router();
 
@@ -297,6 +303,175 @@ router.post("/newsletter/admin/dispatch", requireAdmin, async (req, res) => {
   }
 
   return res.json({ ok: true, mode: "broadcast", sent, failed, total: recipients.length });
+});
+
+// --- Persisted dispatches (drafts, scheduled, history) -----------------------
+
+const dispatchBodySchema = z.object({
+  subject: z.string().trim().min(1, "Subject is required").max(180),
+  body: z.string().trim().min(1, "Body is required").max(50_000),
+  preheader: z.string().trim().max(180).optional().or(z.literal("")),
+  status: z.enum(["draft", "scheduled"]),
+  scheduledFor: z.string().datetime().optional().nullable(),
+});
+
+function normalizePreheader(v: string | undefined | null): string | null {
+  if (!v) return null;
+  const t = v.trim();
+  return t.length > 0 ? t : null;
+}
+
+router.get("/newsletter/admin/dispatches", requireAdmin, async (_req, res) => {
+  const rows = await db
+    .select()
+    .from(dispatchesTable)
+    .orderBy(desc(dispatchesTable.createdAt));
+  return res.json({ ok: true, dispatches: rows });
+});
+
+router.post("/newsletter/admin/dispatches", requireAdmin, async (req, res) => {
+  const parsed = dispatchBodySchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res
+      .status(400)
+      .json({ ok: false, error: parsed.error.issues[0]?.message ?? "Invalid input" });
+  }
+  const { subject, body, preheader, status, scheduledFor } = parsed.data;
+
+  let scheduledAt: Date | null = null;
+  if (status === "scheduled") {
+    if (!scheduledFor) {
+      return res
+        .status(400)
+        .json({ ok: false, error: "A send date is required for scheduled dispatches." });
+    }
+    scheduledAt = new Date(scheduledFor);
+    if (Number.isNaN(scheduledAt.getTime())) {
+      return res.status(400).json({ ok: false, error: "Invalid send date." });
+    }
+  }
+
+  const inserted = await db
+    .insert(dispatchesTable)
+    .values({
+      subject: subject.trim(),
+      body,
+      preheader: normalizePreheader(preheader),
+      status,
+      scheduledFor: scheduledAt,
+    })
+    .returning();
+  return res.json({ ok: true, dispatch: inserted[0] });
+});
+
+router.patch("/newsletter/admin/dispatches/:id", requireAdmin, async (req, res) => {
+  const id = Number(req.params["id"]);
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({ ok: false, error: "Invalid id" });
+  }
+  const existingRows = await db
+    .select()
+    .from(dispatchesTable)
+    .where(eq(dispatchesTable.id, id))
+    .limit(1);
+  const existing = existingRows[0];
+  if (!existing) return res.status(404).json({ ok: false, error: "Not found" });
+  if (existing.status === "sent" || existing.status === "sending") {
+    return res
+      .status(409)
+      .json({ ok: false, error: "Already sent or sending — can't edit." });
+  }
+
+  const parsed = dispatchBodySchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res
+      .status(400)
+      .json({ ok: false, error: parsed.error.issues[0]?.message ?? "Invalid input" });
+  }
+  const { subject, body, preheader, status, scheduledFor } = parsed.data;
+
+  let scheduledAt: Date | null = null;
+  if (status === "scheduled") {
+    if (!scheduledFor) {
+      return res
+        .status(400)
+        .json({ ok: false, error: "A send date is required for scheduled dispatches." });
+    }
+    scheduledAt = new Date(scheduledFor);
+    if (Number.isNaN(scheduledAt.getTime())) {
+      return res.status(400).json({ ok: false, error: "Invalid send date." });
+    }
+  }
+
+  const updated = await db
+    .update(dispatchesTable)
+    .set({
+      subject: subject.trim(),
+      body,
+      preheader: normalizePreheader(preheader),
+      status,
+      scheduledFor: scheduledAt,
+      errorMessage: null,
+      updatedAt: new Date(),
+    })
+    .where(eq(dispatchesTable.id, id))
+    .returning();
+  return res.json({ ok: true, dispatch: updated[0] });
+});
+
+router.delete("/newsletter/admin/dispatches/:id", requireAdmin, async (req, res) => {
+  const id = Number(req.params["id"]);
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({ ok: false, error: "Invalid id" });
+  }
+  const existingRows = await db
+    .select()
+    .from(dispatchesTable)
+    .where(eq(dispatchesTable.id, id))
+    .limit(1);
+  const existing = existingRows[0];
+  if (!existing) return res.status(404).json({ ok: false, error: "Not found" });
+  if (existing.status === "sending") {
+    return res.status(409).json({ ok: false, error: "Currently sending — can't delete." });
+  }
+  await db.delete(dispatchesTable).where(eq(dispatchesTable.id, id));
+  return res.json({ ok: true });
+});
+
+router.post("/newsletter/admin/dispatches/:id/send", requireAdmin, async (req, res) => {
+  const id = Number(req.params["id"]);
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({ ok: false, error: "Invalid id" });
+  }
+  const existingRows = await db
+    .select()
+    .from(dispatchesTable)
+    .where(eq(dispatchesTable.id, id))
+    .limit(1);
+  const existing = existingRows[0];
+  if (!existing) return res.status(404).json({ ok: false, error: "Not found" });
+  if (existing.status === "sent" || existing.status === "sending") {
+    return res
+      .status(409)
+      .json({ ok: false, error: "Already sent or sending." });
+  }
+
+  const result = await sendDispatch(id);
+  if (!result.ok) {
+    return res.status(502).json({
+      ok: false,
+      error: result.error ?? "Send failed",
+      sent: result.sent,
+      failed: result.failed,
+      total: result.total,
+    });
+  }
+  return res.json({
+    ok: true,
+    sent: result.sent,
+    failed: result.failed,
+    total: result.total,
+  });
 });
 
 export default router;
