@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { ArrowRight, CheckCircle2, Sparkles, Phone } from "lucide-react";
 import { useRef } from "react";
 import { WordReveal, LineReveal, AnimatedHeading, AccentFlourish } from "@/components/ui/AnimatedText";
+import { NewsletterSignup } from "@/components/NewsletterSignup";
 import barnHero from "@assets/stock_images/barn-hero.jpg";
 import barnExterior from "@assets/stock_images/barn-exterior.jpg";
 import horsePortrait from "@assets/stock_images/horse-portrait.jpg";
@@ -335,6 +336,33 @@ export default function Home() {
               <div className="absolute -bottom-6 -left-6 w-full h-full border-2 border-accent rounded-2xl z-0" />
             </motion.div>
           </div>
+        </div>
+      </section>
+
+      {/* Newsletter Signup */}
+      <section className="py-24 bg-background">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.7 }}
+            className="max-w-2xl mx-auto"
+          >
+            <div className="text-center mb-8">
+              <span className="inline-block text-xs font-sans tracking-[0.3em] text-primary uppercase mb-3">
+                The Worthy Horse News
+              </span>
+              <h2 className="text-3xl md:text-4xl font-serif text-foreground leading-tight">
+                A monthly note from the barn.
+              </h2>
+            </div>
+            <NewsletterSignup
+              variant="hero"
+              source="home_page"
+              subheading="Thoughtful writing on equine wellness, biomechanics, and the horses behind the work."
+            />
+          </motion.div>
         </div>
       </section>
 
