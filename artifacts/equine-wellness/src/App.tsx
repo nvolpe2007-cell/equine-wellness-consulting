@@ -18,14 +18,50 @@ import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
 
-const titles: Record<string, string> = {
-  "/": "Equine Bodywork and Wellness Consulting | Susie H. Lytal, MS",
-  "/bio": "About Susie H. Lytal, MS — Equine Biomechanist",
-  "/modalities": "Wellness Modalities for Horses — Sports Massage, PEMF, Red Light & More",
-  "/gallery": "Gallery — Sessions in the Barn Aisle",
-  "/partners": "Trusted Partners — Magnawave, RevitaVet, TrueStim, BeneFab",
-  "/news": "The Worthy Horse News — Newsletter for Thoughtful Horse Owners",
+type PageMeta = { title: string; description: string };
+
+const pageMeta: Record<string, PageMeta> = {
+  "/": {
+    title: "Equine Bodywork and Wellness Consulting | Susie H. Lytal, MS",
+    description:
+      "Equine bodywork and wellness sessions with Susie H. Lytal, MS — Equine Biomechanist. Sports massage, PEMF, red light, and more for thoughtful horse owners.",
+  },
+  "/bio": {
+    title: "About Susie H. Lytal, MS — Equine Biomechanist",
+    description:
+      "Meet Susie H. Lytal, MS — equine biomechanist offering bodywork and wellness sessions in partnership with your veterinarian.",
+  },
+  "/modalities": {
+    title: "Wellness Modalities for Horses — Sports Massage, PEMF, Red Light & More",
+    description:
+      "Explore the wellness modalities used in every session: sports massage, PEMF, red light, TENS, and more — supportive, non-medical care for your horse.",
+  },
+  "/gallery": {
+    title: "Gallery — Sessions in the Barn Aisle",
+    description:
+      "A look at sessions in the barn aisle: hands-on bodywork, PEMF, and red light supporting horses across the region.",
+  },
+  "/partners": {
+    title: "Trusted Partners — Magnawave, RevitaVet, TrueStim, BeneFab",
+    description:
+      "The equipment brands and wellness products Susie trusts and uses in every session, including Magnawave, RevitaVet, TrueStim, and BeneFab.",
+  },
+  "/news": {
+    title: "The Worthy Horse News — Newsletter for Thoughtful Horse Owners",
+    description:
+      "Subscribe to The Worthy Horse News: a monthly dispatch covering legislation, state law, petitions, and seasonal care for thoughtful horse owners.",
+  },
 };
+
+function setMetaDescription(content: string) {
+  let tag = document.querySelector<HTMLMetaElement>('meta[name="description"]');
+  if (!tag) {
+    tag = document.createElement("meta");
+    tag.name = "description";
+    document.head.appendChild(tag);
+  }
+  tag.content = content;
+}
 
 function PageWrapper({ children }: { children: React.ReactNode }) {
   return (
@@ -44,7 +80,9 @@ function Router() {
   const [location] = useLocation();
 
   useEffect(() => {
-    document.title = titles[location] ?? titles["/"];
+    const meta = pageMeta[location] ?? pageMeta["/"];
+    document.title = meta.title;
+    setMetaDescription(meta.description);
     window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
   }, [location]);
 

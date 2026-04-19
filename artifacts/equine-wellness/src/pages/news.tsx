@@ -5,6 +5,10 @@ import { WordReveal, LineReveal } from "@/components/ui/AnimatedText";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
 import { newsletterPosts, formatPostDate, type NewsletterPost } from "@/content/newsletter-posts";
 
+const sortedPosts: NewsletterPost[] = [...newsletterPosts].sort(
+  (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+);
+
 function PostCard({ post, index }: { post: NewsletterPost; index: number }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -132,7 +136,7 @@ export default function News() {
         </div>
 
         <div className="space-y-8">
-          {newsletterPosts.map((post, idx) => (
+          {sortedPosts.map((post, idx) => (
             <PostCard key={post.id} post={post} index={idx} />
           ))}
         </div>

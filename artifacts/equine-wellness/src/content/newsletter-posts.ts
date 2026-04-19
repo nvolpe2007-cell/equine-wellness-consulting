@@ -32,9 +32,9 @@ export const newsletterPosts: NewsletterPost[] = [
   },
   {
     id: "2026-03-state-roundup",
-    title: "State Roundup: What's Changing for Equine Bodywork Practitioners in 2026",
+    title: "Legislation Update: What's Changing for Equine Bodywork Practitioners in 2026",
     date: "2026-03-22",
-    category: "State Law",
+    category: "Legislation",
     excerpt:
       "From California to Florida, state veterinary boards have been quietly updating language around equine wellness work and bodywork. Here's a plain-English summary of what owners should know.",
     body: [
