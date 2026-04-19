@@ -1,6 +1,5 @@
 import { Router, type IRouter } from "express";
 import { z } from "zod";
-import { sql } from "drizzle-orm";
 import { db, subscribersTable } from "@workspace/db";
 
 const router: IRouter = Router();
@@ -59,8 +58,5 @@ router.post("/newsletter/subscribe", async (req, res) => {
       .json({ ok: false, error: "Something went wrong. Please try again." });
   }
 });
-
-// Keep `sql` reference to avoid unused-import warnings if we extend later.
-void sql;
 
 export default router;

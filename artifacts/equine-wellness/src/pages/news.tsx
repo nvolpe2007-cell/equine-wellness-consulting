@@ -1,8 +1,88 @@
-import { motion } from "framer-motion";
-import { Calendar, Tag } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Calendar, Tag, ChevronDown, ChevronUp } from "lucide-react";
 import { WordReveal, LineReveal } from "@/components/ui/AnimatedText";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
-import { newsletterPosts, formatPostDate } from "@/content/newsletter-posts";
+import { newsletterPosts, formatPostDate, type NewsletterPost } from "@/content/newsletter-posts";
+
+function PostCard({ post, index }: { post: NewsletterPost; index: number }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.5, delay: index * 0.05, ease: [0.22, 1, 0.36, 1] }}
+      className="bg-card border border-border rounded-2xl p-6 md:p-8 shadow-sm"
+      data-testid={`post-${post.id}`}
+    >
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground mb-3">
+        <span className="inline-flex items-center gap-1.5">
+          <Calendar className="h-3.5 w-3.5" />
+          {formatPostDate(post.date)}
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <Tag className="h-3.5 w-3.5" />
+          <span className="uppercase tracking-wider text-primary font-medium">
+            {post.category}
+          </span>
+        </span>
+      </div>
+
+      <h3 className="font-serif text-xl md:text-2xl text-foreground mb-3 leading-snug">
+        {post.title}
+      </h3>
+
+      <p className="text-muted-foreground leading-relaxed italic">
+        {post.excerpt}
+      </p>
+
+      <AnimatePresence initial={false}>
+        {expanded && (
+          <motion.div
+            id={`post-body-${post.id}`}
+            key="body"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="overflow-hidden"
+          >
+            <div className="space-y-4 text-foreground/90 leading-relaxed pt-5">
+              {post.body.map((paragraph, i) => (
+                <p key={i}>{paragraph}</p>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="mt-5">
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          aria-expanded={expanded}
+          aria-controls={`post-body-${post.id}`}
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 focus:outline-none focus:ring-2 focus:ring-ring rounded-sm"
+          data-testid={`button-read-more-${post.id}`}
+        >
+          {expanded ? (
+            <>
+              Read less
+              <ChevronUp className="h-4 w-4" />
+            </>
+          ) : (
+            <>
+              Read more
+              <ChevronDown className="h-4 w-4" />
+            </>
+          )}
+        </button>
+      </div>
+    </motion.article>
+  );
+}
 
 export default function News() {
   return (
@@ -51,44 +131,9 @@ export default function News() {
           </p>
         </div>
 
-        <div className="space-y-12">
+        <div className="space-y-8">
           {newsletterPosts.map((post, idx) => (
-            <motion.article
-              key={post.id}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: idx * 0.05, ease: [0.22, 1, 0.36, 1] }}
-              className="bg-card border border-border rounded-2xl p-6 md:p-8 shadow-sm hover-elevate"
-              data-testid={`post-${post.id}`}
-            >
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground mb-3">
-                <span className="inline-flex items-center gap-1.5">
-                  <Calendar className="h-3.5 w-3.5" />
-                  {formatPostDate(post.date)}
-                </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <Tag className="h-3.5 w-3.5" />
-                  <span className="uppercase tracking-wider text-primary font-medium">
-                    {post.category}
-                  </span>
-                </span>
-              </div>
-
-              <h3 className="font-serif text-xl md:text-2xl text-foreground mb-3 leading-snug">
-                {post.title}
-              </h3>
-
-              <p className="text-muted-foreground leading-relaxed mb-5 italic">
-                {post.excerpt}
-              </p>
-
-              <div className="space-y-4 text-foreground/90 leading-relaxed">
-                {post.body.map((paragraph, i) => (
-                  <p key={i}>{paragraph}</p>
-                ))}
-              </div>
-            </motion.article>
+            <PostCard key={post.id} post={post} index={idx} />
           ))}
         </div>
 
