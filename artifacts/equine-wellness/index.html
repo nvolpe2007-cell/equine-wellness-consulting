@@ -46,7 +46,22 @@
             "@type": "Place",
             "name": "Southern California (Los Angeles area)"
           },
-          "hoursAvailable": "By appointment only",
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "description": "By appointment only.",
+              "dayOfWeek": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday"
+              ],
+              "opens": "08:00",
+              "closes": "18:00"
+            }
+          ],
           "founder": { "@id": "https://equinebodywork.com/#susie" },
           "employee": { "@id": "https://equinebodywork.com/#susie" },
           "makesOffer": [
@@ -84,6 +99,7 @@
           "@id": "https://equinebodywork.com/#service-massage",
           "name": "Equine Sports Massage",
           "serviceType": "Equine Sports Massage",
+          "url": "https://equinebodywork.com/modalities#massage",
           "description": "Hands-on session to support muscular relaxation, flexibility, and overall comfort, applied by a Certified Equine Sports Massage Therapist.",
           "provider": { "@id": "https://equinebodywork.com/#business" },
           "areaServed": { "@type": "Place", "name": "Southern California" }
@@ -93,6 +109,7 @@
           "@id": "https://equinebodywork.com/#service-pemf",
           "name": "PEMF Sessions (Magnawave)",
           "serviceType": "PEMF (Pulsed Electromagnetic Field)",
+          "url": "https://equinebodywork.com/modalities#pemf",
           "description": "Non-invasive PEMF application using Magnawave equipment to support cellular function, recovery, and relaxation.",
           "provider": { "@id": "https://equinebodywork.com/#business" },
           "areaServed": { "@type": "Place", "name": "Southern California" }
@@ -102,6 +119,7 @@
           "@id": "https://equinebodywork.com/#service-redlight",
           "name": "Red Light Application (RevitaVet)",
           "serviceType": "Red Light Application",
+          "url": "https://equinebodywork.com/modalities#red-light",
           "description": "Targeted red and infrared light using RevitaVet equipment to support soft tissue health and comfort.",
           "provider": { "@id": "https://equinebodywork.com/#business" },
           "areaServed": { "@type": "Place", "name": "Southern California" }
@@ -111,6 +129,7 @@
           "@id": "https://equinebodywork.com/#service-coldlaser",
           "name": "Cold Laser",
           "serviceType": "Cold Laser",
+          "url": "https://equinebodywork.com/modalities#cold-laser",
           "description": "Low-level light application used selectively during sessions to support muscular comfort without generating heat.",
           "provider": { "@id": "https://equinebodywork.com/#business" },
           "areaServed": { "@type": "Place", "name": "Southern California" }
@@ -120,6 +139,7 @@
           "@id": "https://equinebodywork.com/#service-tens",
           "name": "TENS (TrueStim)",
           "serviceType": "Transcutaneous Electrical Nerve Stimulation",
+          "url": "https://equinebodywork.com/modalities#tens",
           "description": "Mild electrical impulses delivered via TrueStim equipment to support muscular relaxation and range of motion.",
           "provider": { "@id": "https://equinebodywork.com/#business" },
           "areaServed": { "@type": "Place", "name": "Southern California" }
@@ -129,6 +149,7 @@
           "@id": "https://equinebodywork.com/#service-tecar",
           "name": "TECAR",
           "serviceType": "TECAR (Capacitive and Resistive Energy Transfer)",
+          "url": "https://equinebodywork.com/modalities#tecar",
           "description": "Radiofrequency energy applied smoothly over the horse's body to support circulation and localized comfort.",
           "provider": { "@id": "https://equinebodywork.com/#business" },
           "areaServed": { "@type": "Place", "name": "Southern California" }
