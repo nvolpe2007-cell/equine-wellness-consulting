@@ -49,9 +49,11 @@ export default function Gallery() {
               className={`relative group overflow-hidden rounded-xl bg-muted ${image.colSpan}`}
               data-testid={`img-gallery-${index}`}
             >
-              <img 
-                src={image.src} 
-                alt={image.alt} 
+              <img
+                src={image.src}
+                alt={image.alt}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">

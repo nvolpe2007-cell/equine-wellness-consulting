@@ -12,10 +12,12 @@
     <meta property="og:title" content="Equine Bodywork and Wellness Consulting" />
     <meta property="og:description" content="Professional equine bodywork and wellness sessions grounded in graduate-level biomechanics. Sports massage, PEMF, red light, cold laser, TENS, and TECAR." />
     <meta property="og:site_name" content="Equine Bodywork and Wellness Consulting" />
+    <meta property="og:image" content="https://equinebodywork.com/opengraph.jpg" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Equine Bodywork and Wellness Consulting" />
     <meta name="twitter:description" content="Equine sports massage, PEMF, red light, cold laser, TENS, and TECAR sessions with Susie H. Lytal, MS — Equine Biomechanist." />
+    <meta name="twitter:image" content="https://equinebodywork.com/opengraph.jpg" />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,26 +27,169 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "ProfessionalService",
-      "name": "Equine Bodywork and Wellness Consulting",
-      "description": "Professional equine bodywork and wellness sessions including sports massage, PEMF, red light, cold laser, TENS, and TECAR.",
-      "telephone": "+1-310-488-4389",
-      "priceRange": "$$",
-      "image": "/favicon.svg",
-      "founder": {
-        "@type": "Person",
-        "name": "Susie H. Lytal",
-        "honorificSuffix": "MS",
-        "jobTitle": "Equine Biomechanist & Certified Equine Sports Massage Therapist",
-        "alumniOf": "Master of Science (MS), Biomechanics"
-      },
-      "makesOffer": [
-        { "@type": "Offer", "name": "Equine Sports Massage" },
-        { "@type": "Offer", "name": "PEMF Sessions (Magnawave)" },
-        { "@type": "Offer", "name": "Red Light Application (RevitaVet)" },
-        { "@type": "Offer", "name": "Cold Laser" },
-        { "@type": "Offer", "name": "TENS (TrueStim)" },
-        { "@type": "Offer", "name": "TECAR" }
+      "@graph": [
+        {
+          "@type": "LocalBusiness",
+          "@id": "https://equinebodywork.com/#business",
+          "name": "Equine Bodywork and Wellness Consulting",
+          "description": "Professional equine bodywork and wellness sessions including sports massage, PEMF, red light, cold laser, TENS, and TECAR. Led by Susie H. Lytal, MS — Equine Biomechanist.",
+          "url": "https://equinebodywork.com/",
+          "telephone": "+1-310-488-4389",
+          "priceRange": "$$",
+          "image": "https://equinebodywork.com/opengraph.jpg",
+          "address": {
+            "@type": "PostalAddress",
+            "addressRegion": "CA",
+            "addressCountry": "US"
+          },
+          "areaServed": {
+            "@type": "Place",
+            "name": "Southern California (Los Angeles area)"
+          },
+          "hoursAvailable": "By appointment only",
+          "founder": { "@id": "https://equinebodywork.com/#susie" },
+          "employee": { "@id": "https://equinebodywork.com/#susie" },
+          "makesOffer": [
+            { "@type": "Offer", "itemOffered": { "@id": "https://equinebodywork.com/#service-massage" } },
+            { "@type": "Offer", "itemOffered": { "@id": "https://equinebodywork.com/#service-pemf" } },
+            { "@type": "Offer", "itemOffered": { "@id": "https://equinebodywork.com/#service-redlight" } },
+            { "@type": "Offer", "itemOffered": { "@id": "https://equinebodywork.com/#service-coldlaser" } },
+            { "@type": "Offer", "itemOffered": { "@id": "https://equinebodywork.com/#service-tens" } },
+            { "@type": "Offer", "itemOffered": { "@id": "https://equinebodywork.com/#service-tecar" } }
+          ]
+        },
+        {
+          "@type": "Person",
+          "@id": "https://equinebodywork.com/#susie",
+          "name": "Susie H. Lytal",
+          "honorificSuffix": "MS",
+          "jobTitle": "Equine Biomechanist & Certified Equine Sports Massage Therapist",
+          "worksFor": { "@id": "https://equinebodywork.com/#business" },
+          "url": "https://equinebodywork.com/bio",
+          "hasCredential": [
+            {
+              "@type": "EducationalOccupationalCredential",
+              "credentialCategory": "degree",
+              "name": "Master of Science (MS), Biomechanics"
+            },
+            {
+              "@type": "EducationalOccupationalCredential",
+              "credentialCategory": "certification",
+              "name": "Certified Equine Sports Massage Therapist"
+            }
+          ]
+        },
+        {
+          "@type": "Service",
+          "@id": "https://equinebodywork.com/#service-massage",
+          "name": "Equine Sports Massage",
+          "serviceType": "Equine Sports Massage",
+          "description": "Hands-on session to support muscular relaxation, flexibility, and overall comfort, applied by a Certified Equine Sports Massage Therapist.",
+          "provider": { "@id": "https://equinebodywork.com/#business" },
+          "areaServed": { "@type": "Place", "name": "Southern California" }
+        },
+        {
+          "@type": "Service",
+          "@id": "https://equinebodywork.com/#service-pemf",
+          "name": "PEMF Sessions (Magnawave)",
+          "serviceType": "PEMF (Pulsed Electromagnetic Field)",
+          "description": "Non-invasive PEMF application using Magnawave equipment to support cellular function, recovery, and relaxation.",
+          "provider": { "@id": "https://equinebodywork.com/#business" },
+          "areaServed": { "@type": "Place", "name": "Southern California" }
+        },
+        {
+          "@type": "Service",
+          "@id": "https://equinebodywork.com/#service-redlight",
+          "name": "Red Light Application (RevitaVet)",
+          "serviceType": "Red Light Application",
+          "description": "Targeted red and infrared light using RevitaVet equipment to support soft tissue health and comfort.",
+          "provider": { "@id": "https://equinebodywork.com/#business" },
+          "areaServed": { "@type": "Place", "name": "Southern California" }
+        },
+        {
+          "@type": "Service",
+          "@id": "https://equinebodywork.com/#service-coldlaser",
+          "name": "Cold Laser",
+          "serviceType": "Cold Laser",
+          "description": "Low-level light application used selectively during sessions to support muscular comfort without generating heat.",
+          "provider": { "@id": "https://equinebodywork.com/#business" },
+          "areaServed": { "@type": "Place", "name": "Southern California" }
+        },
+        {
+          "@type": "Service",
+          "@id": "https://equinebodywork.com/#service-tens",
+          "name": "TENS (TrueStim)",
+          "serviceType": "Transcutaneous Electrical Nerve Stimulation",
+          "description": "Mild electrical impulses delivered via TrueStim equipment to support muscular relaxation and range of motion.",
+          "provider": { "@id": "https://equinebodywork.com/#business" },
+          "areaServed": { "@type": "Place", "name": "Southern California" }
+        },
+        {
+          "@type": "Service",
+          "@id": "https://equinebodywork.com/#service-tecar",
+          "name": "TECAR",
+          "serviceType": "TECAR (Capacitive and Resistive Energy Transfer)",
+          "description": "Radiofrequency energy applied smoothly over the horse's body to support circulation and localized comfort.",
+          "provider": { "@id": "https://equinebodywork.com/#business" },
+          "areaServed": { "@type": "Place", "name": "Southern California" }
+        }
+      ]
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is equine bodywork?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Equine bodywork is a non-invasive, hands-on approach designed to support a horse's muscular comfort, flexibility, and overall well-being. It draws on a combination of techniques — including sports massage and complementary modalities such as PEMF, red light, cold laser, TENS, and TECAR — and is offered as wellness support, not medical care."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is this a substitute for veterinary care?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Susie H. Lytal is an Equine Biomechanist and Certified Equine Sports Massage Therapist — not a veterinarian. Wellness sessions do not diagnose, treat, cure, or prescribe for any medical condition. We work alongside your primary veterinarian as part of a team approach to your horse's health."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How long does a session take?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A typical session lasts approximately 60 to 90 minutes, depending on the horse and the modalities included. Susie tailors each session to the individual horse's needs, often combining hands-on massage with one or more complementary modalities."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Which modalities are offered?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Six modalities are offered: Equine Sports Massage, PEMF (Magnawave), Red Light (RevitaVet), Cold Laser, TENS (TrueStim), and TECAR. Each is integrated thoughtfully based on the horse's response and biomechanical needs."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How often should my horse have a session?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Frequency depends on the horse's workload, age, and goals. Performance horses in heavy training often benefit from regular sessions, while companion horses may do well with periodic maintenance sessions. Susie can recommend a cadence after the first session."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I book a session?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Call or text Susie directly at (310) 488-4389 to discuss your horse's needs and schedule a visit."
+          }
+        }
       ]
     }
     </script>

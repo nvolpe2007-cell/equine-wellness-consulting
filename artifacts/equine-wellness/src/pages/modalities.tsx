@@ -165,9 +165,11 @@ export default function Modalities() {
                   transition={{ duration: 0.5 }}
                   className="aspect-[4/3] rounded-2xl overflow-hidden shadow-lg border group"
                 >
-                  <img 
-                    src={modality.image} 
-                    alt={modality.title} 
+                  <img
+                    src={modality.image}
+                    alt={`${modality.title} session for horses — ${modality.subtitle}`}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-105"
                   />
                 </motion.div>

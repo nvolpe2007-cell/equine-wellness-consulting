@@ -35,9 +35,11 @@ export default function Bio() {
               transition={{ delay: 0.2 }}
               className="rounded-2xl overflow-hidden shadow-xl aspect-[3/4]"
             >
-              <img 
-                src={horsePortrait} 
-                alt="Susie on-site between sessions" 
+              <img
+                src={horsePortrait}
+                alt="Susie H. Lytal, MS, on-site between equine wellness sessions in the barn aisle"
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover"
               />
             </motion.div>

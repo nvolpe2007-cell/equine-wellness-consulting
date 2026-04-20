@@ -34,9 +34,11 @@ export default function Home() {
       {/* Hero Section */}
       <section ref={heroRef} className="relative h-[92vh] min-h-[640px] flex items-center justify-center overflow-hidden">
         <motion.div style={{ y: heroY, opacity: heroOpacity }} className="absolute inset-0 z-0">
-          <img 
-            src={barnHero} 
-            alt="Warm barn interior morning light" 
+          <img
+            src={barnHero}
+            alt="Sunlit barn aisle at dawn — equine bodywork session setting"
+            fetchPriority="high"
+            decoding="async"
             className="w-full h-full object-cover object-center animate-ken-burns"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/70" />
@@ -179,7 +181,13 @@ export default function Home() {
               transition={{ duration: 0.4 }}
               className="overflow-hidden rounded-2xl shadow-xl"
             >
-              <img src={barnExterior} alt="Stable" className="w-full h-auto max-h-[420px] object-cover" />
+              <img
+                src={barnExterior}
+                alt="Quiet stable exterior at golden hour where Susie conducts equine wellness sessions"
+                loading="lazy"
+                decoding="async"
+                className="w-full h-auto max-h-[420px] object-cover"
+              />
             </motion.div>
           </motion.div>
         </div>
@@ -252,9 +260,11 @@ export default function Home() {
                 className="bg-card rounded-2xl overflow-hidden border shadow-sm hover:shadow-xl transition-shadow duration-500 group flex flex-col"
               >
                 <div className="h-64 overflow-hidden relative">
-                  <img 
-                    src={service.img} 
-                    alt={service.title} 
+                  <img
+                    src={service.img}
+                    alt={`${service.title} for horses — ${service.tag}`}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -330,7 +340,13 @@ export default function Home() {
               className="relative"
             >
               <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl relative z-10">
-                <img src={horsePortrait} alt="A horse close up" className="w-full h-full object-cover" />
+                <img
+                  src={horsePortrait}
+                  alt="Close-up portrait of a calm horse — illustrating the biomechanical advantage of attentive equine bodywork"
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="absolute -bottom-6 -left-6 w-full h-full border-2 border-accent rounded-2xl z-0" />
             </motion.div>

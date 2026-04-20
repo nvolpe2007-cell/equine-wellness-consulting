@@ -18,49 +18,108 @@ import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
 
-type PageMeta = { title: string; description: string };
+type PageMeta = {
+  title: string;
+  description: string;
+  ogTitle?: string;
+  ogDescription?: string;
+};
 
 const pageMeta: Record<string, PageMeta> = {
   "/": {
     title: "Equine Bodywork and Wellness Consulting | Susie H. Lytal, MS",
     description:
       "Equine bodywork and wellness sessions with Susie H. Lytal, MS — Equine Biomechanist. Sports massage, PEMF, red light, and more for thoughtful horse owners.",
+    ogTitle: "Equine Bodywork and Wellness Consulting",
+    ogDescription:
+      "Professional equine bodywork and wellness sessions grounded in graduate-level biomechanics. Sports massage, PEMF, red light, cold laser, TENS, and TECAR.",
   },
   "/bio": {
     title: "About Susie H. Lytal, MS — Equine Biomechanist",
     description:
       "Meet Susie H. Lytal, MS — equine biomechanist offering bodywork and wellness sessions in partnership with your veterinarian.",
+    ogTitle: "About Susie H. Lytal, MS — Equine Biomechanist",
+    ogDescription:
+      "Graduate-level biomechanics expertise applied to hands-on equine wellness sessions in partnership with your veterinarian.",
   },
   "/modalities": {
     title: "Wellness Modalities for Horses — Sports Massage, PEMF, Red Light & More",
     description:
       "Explore the wellness modalities used in every session: sports massage, PEMF, red light, TENS, and more — supportive, non-medical care for your horse.",
+    ogTitle: "Six Wellness Modalities for Horses",
+    ogDescription:
+      "Equine sports massage, PEMF (Magnawave), red light (RevitaVet), cold laser, TENS (TrueStim), and TECAR — tailored to your horse.",
   },
   "/gallery": {
     title: "Gallery — Sessions in the Barn Aisle",
     description:
       "A look at sessions in the barn aisle: hands-on bodywork, PEMF, and red light supporting horses across the region.",
+    ogTitle: "Gallery — Sessions in the Barn Aisle",
+    ogDescription:
+      "Glimpses of hands-on equine bodywork, PEMF, and red light sessions in real working barns.",
   },
   "/partners": {
     title: "Trusted Partners — Magnawave, RevitaVet, TrueStim, BeneFab",
     description:
       "The equipment brands and wellness products Susie trusts and uses in every session, including Magnawave, RevitaVet, TrueStim, and BeneFab.",
+    ogTitle: "Trusted Equipment Partners",
+    ogDescription:
+      "The equipment brands Susie uses and recommends: Magnawave, RevitaVet, TrueStim, and BeneFab.",
   },
   "/news": {
     title: "The Worthy Horse News — Newsletter for Thoughtful Horse Owners",
     description:
       "Subscribe to The Worthy Horse News: a monthly dispatch covering legislation, state law, petitions, and seasonal care for thoughtful horse owners.",
+    ogTitle: "The Worthy Horse News",
+    ogDescription:
+      "A monthly dispatch on equine wellness, legislation, petitions, and seasonal care — for thoughtful horse owners.",
   },
 };
 
-function setMetaDescription(content: string) {
-  let tag = document.querySelector<HTMLMetaElement>('meta[name="description"]');
+function setMeta(name: string, content: string) {
+  let tag = document.querySelector<HTMLMetaElement>(`meta[name="${name}"]`);
   if (!tag) {
     tag = document.createElement("meta");
-    tag.name = "description";
+    tag.setAttribute("name", name);
     document.head.appendChild(tag);
   }
-  tag.content = content;
+  tag.setAttribute("content", content);
+}
+
+function setProperty(property: string, content: string) {
+  let tag = document.querySelector<HTMLMetaElement>(
+    `meta[property="${property}"]`,
+  );
+  if (!tag) {
+    tag = document.createElement("meta");
+    tag.setAttribute("property", property);
+    document.head.appendChild(tag);
+  }
+  tag.setAttribute("content", content);
+}
+
+function setCanonical(href: string) {
+  let tag = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+  if (!tag) {
+    tag = document.createElement("link");
+    tag.setAttribute("rel", "canonical");
+    document.head.appendChild(tag);
+  }
+  tag.setAttribute("href", href);
+}
+
+function setRobots(content: string | null) {
+  let tag = document.querySelector<HTMLMetaElement>('meta[name="robots"]');
+  if (content === null) {
+    if (tag) tag.remove();
+    return;
+  }
+  if (!tag) {
+    tag = document.createElement("meta");
+    tag.setAttribute("name", "robots");
+    document.head.appendChild(tag);
+  }
+  tag.setAttribute("content", content);
 }
 
 function PageWrapper({ children }: { children: React.ReactNode }) {
@@ -80,9 +139,31 @@ function Router() {
   const [location] = useLocation();
 
   useEffect(() => {
-    const meta = pageMeta[location] ?? pageMeta["/"];
+    const known = pageMeta[location];
+    const meta: PageMeta = known ?? {
+      title: "Page not found | Equine Bodywork and Wellness Consulting",
+      description:
+        "The page you're looking for couldn't be found. Return to the home page to continue exploring equine bodywork and wellness sessions.",
+    };
+    const ogTitle = meta.ogTitle ?? meta.title;
+    const ogDescription = meta.ogDescription ?? meta.description;
+    const url = `${window.location.origin}${window.location.pathname}`;
+
     document.title = meta.title;
-    setMetaDescription(meta.description);
+    setMeta("description", meta.description);
+
+    setProperty("og:title", ogTitle);
+    setProperty("og:description", ogDescription);
+    setProperty("og:url", url);
+    setProperty("og:type", "website");
+
+    setMeta("twitter:title", ogTitle);
+    setMeta("twitter:description", ogDescription);
+    setMeta("twitter:card", "summary_large_image");
+
+    setCanonical(url);
+    setRobots(known ? null : "noindex, follow");
+
     window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
   }, [location]);
 
