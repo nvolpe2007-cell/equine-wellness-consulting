@@ -49,7 +49,7 @@ const pageMeta: Record<string, PageMeta> = {
   "/news": {
     title: "The Worthy Horse News — Newsletter for Thoughtful Horse Owners",
     description:
-      "The Worthy Horse News: notes on legislation, state law, petitions, and seasonal care for thoughtful horse owners.",
+      "Subscribe to The Worthy Horse News: a monthly dispatch covering legislation, state law, petitions, and seasonal care for thoughtful horse owners.",
   },
 };
 

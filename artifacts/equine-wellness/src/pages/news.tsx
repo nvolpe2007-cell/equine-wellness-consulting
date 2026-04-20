@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Calendar, Tag, ChevronDown, ChevronUp } from "lucide-react";
 import { WordReveal, LineReveal } from "@/components/ui/AnimatedText";
+import { NewsletterSignup } from "@/components/NewsletterSignup";
 import { newsletterPosts, formatPostDate, type NewsletterPost } from "@/content/newsletter-posts";
 
 const sortedPosts: NewsletterPost[] = [...newsletterPosts].sort(
@@ -111,6 +112,16 @@ export default function News() {
             className="text-lg md:text-xl text-muted-foreground font-light leading-relaxed"
           />
         </div>
+      </div>
+
+      {/* Signup */}
+      <div className="container mx-auto px-4 pt-16 max-w-2xl">
+        <NewsletterSignup
+          variant="hero"
+          source="news_page"
+          heading="Subscribe to The Worthy Horse News"
+          subheading="One thoughtful note a month — legislation, seasonal care, and petitions worth following. No spam, unsubscribe anytime."
+        />
       </div>
 
       {/* Posts */}
