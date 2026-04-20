@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, Tag, ChevronDown, ChevronUp } from "lucide-react";
+import { Link } from "wouter";
+import { motion } from "framer-motion";
+import { Calendar, Tag, ArrowRight } from "lucide-react";
 import { WordReveal, LineReveal } from "@/components/ui/AnimatedText";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
 import { newsletterPosts, formatPostDate, type NewsletterPost } from "@/content/newsletter-posts";
@@ -10,8 +10,6 @@ const sortedPosts: NewsletterPost[] = [...newsletterPosts].sort(
 );
 
 function PostCard({ post, index }: { post: NewsletterPost; index: number }) {
-  const [expanded, setExpanded] = useState(false);
-
   return (
     <motion.article
       initial={{ opacity: 0, y: 16 }}
@@ -35,54 +33,28 @@ function PostCard({ post, index }: { post: NewsletterPost; index: number }) {
       </div>
 
       <h3 className="font-serif text-xl md:text-2xl text-foreground mb-3 leading-snug">
-        {post.title}
+        <Link
+          href={`/news/${post.slug}`}
+          className="hover:text-primary transition-colors"
+          data-testid={`link-post-title-${post.id}`}
+        >
+          {post.title}
+        </Link>
       </h3>
 
       <p className="text-muted-foreground leading-relaxed italic">
         {post.excerpt}
       </p>
 
-      <AnimatePresence initial={false}>
-        {expanded && (
-          <motion.div
-            id={`post-body-${post.id}`}
-            key="body"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="overflow-hidden"
-          >
-            <div className="space-y-4 text-foreground/90 leading-relaxed pt-5">
-              {post.body.map((paragraph, i) => (
-                <p key={i}>{paragraph}</p>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <div className="mt-5">
-        <button
-          type="button"
-          onClick={() => setExpanded((v) => !v)}
-          aria-expanded={expanded}
-          aria-controls={`post-body-${post.id}`}
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 focus:outline-none focus:ring-2 focus:ring-ring rounded-sm"
-          data-testid={`button-read-more-${post.id}`}
+        <Link
+          href={`/news/${post.slug}`}
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80"
+          data-testid={`link-read-full-${post.id}`}
         >
-          {expanded ? (
-            <>
-              Read less
-              <ChevronUp className="h-4 w-4" />
-            </>
-          ) : (
-            <>
-              Read more
-              <ChevronDown className="h-4 w-4" />
-            </>
-          )}
-        </button>
+          Read full dispatch
+          <ArrowRight className="h-4 w-4" />
+        </Link>
       </div>
     </motion.article>
   );

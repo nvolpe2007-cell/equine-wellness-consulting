@@ -14,7 +14,10 @@ import Modalities from "@/pages/modalities";
 import Partners from "@/pages/partners";
 import Gallery from "@/pages/gallery";
 import News from "@/pages/news";
+import NewsPost from "@/pages/news-post";
 import NotFound from "@/pages/not-found";
+
+import { getPostBySlug } from "@/content/newsletter-posts";
 
 const queryClient = new QueryClient();
 
@@ -139,7 +142,16 @@ function Router() {
   const [location] = useLocation();
 
   useEffect(() => {
-    const known = pageMeta[location];
+    const postSlugMatch = location.match(/^\/news\/([^/]+)$/);
+    const post = postSlugMatch ? getPostBySlug(postSlugMatch[1]) : undefined;
+    const known: PageMeta | undefined = post
+      ? {
+          title: `${post.title} | The Worthy Horse News`,
+          description: post.metaDescription,
+          ogTitle: post.title,
+          ogDescription: post.metaDescription,
+        }
+      : pageMeta[location];
     const meta: PageMeta = known ?? {
       title: "Page not found | Equine Bodywork and Wellness Consulting",
       description:
@@ -180,6 +192,7 @@ function Router() {
               <Route path="/partners" component={Partners} />
               <Route path="/gallery" component={Gallery} />
               <Route path="/news" component={News} />
+              <Route path="/news/:slug" component={NewsPost} />
               <Route component={NotFound} />
             </Switch>
           </PageWrapper>

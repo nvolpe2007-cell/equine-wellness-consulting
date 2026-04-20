@@ -7,21 +7,26 @@ export type NewsletterCategory =
 
 export type NewsletterPost = {
   id: string;
+  slug: string;
   title: string;
   date: string;
   category: NewsletterCategory;
   excerpt: string;
+  metaDescription: string;
   body: string[];
 };
 
 export const newsletterPosts: NewsletterPost[] = [
   {
     id: "2026-04-spring-transition",
+    slug: "spring-transition-helping-horses-through-the-seasonal-shift",
     title: "Spring Transition: Helping Your Horse Move Through the Seasonal Shift",
     date: "2026-04-10",
     category: "Seasonal Care",
     excerpt:
       "As pastures green up and work loads ramp back up, horses often experience a noticeable change in body condition, hydration, and muscular comfort. Here are the things I'm watching for in spring sessions.",
+    metaDescription:
+      "Spring brings shifts in body condition, hydration, and muscular comfort for horses. Susie H. Lytal, MS shares what she's watching for in spring bodywork sessions.",
     body: [
       "After a long winter of reduced movement, blanketing, and limited turnout, most horses come into spring carrying some degree of muscular guarding — particularly through the topline, hindquarters, and the base of the neck.",
       "In sessions over the past few weeks, I've been seeing a lot of tightness around the longissimus dorsi and the gluteal complex. This often shows up as a shortened stride behind, reluctance to bend through the ribcage, or a horse that feels 'sticky' in the first ten minutes of warm-up.",
@@ -32,11 +37,14 @@ export const newsletterPosts: NewsletterPost[] = [
   },
   {
     id: "2026-03-state-roundup",
+    slug: "2026-legislation-update-equine-bodywork-practitioners",
     title: "Legislation Update: What's Changing for Equine Bodywork Practitioners in 2026",
     date: "2026-03-22",
     category: "Legislation",
     excerpt:
       "From California to Florida, state veterinary boards have been quietly updating language around equine wellness work and bodywork. Here's a plain-English summary of what owners should know.",
+    metaDescription:
+      "A state-by-state look at how veterinary boards in California, Texas, and Florida are updating their language around equine wellness work in 2026.",
     body: [
       "Over the last six months, several state veterinary boards have either proposed or adopted clarifying language around who may provide hands-on, non-medical care to horses — and under what circumstances.",
       "California (proposed): A working group is reviewing how the state defines hands-on, non-medical wellness work to draw a clearer line between licensed veterinary medicine and certified wellness practices like sports massage. Comment periods have been open through the spring.",
@@ -48,11 +56,14 @@ export const newsletterPosts: NewsletterPost[] = [
   },
   {
     id: "2026-02-petition-watch",
+    slug: "petition-watch-recognizing-certified-equine-massage",
     title: "Petition Watch: Recognizing Certified Equine Massage as a Distinct Profession",
     date: "2026-02-18",
     category: "Petition",
     excerpt:
       "A national petition is gaining traction asking for clearer professional recognition of certified equine sports massage practitioners. Here's what it actually says — and what it doesn't.",
+    metaDescription:
+      "A national petition asks state regulators to formally recognize certified equine sports massage as a distinct, non-medical profession. Here's what it does and does not propose.",
     body: [
       "A petition circulated by a coalition of certified equine bodywork practitioners and educators is currently gathering signatures from horse owners, trainers, and veterinarians across the country.",
       "The petition does not seek to expand scope into veterinary medicine. It explicitly affirms that diagnosis, prescription, and medical care remain the exclusive domain of licensed veterinarians.",
@@ -63,11 +74,14 @@ export const newsletterPosts: NewsletterPost[] = [
   },
   {
     id: "2026-01-industry-pemf",
+    slug: "research-pemf-recovery-performance-horses",
     title: "Industry Note: New Research on PEMF and Recovery in Performance Horses",
     date: "2026-01-30",
     category: "Industry",
     excerpt:
       "A pair of recently published studies look at the relationship between consistent PEMF application and recovery markers in actively competing horses. A measured look at what they found — and what they didn't.",
+    metaDescription:
+      "Two new studies examine PEMF application and recovery in performance horses. A measured look at what the research does and does not tell us about consistent PEMF sessions.",
     body: [
       "Two studies published in the last quarter add to the growing — but still developing — body of literature around Pulsed Electromagnetic Field (PEMF) application in equine athletes.",
       "The first, a smaller cohort study out of a European sport horse program, observed self-reported owner-perceived improvements in post-work recovery and a measurable trend in heart-rate recovery times in horses receiving consistent PEMF sessions over a 12-week training block.",
@@ -77,6 +91,10 @@ export const newsletterPosts: NewsletterPost[] = [
     ],
   },
 ];
+
+export function getPostBySlug(slug: string): NewsletterPost | undefined {
+  return newsletterPosts.find((p) => p.slug === slug);
+}
 
 export function formatPostDate(iso: string): string {
   const date = new Date(iso);
