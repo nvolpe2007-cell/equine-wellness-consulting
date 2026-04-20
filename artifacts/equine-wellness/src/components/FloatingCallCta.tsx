@@ -1,6 +1,10 @@
 import { Phone } from "lucide-react";
+import { useLocation } from "wouter";
 
 export function FloatingCallCta() {
+  const [location] = useLocation();
+  if (location.startsWith("/admin")) return null;
+
   return (
     <a
       href="tel:+13104884389"
