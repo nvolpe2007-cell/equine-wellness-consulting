@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { FloatingCallCta } from "@/components/FloatingCallCta";
 
 import Home from "@/pages/home";
 import Bio from "@/pages/bio";
@@ -199,6 +200,7 @@ function Router() {
         </AnimatePresence>
       </main>
       <Footer />
+      <FloatingCallCta />
     </div>
   );
 }

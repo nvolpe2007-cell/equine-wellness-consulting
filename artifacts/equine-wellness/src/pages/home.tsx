@@ -3,6 +3,8 @@ import { Link } from "wouter";
 import { ArrowRight, CheckCircle2, Sparkles, Phone } from "lucide-react";
 import { useRef } from "react";
 import { WordReveal, LineReveal, AnimatedHeading, AccentFlourish } from "@/components/ui/AnimatedText";
+import { ServiceArea } from "@/components/sections/ServiceArea";
+import { Testimonials } from "@/components/sections/Testimonials";
 import barnHero from "@assets/stock_images/barn-hero.jpg";
 import barnExterior from "@assets/stock_images/barn-exterior.jpg";
 import horsePortrait from "@assets/stock_images/horse-portrait.jpg";
@@ -193,6 +195,9 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Service Area */}
+      <ServiceArea />
+
       {/* Services Preview */}
       <section className="py-24 bg-background">
         <div className="container mx-auto px-4">
@@ -353,6 +358,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Testimonials */}
+      <Testimonials />
 
       {/* Disclaimer / Professionalism */}
       <section className="py-16 bg-muted text-center">
