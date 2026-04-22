@@ -6,7 +6,7 @@ import massageHands from "@assets/0629_LOC_Horse02_CBH_t1170_1776529181857.jpg";
 import horseStall from "@assets/stock_images/horse-stall.jpg";
 import pemfWhiteHorse from "@assets/20260407_121449_1776528702902.jpg";
 import pemfRear from "@assets/20260407_112708_1776528693859.jpg";
-import redLightLeg from "@assets/20260319_191731_1776528710545.jpg";
+import redLightLeg from "@assets/image_1776880244507.jpeg";
 import susieWithHorse from "@assets/20260401_140719_1776528664269.jpg";
 
 type Modality = {
