@@ -4,12 +4,12 @@ import susieWithHorse from "@assets/20260401_140719_1776528664269.jpg";
 import horseOnPad from "@assets/20260320_141245_1776528671943.jpg";
 import pemfRear from "@assets/20260407_112708_1776528693859.jpg";
 import pemfWhiteHorse from "@assets/20260407_121449_1776528702902.jpg";
-import redLightLeg from "@assets/20260319_191731_1776528710545.jpg";
+import redLightPad from "@assets/image_1776880244507.jpeg";
 
 export default function Gallery() {
   const images = [
     { src: susieWithHorse, alt: "Susie on-site preparing for a session", colSpan: "col-span-1 md:col-span-2" },
-    { src: redLightLeg, alt: "Red light session on the lower leg", colSpan: "col-span-1" },
+    { src: redLightPad, alt: "LED red light therapy pad glowing across a horse's back during a wellness session", colSpan: "col-span-1" },
     { src: horseOnPad, alt: "A calm bay standing on the PEMF pad", colSpan: "col-span-1" },
     { src: pemfWhiteHorse, alt: "PEMF session in the stall with a relaxed grey", colSpan: "col-span-1 md:col-span-2" },
     { src: pemfRear, alt: "Magnawave PEMF loops in use during a session", colSpan: "col-span-1 md:col-span-2" },
