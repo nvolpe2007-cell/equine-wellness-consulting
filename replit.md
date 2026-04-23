@@ -22,6 +22,7 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
+- `pnpm --filter @workspace/db run check-drift` — verify the live database matches `lib/db/src/schema/*`
 - `pnpm --filter @workspace/api-server run dev` — run API server locally
 
 ## Newsletter (The Worthy Horse News)
@@ -76,5 +77,25 @@ Where to get the values:
   (not the full tag).
 - `VITE_GA4_MEASUREMENT_ID`: in Google Analytics → Admin → Data Streams →
   pick the web stream → copy the Measurement ID at the top.
+
+## Schema drift detection
+
+The signup flow once 500'd because `lib/db/src/schema/subscribers.ts` had
+columns (`unsubscribe_token`, `unsubscribed_at`) that were never pushed to the
+live database. To prevent that recurring silently:
+
+- `lib/db/src/check-schema-drift.ts` introspects `information_schema` and
+  compares every column declared in `lib/db/src/schema/*` against the live DB.
+  It exits non-zero on any missing table, missing column, type mismatch, or
+  nullability mismatch.
+- The post-merge script (`scripts/post-merge.sh`) runs `pnpm --filter db push`
+  followed by `pnpm --filter db run check-drift`, so a merge fails loudly if
+  the schema and the database disagree.
+- A `schema-drift` validation step is registered for the same command, so it
+  can be run on demand alongside other quality gates.
+
+When you change anything under `lib/db/src/schema/`, push it
+(`pnpm --filter @workspace/db run push`) before relying on it from the API.
+If `check-drift` reports drift, push the schema and re-run the check.
 
 See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details.
