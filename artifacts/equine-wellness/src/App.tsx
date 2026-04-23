@@ -19,6 +19,7 @@ import NewsPost from "@/pages/news-post";
 import NotFound from "@/pages/not-found";
 
 import { getPostBySlug } from "@/content/newsletter-posts";
+import { trackPageView } from "@/lib/analytics";
 
 const queryClient = new QueryClient();
 
@@ -178,6 +179,7 @@ function Router() {
     setRobots(known ? null : "noindex, follow");
 
     window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+    trackPageView(window.location.pathname, meta.title);
   }, [location]);
 
   return (

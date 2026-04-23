@@ -5,6 +5,7 @@ import { z } from "zod";
 import { motion } from "framer-motion";
 import { Mail, Check, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { trackEvent } from "@/lib/analytics";
 
 type Variant = "hero" | "footer" | "inline";
 
@@ -88,6 +89,10 @@ export function NewsletterSignup({
       }
 
       setStatus(data.alreadySubscribed ? "already" : "success");
+      trackEvent("newsletter_signup", {
+        source,
+        already_subscribed: Boolean(data.alreadySubscribed),
+      });
       reset();
     } catch {
       setStatus("error");
