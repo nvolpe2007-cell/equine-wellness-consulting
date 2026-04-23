@@ -30,6 +30,19 @@ function applyGtagConsent(choice: ConsentChoice): void {
   window.gtag("consent", "update", { analytics_storage: choice });
 }
 
+export const COOKIE_CONSENT_RESET_EVENT = "cookie-consent:reset";
+
+export function clearStoredConsent(): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.removeItem(CONSENT_STORAGE_KEY);
+  } catch {
+    // ignore storage failures
+  }
+  applyGtagConsent("denied");
+  window.dispatchEvent(new CustomEvent(COOKIE_CONSENT_RESET_EVENT));
+}
+
 export function setAnalyticsConsent(choice: ConsentChoice): void {
   if (typeof window !== "undefined") {
     try {

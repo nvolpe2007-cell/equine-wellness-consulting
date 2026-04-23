@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   analyticsEnabled,
+  COOKIE_CONSENT_RESET_EVENT,
   getStoredConsent,
   setAnalyticsConsent,
   trackPageView,
@@ -12,6 +13,11 @@ export function CookieConsent() {
   useEffect(() => {
     if (!analyticsEnabled) return;
     if (getStoredConsent() === null) setVisible(true);
+    const handleReset = () => setVisible(true);
+    window.addEventListener(COOKIE_CONSENT_RESET_EVENT, handleReset);
+    return () => {
+      window.removeEventListener(COOKIE_CONSENT_RESET_EVENT, handleReset);
+    };
   }, []);
 
   if (!analyticsEnabled || !visible) return null;

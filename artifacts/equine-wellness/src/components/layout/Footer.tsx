@@ -1,7 +1,12 @@
 import { Link } from "wouter";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
+import { analyticsEnabled, clearStoredConsent } from "@/lib/analytics";
 
 export function Footer() {
+  const handleCookiePreferences = () => {
+    clearStoredConsent();
+  };
+
   return (
     <footer className="bg-foreground text-background py-16 mt-20">
       <div className="container mx-auto px-4 mb-12 pb-12 border-b border-white/10">
@@ -57,6 +62,18 @@ export function Footer() {
       
       <div className="container mx-auto px-4 mt-12 pt-8 border-t border-white/10 text-center text-xs text-muted/60">
         <p>&copy; {new Date().getFullYear()} Equine Bodywork and Wellness Consulting. All rights reserved.</p>
+        {analyticsEnabled && (
+          <p className="mt-2">
+            <button
+              type="button"
+              onClick={handleCookiePreferences}
+              data-testid="button-cookie-preferences"
+              className="hover:text-white transition-colors underline-offset-2 hover:underline"
+            >
+              Cookie preferences
+            </button>
+          </p>
+        )}
       </div>
     </footer>
   );
