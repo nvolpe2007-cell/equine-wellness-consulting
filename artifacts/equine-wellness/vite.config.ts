@@ -98,7 +98,7 @@ function siteSeoPlugin(): Plugin {
           `    <script async src="https://www.googletagmanager.com/gtag/js?id=${GA4_MEASUREMENT_ID}"></script>`,
         );
         tags.push(
-          `    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('js',new Date());gtag('config','${GA4_MEASUREMENT_ID}',{send_page_view:false});</script>`,
+          `    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('consent','default',{'analytics_storage':'denied'});gtag('js',new Date());gtag('config','${GA4_MEASUREMENT_ID}',{send_page_view:false});</script>`,
         );
       }
       if (tags.length === 0) return html;

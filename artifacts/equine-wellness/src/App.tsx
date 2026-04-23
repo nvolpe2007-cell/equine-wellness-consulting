@@ -8,6 +8,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { FloatingCallCta } from "@/components/FloatingCallCta";
+import { CookieConsent } from "@/components/CookieConsent";
 
 import Home from "@/pages/home";
 import Bio from "@/pages/bio";
@@ -19,7 +20,7 @@ import NewsPost from "@/pages/news-post";
 import NotFound from "@/pages/not-found";
 
 import { getPostBySlug } from "@/content/newsletter-posts";
-import { trackPageView } from "@/lib/analytics";
+import { trackPageView, initAnalyticsConsent } from "@/lib/analytics";
 
 const queryClient = new QueryClient();
 
@@ -144,6 +145,10 @@ function Router() {
   const [location] = useLocation();
 
   useEffect(() => {
+    initAnalyticsConsent();
+  }, []);
+
+  useEffect(() => {
     const postSlugMatch = location.match(/^\/news\/([^/]+)$/);
     const post = postSlugMatch ? getPostBySlug(postSlugMatch[1]) : undefined;
     const known: PageMeta | undefined = post
@@ -203,6 +208,7 @@ function Router() {
       </main>
       <Footer />
       <FloatingCallCta />
+      <CookieConsent />
     </div>
   );
 }
