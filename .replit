@@ -46,3 +46,4 @@ channel = "stable-25_05"
 [userenv]
 
 [userenv.shared]
+NEWSLETTER_FROM_EMAIL = "The Worthy Horse <hello@theworthyhorse.org>"
