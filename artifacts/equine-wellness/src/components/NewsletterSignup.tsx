@@ -89,10 +89,13 @@ export function NewsletterSignup({
       }
 
       setStatus(data.alreadySubscribed ? "already" : "success");
-      trackEvent("newsletter_signup", {
-        source,
-        already_subscribed: Boolean(data.alreadySubscribed),
-      });
+      // Only count brand-new subscribes as a conversion; re-submits of
+      // already-subscribed emails fire a separate, non-conversion event.
+      if (data.alreadySubscribed) {
+        trackEvent("newsletter_signup_duplicate", { source });
+      } else {
+        trackEvent("newsletter_signup", { source });
+      }
       reset();
     } catch {
       setStatus("error");
