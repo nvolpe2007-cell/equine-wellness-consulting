@@ -98,4 +98,46 @@ When you change anything under `lib/db/src/schema/`, push it
 (`pnpm --filter @workspace/db run push`) before relying on it from the API.
 If `check-drift` reports drift, push the schema and re-run the check.
 
+## Going live with Google (equine-wellness)
+
+Once the real domain has been purchased and DNS points at the deployment,
+three short manual steps make the site fully visible to Google. None of
+this requires a developer — Susie (or whoever owns the Google account)
+can do it from a browser.
+
+1. **Verify the site in Google Search Console.** Go to
+   [Search Console](https://search.google.com/search-console), add the
+   site as a property, and choose the "HTML tag" verification method.
+   Google will give a small `<meta>` tag — copy the value of its
+   `content="..."` attribute (just the long token, not the whole tag),
+   set it as the deployment env var `VITE_GSC_VERIFICATION`, and
+   redeploy. Search Console will then click "Verify" and the site is
+   confirmed as Susie's.
+
+2. **Submit the sitemap.** In Search Console, open Sitemaps in the left
+   nav and submit `https://<your-real-domain>/sitemap.xml`. Google will
+   pick up every page and every newsletter post from there
+   automatically — no need to re-submit when new posts are added.
+
+3. **Set up Google Analytics 4.** In
+   [Google Analytics](https://analytics.google.com), create a new GA4
+   property for the site, add a Web data stream pointing at the live
+   domain, and copy the Measurement ID at the top of the stream
+   (`G-XXXXXXXXXX`). Set it as the deployment env var
+   `VITE_GA4_MEASUREMENT_ID` and redeploy. Visits will start showing up
+   in GA4 within a few minutes, and newsletter signups will appear as
+   `newsletter_signup` events under Reports → Engagement → Events.
+
+The site already ships with the supporting pieces:
+- Per-page titles, descriptions, canonical URLs, Open Graph + Twitter
+  Card meta, and a `noindex, follow` tag on unknown URLs.
+- JSON-LD structured data (LocalBusiness, Person, Service x6, FAQPage)
+  in `index.html` so Google can render rich results.
+- A dynamic `/sitemap.xml` and `/robots.txt` generated from
+  `src/content/newsletter-posts.ts` (no hand-editing needed).
+- A modern favicon set (`favicon.ico`, `favicon.svg`, Apple touch icon,
+  192/512 PNGs, plus `site.webmanifest` for mobile home screens) and a
+  branded `opengraph.jpg` share card.
+- A cookie consent banner that gates GA4 until the visitor accepts.
+
 See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details.

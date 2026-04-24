@@ -83,3 +83,15 @@ id = "e4b8ii5N4rvYDePiOqnjz"
 uri = "file://attached_assets/stock_images/horse-stall.jpg"
 type = "image"
 title = "horse in stall calm relaxed wellness"
+
+[[outputs]]
+id = "ht1QAQs0g4rY-w8PaLkNt"
+uri = "file://artifacts/equine-wellness/public/opengraph.jpg"
+type = "image"
+title = "Open Graph share image preview"
+
+[[outputs]]
+id = "bnsRkGjs-KpWut6zLcJ0W"
+uri = "file://artifacts/equine-wellness/public/icon-512.png"
+type = "image"
+title = "Favicon at 512px"
