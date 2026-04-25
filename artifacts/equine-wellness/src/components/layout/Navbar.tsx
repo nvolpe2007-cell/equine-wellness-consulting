@@ -39,9 +39,18 @@ export function Navbar() {
         "container mx-auto px-4 flex items-center justify-between transition-all duration-300",
         scrolled ? "h-16" : "h-20"
       )}>
-        <Link href="/" className="flex flex-col items-start gap-0.5 group" data-testid="link-home-logo">
-          <span className="font-serif text-xl font-medium text-foreground transition-colors group-hover:text-primary">Equine Bodywork and Wellness Consulting</span>
-          <span className="text-[0.65rem] font-sans text-muted-foreground uppercase tracking-[0.2em]">Susie H. Lytal, MS</span>
+        <Link href="/" className="flex items-center gap-2 sm:gap-3 group" data-testid="link-home-logo">
+          <img
+            src={`${import.meta.env.BASE_URL}favicon.svg`}
+            alt=""
+            aria-hidden="true"
+            className="h-7 w-7 sm:h-9 sm:w-9 shrink-0"
+            data-testid="img-header-mark"
+          />
+          <span className="flex flex-col items-start gap-0.5">
+            <span className="font-serif text-xl font-medium text-foreground transition-colors group-hover:text-primary">Equine Bodywork and Wellness Consulting</span>
+            <span className="text-[0.65rem] font-sans text-muted-foreground uppercase tracking-[0.2em]">Susie H. Lytal, MS</span>
+          </span>
         </Link>
 
         {/* Desktop Nav */}
