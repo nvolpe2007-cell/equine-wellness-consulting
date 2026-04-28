@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { WordReveal, LineReveal } from "@/components/ui/AnimatedText";
+import { LineReveal } from "@/components/ui/AnimatedText";
 import susieWithHorse from "@assets/20260401_140719_1776528664269.jpg";
 import horseOnPad from "@assets/20260320_141245_1776528671943.jpg";
 import pemfRear from "@assets/20260407_112708_1776528693859.jpg";
@@ -19,29 +19,21 @@ export default function Gallery() {
   return (
     <div className="min-h-screen bg-background">
       <section className="relative bg-card overflow-hidden">
-        <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
-          <div
-            className="absolute -top-40 -right-40 w-[55vw] h-[55vw] rounded-full blur-[140px] opacity-50"
-            style={{
-              background:
-                "radial-gradient(closest-side, hsl(var(--gold) / 0.28), hsl(var(--gold-deep) / 0.10), transparent 72%)",
-            }}
-          />
-        </div>
-        <div className="container mx-auto px-4 py-32 md:py-44 relative">
+        <div className="container mx-auto px-4 py-20 md:py-28 relative">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-end">
             <div className="lg:col-span-7">
               <span className="block mb-6 gold-rule" aria-hidden="true" />
               <p className="text-xs uppercase tracking-[0.3em] text-primary mb-5 font-medium">
                 Gallery
               </p>
-              <WordReveal
-                text="Gallery"
-                as="h1"
+              <motion.h1
                 className="text-5xl md:text-7xl font-serif text-foreground leading-[1.02] tracking-tight"
-                delay={0.1}
-                stagger={0.08}
-              />
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+              >
+                Gallery
+              </motion.h1>
             </div>
             <div className="lg:col-span-5 lg:pb-3 lg:pl-10 lg:border-l lg:border-border">
               <LineReveal

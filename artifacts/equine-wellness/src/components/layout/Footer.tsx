@@ -8,8 +8,22 @@ export function Footer() {
   };
 
   return (
-    <footer className="bg-card text-card-foreground py-16 mt-20 border-t border-border">
-      <div className="container mx-auto px-4 mb-12 pb-12 border-b border-border">
+    <footer className="bg-card text-card-foreground mt-20 border-t border-border">
+      {/* Brand closure */}
+      <div className="container mx-auto px-4 pt-12 pb-8 flex items-center gap-3 border-b border-border/50">
+        <img
+          src={`${import.meta.env.BASE_URL}favicon.svg`}
+          alt=""
+          aria-hidden="true"
+          className="h-9 w-9 shrink-0 opacity-70"
+        />
+        <div className="flex flex-col gap-0.5">
+          <span className="font-serif text-xl text-foreground leading-tight">Equine Bodywork and Wellness Consulting</span>
+          <span className="text-[0.6rem] font-sans text-muted-foreground uppercase tracking-[0.22em]">Susie H. Lytal, MS · Equine Biomechanist</span>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 py-12 mb-0 border-b border-border">
         <div className="max-w-2xl">
           <NewsletterSignup
             variant="footer"
@@ -19,9 +33,8 @@ export function Footer() {
           />
         </div>
       </div>
-      <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12">
+      <div className="container mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-4 gap-12">
         <div className="col-span-1 md:col-span-2">
-          <h2 className="font-serif text-2xl mb-4 text-foreground">Equine Bodywork and Wellness Consulting</h2>
           <p className="text-muted-foreground text-sm max-w-md mb-6 leading-relaxed">
             Professional equine biomechanics and wellness services. Susie H. Lytal, MS brings graduate-level expertise to support your horse's performance and well-being.
           </p>

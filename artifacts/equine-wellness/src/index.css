@@ -247,7 +247,7 @@
   }
 
   ::selection {
-    background-color: hsl(var(--primary) / 0.25);
+    background-color: hsl(var(--gold) / 0.42);
     color: hsl(var(--foreground));
   }
 }

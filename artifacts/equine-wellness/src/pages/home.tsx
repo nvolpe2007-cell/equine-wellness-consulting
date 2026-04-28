@@ -1,6 +1,6 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Link } from "wouter";
-import { ArrowRight, CheckCircle2, Sparkles, Phone } from "lucide-react";
+import { ArrowRight, CheckCircle2, Phone } from "lucide-react";
 import { useRef } from "react";
 import { WordReveal, LineReveal, AnimatedHeading, AccentFlourish } from "@/components/ui/AnimatedText";
 import { ServiceArea } from "@/components/sections/ServiceArea";
@@ -54,10 +54,9 @@ export default function Home() {
             animate="visible"
             className="max-w-3xl mx-auto"
           >
-            <motion.div variants={fadeUp} transition={{ duration: 0.6 }} className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 backdrop-blur-sm mb-6">
-              <Sparkles className="h-3.5 w-3.5 text-accent" />
-              <span className="text-white/90 font-sans tracking-widest uppercase text-xs">Susie H. Lytal, MS · Equine Biomechanist</span>
-            </motion.div>
+            <motion.p variants={fadeUp} transition={{ duration: 0.6 }} className="text-[0.7rem] font-sans tracking-[0.28em] text-white/65 uppercase mb-5">
+              Susie H. Lytal, MS · Equine Biomechanist
+            </motion.p>
             <motion.span
               variants={fadeUp}
               transition={{ duration: 0.6 }}
@@ -108,46 +107,33 @@ export default function Home() {
           </motion.div>
         </div>
 
-        {/* Scroll cue */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2, duration: 0.8 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
-        >
-          <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className="h-10 w-6 rounded-full border-2 border-white/40 flex items-start justify-center pt-2"
-          >
-            <div className="h-1.5 w-1 rounded-full bg-white/70" />
-          </motion.div>
-        </motion.div>
       </section>
 
-      {/* Stats Strip */}
-      <section className="bg-gold-metallic-band py-12 border-y border-[hsl(var(--gold-deep))]/40 shadow-gold-glow">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-            variants={stagger}
-            className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center"
-          >
+      {/* Credentials Band */}
+      <section className="bg-gold-metallic-band border-y border-[hsl(var(--gold-deep))]/40">
+        <motion.div
+          className="container mx-auto px-4 py-5"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          <ul className="flex flex-wrap justify-center items-center gap-y-2 gap-x-0 text-[0.72rem] font-sans tracking-[0.18em] text-primary-foreground/85 uppercase">
             {[
-              { num: "MS", label: "Master of Science, Biomechanics" },
-              { num: "6", label: "Wellness Modalities Offered" },
-              { num: "Certified", label: "Equine Sports Massage Therapist" },
-              { num: "100%", label: "Customized to Each Horse" },
-            ].map((stat, i) => (
-              <motion.div key={i} variants={fadeUp} transition={{ duration: 0.5 }}>
-                <div className="text-3xl md:text-4xl font-serif text-primary-foreground mb-1">{stat.num}</div>
-                <div className="text-xs md:text-sm text-primary-foreground/80 uppercase tracking-wider leading-tight">{stat.label}</div>
-              </motion.div>
+              "M.S., Biomechanics",
+              "Certified Equine Sports Massage Therapist",
+              "Six Wellness Modalities",
+              "Southern California",
+            ].map((item, i, arr) => (
+              <li key={item} className="flex items-center">
+                <span>{item}</span>
+                {i < arr.length - 1 && (
+                  <span aria-hidden="true" className="mx-4 h-3 w-px bg-primary-foreground/35 inline-block align-middle" />
+                )}
+              </li>
             ))}
-          </motion.div>
-        </div>
+          </ul>
+        </motion.div>
       </section>
 
       {/* Intro / Philosophy */}

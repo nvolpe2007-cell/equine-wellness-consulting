@@ -7,29 +7,21 @@ export default function Bio() {
     <div className="min-h-screen bg-background">
       {/* Editorial Header */}
       <section className="relative bg-card overflow-hidden">
-        <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
-          <div
-            className="absolute -top-40 -right-32 w-[55vw] h-[55vw] rounded-full blur-[140px] opacity-50"
-            style={{
-              background:
-                "radial-gradient(closest-side, hsl(var(--gold) / 0.28), hsl(var(--gold-deep) / 0.12), transparent 72%)",
-            }}
-          />
-        </div>
-        <div className="container mx-auto px-4 py-32 md:py-44 relative">
+        <div className="container mx-auto px-4 py-20 md:py-28 relative">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-end">
             <div className="lg:col-span-7">
               <span className="block mb-6 gold-rule" aria-hidden="true" />
               <p className="text-xs uppercase tracking-[0.3em] text-primary mb-5 font-medium">
                 About Susie
               </p>
-              <WordReveal
-                text="Meet Susie H. Lytal, MS"
-                as="h1"
+              <motion.h1
                 className="text-5xl md:text-7xl font-serif text-foreground leading-[1.02] tracking-tight"
-                delay={0.1}
-                stagger={0.07}
-              />
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+              >
+                Meet Susie H. Lytal, MS
+              </motion.h1>
             </div>
             <div className="lg:col-span-5 lg:pb-3 lg:pl-10 lg:border-l lg:border-border">
               <LineReveal

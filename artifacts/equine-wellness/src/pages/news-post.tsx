@@ -65,16 +65,7 @@ export default function NewsPost() {
     <div className="min-h-screen bg-background">
       {/* Editorial article header */}
       <section className="relative bg-card overflow-hidden">
-        <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
-          <div
-            className="absolute -top-40 -right-32 w-[55vw] h-[55vw] rounded-full blur-[140px] opacity-50"
-            style={{
-              background:
-                "radial-gradient(closest-side, hsl(var(--gold) / 0.26), hsl(var(--gold-deep) / 0.12), transparent 72%)",
-            }}
-          />
-        </div>
-        <div className="container mx-auto px-4 pt-20 pb-28 md:pt-28 md:pb-40 relative">
+        <div className="container mx-auto px-4 pt-20 pb-24 md:pt-24 md:pb-32 relative">
           <Link
             href="/news"
             className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 mb-12"
