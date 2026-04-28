@@ -247,8 +247,8 @@
   }
 
   ::selection {
-    background-color: hsl(var(--gold) / 0.42);
-    color: hsl(var(--foreground));
+    background-color: hsl(var(--gold) / 0.35);
+    color: inherit;
   }
 }
 
