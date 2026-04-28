@@ -80,23 +80,52 @@ Where to get the values:
 
 ## Visual identity (equine-wellness)
 
-The site uses a "Full Luxury" palette: black background, ivory text, gold
-primary/accent. Source of truth: `:root` block in
+The site uses a "Full Luxury" palette: black background, ivory text, bright
+metallic gold primary/accent. Source of truth: `:root` block in
 `artifacts/equine-wellness/src/index.css`.
 
 - `--background 0 0% 6%` (near-black) / `--foreground 40 30% 96%` (ivory)
-- `--primary` and `--accent` `42 75% 58%` (warm gold) with
-  `--primary-foreground 0 0% 6%` so any `bg-primary` surface
-  (stats strip, "Biomechanical Advantage" section, gold buttons) MUST use
-  `text-primary-foreground` for AAA contrast — never `text-white`.
+- `--primary` and `--accent` `46 92% 62%` (bright metallic gold) with
+  `--primary-foreground 0 0% 6%`. Three gold gradient stops are also
+  defined for metallic surfaces:
+  - `--gold-light 48 100% 78%` (champagne highlight)
+  - `--gold       46 92% 62%`  (matches `--primary`)
+  - `--gold-deep  38 80% 44%`  (deep bronze shadow)
 - `--card 0 0% 10%` is used for the footer (`bg-card text-card-foreground`)
   so it sits as a slightly-lighter band against the page background.
 - `--secondary 36 40% 30%` is bronze, kept for muted accents.
 
+Reusable gold utilities (defined in the `@layer utilities` block of
+`index.css`) — use these on any "trophy" surface so it reads as metal:
+
+- `bg-gold-metallic` — diagonal light → gold → deep linear gradient.
+  Use for primary CTAs (hero "Explore Modalities", contact phone CTAs,
+  navbar phone CTA, newsletter Subscribe button).
+- `bg-gold-metallic-band` — same gradient with a top highlight overlay,
+  for full-width strips ("Biomechanical Advantage" section, stats strip).
+- `text-gold-gradient` — gradient-clipped text fill.
+- `shadow-gold-glow` / `shadow-gold-glow-lg` — soft gold glow shadow,
+  pair with `bg-gold-metallic` buttons.
+- `divider-gold` — full-width hairline gold gradient rule, used between
+  cinematic sections instead of flat `border-b`.
+- `gold-rule` — short 56px gold rule, used as an editorial flourish
+  above eyebrows and section headings.
+- `bg-gold-aurora` — soft multi-bloom gold radial-gradient background,
+  used by the "Where I Work" section (`components/sections/ServiceArea.tsx`).
+
+Sub-page editorial hero pattern (bio, modalities, gallery, news, partners):
+asymmetric 7/5 grid with gold rule + uppercase eyebrow + large left-aligned
+serif h1 in the 7-col, lead paragraph offset behind a left border in the
+5-col, soft gold radial bloom corner accent, and a `divider-gold` at the
+bottom. Section vertical rhythm uses `py-32 md:py-40/44`.
+
 Hardcoded `text-white` is only allowed over the dark hero photograph in
 `pages/home.tsx` and the gallery overlay in `pages/gallery.tsx`. Everywhere
 else, use semantic tokens (`text-foreground`, `text-muted-foreground`,
-`text-primary-foreground`) so the palette stays swappable.
+`text-primary-foreground`) so the palette stays swappable. On the
+metallic-gold band (`bg-gold-metallic-band`), use
+`text-primary-foreground` for body copy and `text-[hsl(var(--gold-deep))]`
+for accents/icons so they remain legible against the bright gradient.
 
 The `.dark {}` block in `index.css` is currently unused (no theme toggle in
 the app). If a system-preference dark mode is ever enabled, mirror the

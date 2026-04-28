@@ -32,65 +32,95 @@ export default function Partners() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="bg-card py-20 border-b">
-        <div className="container mx-auto px-4 text-center max-w-4xl">
-          <WordReveal
-            text="Trusted Partners"
-            as="h1"
-            className="text-4xl md:text-5xl font-serif text-foreground mb-6"
-            delay={0.1}
-            stagger={0.07}
-          />
-          <LineReveal
-            text="The tools, brands, and equipment I trust to support your horse's wellness."
-            as="p"
-            whileInView={false}
-            delay={0.45}
-            className="text-xl text-muted-foreground font-light leading-relaxed"
+      <section className="relative bg-card overflow-hidden">
+        <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
+          <div
+            className="absolute -top-40 -right-32 w-[55vw] h-[55vw] rounded-full blur-[140px] opacity-50"
+            style={{
+              background:
+                "radial-gradient(closest-side, hsl(var(--gold) / 0.26), hsl(var(--gold-deep) / 0.12), transparent 72%)",
+            }}
           />
         </div>
-      </div>
-
-      <div className="container mx-auto px-4 py-20">
-        <div className="max-w-3xl mx-auto mb-16 text-center">
-          <p className="text-lg text-muted-foreground">
-            I carefully select the equipment and products used during my sessions. Because I believe in these brands, I maintain referral partnerships with several of them. If you are interested in purchasing equipment or products for your own use, you may be able to receive a discount through my partner links below.
-          </p>
+        <div className="container mx-auto px-4 py-32 md:py-44 relative">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-end">
+            <div className="lg:col-span-7">
+              <span className="block mb-6 gold-rule" aria-hidden="true" />
+              <p className="text-xs uppercase tracking-[0.3em] text-primary mb-5 font-medium">
+                The Roster
+              </p>
+              <WordReveal
+                text="Trusted Partners"
+                as="h1"
+                className="text-5xl md:text-7xl font-serif text-foreground leading-[1.02] tracking-tight"
+                delay={0.1}
+                stagger={0.07}
+              />
+            </div>
+            <div className="lg:col-span-5 lg:pb-3 lg:pl-10 lg:border-l lg:border-border">
+              <LineReveal
+                text="The tools, brands, and equipment I trust to support your horse's wellness."
+                as="p"
+                whileInView={false}
+                delay={0.45}
+                className="text-lg md:text-xl text-muted-foreground font-light leading-relaxed"
+              />
+            </div>
+          </div>
         </div>
+        <div className="divider-gold" />
+      </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-          {partners.map((partner, index) => (
-            <motion.div
-              key={partner.name}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-card border rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow flex flex-col h-full"
-            >
-              <div className="mb-6">
-                <span className="text-xs font-sans tracking-widest text-primary uppercase mb-2 block">
-                  {partner.role}
-                </span>
-                <h2 className="text-2xl font-serif text-foreground mb-4">{partner.name}</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  {partner.description}
-                </p>
-              </div>
-              
-              <div className="mt-auto pt-6">
-                <a 
-                  href={partner.link}
-                  className="inline-flex items-center text-sm font-medium text-accent hover:text-accent/80 transition-colors group"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-testid={`link-partner-${partner.name.toLowerCase()}`}
-                >
-                  Visit {partner.name}
-                  <ExternalLink className="ml-2 h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                </a>
-              </div>
-            </motion.div>
-          ))}
+      {/* Asymmetric: sticky intro column + partner cards */}
+      <div className="container mx-auto px-4 py-24 md:py-32">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+          <aside className="lg:col-span-4 lg:sticky lg:top-28 lg:self-start">
+            <span className="block mb-5 gold-rule" aria-hidden="true" />
+            <p className="text-xs uppercase tracking-[0.3em] text-primary mb-3 font-medium">
+              How I select
+            </p>
+            <h2 className="font-serif text-2xl md:text-3xl text-foreground mb-5 leading-tight">
+              The equipment behind every session.
+            </h2>
+            <p className="text-muted-foreground leading-relaxed">
+              I carefully select the equipment and products used during my sessions. Because I believe in these brands, I maintain referral partnerships with several of them. If you are interested in purchasing equipment or products for your own use, you may be able to receive a discount through my partner links.
+            </p>
+          </aside>
+
+          <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+            {partners.map((partner, index) => (
+              <motion.div
+                key={partner.name}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-card border rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow flex flex-col h-full"
+              >
+                <div className="mb-6">
+                  <span className="text-xs font-sans tracking-widest text-primary uppercase mb-2 block">
+                    {partner.role}
+                  </span>
+                  <h3 className="text-2xl font-serif text-foreground mb-4">{partner.name}</h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {partner.description}
+                  </p>
+                </div>
+
+                <div className="mt-auto pt-6">
+                  <a
+                    href={partner.link}
+                    className="inline-flex items-center text-sm font-medium text-accent hover:text-accent/80 transition-colors group"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-testid={`link-partner-${partner.name.toLowerCase()}`}
+                  >
+                    Visit {partner.name}
+                    <ExternalLink className="ml-2 h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                  </a>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

@@ -5,27 +5,47 @@ import horsePortrait from "@assets/20260401_140719_1776529313797.jpg";
 export default function Bio() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="bg-card py-20 border-b">
-        <div className="container mx-auto px-4 text-center max-w-4xl">
-          <WordReveal
-            text="Meet Susie H. Lytal, MS"
-            as="h1"
-            className="text-4xl md:text-5xl font-serif text-foreground mb-6"
-            delay={0.1}
-            stagger={0.07}
-          />
-          <LineReveal
-            text="Equine Biomechanist & Certified Equine Sports Massage Therapist"
-            as="p"
-            whileInView={false}
-            delay={0.55}
-            className="text-xl text-muted-foreground font-light"
+      {/* Editorial Header */}
+      <section className="relative bg-card overflow-hidden">
+        <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
+          <div
+            className="absolute -top-40 -right-32 w-[55vw] h-[55vw] rounded-full blur-[140px] opacity-50"
+            style={{
+              background:
+                "radial-gradient(closest-side, hsl(var(--gold) / 0.28), hsl(var(--gold-deep) / 0.12), transparent 72%)",
+            }}
           />
         </div>
-      </div>
+        <div className="container mx-auto px-4 py-32 md:py-44 relative">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-end">
+            <div className="lg:col-span-7">
+              <span className="block mb-6 gold-rule" aria-hidden="true" />
+              <p className="text-xs uppercase tracking-[0.3em] text-primary mb-5 font-medium">
+                About Susie
+              </p>
+              <WordReveal
+                text="Meet Susie H. Lytal, MS"
+                as="h1"
+                className="text-5xl md:text-7xl font-serif text-foreground leading-[1.02] tracking-tight"
+                delay={0.1}
+                stagger={0.07}
+              />
+            </div>
+            <div className="lg:col-span-5 lg:pb-3 lg:pl-10 lg:border-l lg:border-border">
+              <LineReveal
+                text="Equine Biomechanist & Certified Equine Sports Massage Therapist — bridging graduate-level science and barn-aisle care."
+                as="p"
+                whileInView={false}
+                delay={0.55}
+                className="text-lg md:text-xl text-muted-foreground font-light leading-relaxed"
+              />
+            </div>
+          </div>
+        </div>
+        <div className="divider-gold" />
+      </section>
 
-      <div className="container mx-auto px-4 py-20">
+      <div className="container mx-auto px-4 py-24 md:py-32">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
           {/* Sidebar / Image */}
           <div className="lg:col-span-5 space-y-8">

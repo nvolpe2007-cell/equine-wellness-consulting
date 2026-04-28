@@ -9,7 +9,7 @@ import redLightPad from "@assets/image_1776880244507.jpeg";
 export default function Gallery() {
   const images = [
     { src: susieWithHorse, alt: "Susie on-site preparing for a session", colSpan: "col-span-1 md:col-span-2" },
-    { src: redLightPad, alt: "LED red light therapy pad glowing across a horse's back during a wellness session", colSpan: "col-span-1" },
+    { src: redLightPad, alt: "LED red light pad glowing across a horse's back during a wellness session", colSpan: "col-span-1" },
     { src: horseOnPad, alt: "A calm bay standing on the PEMF pad", colSpan: "col-span-1" },
     { src: pemfWhiteHorse, alt: "PEMF session in the stall with a relaxed grey", colSpan: "col-span-1 md:col-span-2" },
     { src: pemfRear, alt: "Magnawave PEMF loops in use during a session", colSpan: "col-span-1 md:col-span-2" },
@@ -18,26 +18,46 @@ export default function Gallery() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="bg-card py-20 border-b">
-        <div className="container mx-auto px-4 text-center max-w-4xl">
-          <WordReveal
-            text="Gallery"
-            as="h1"
-            className="text-4xl md:text-5xl font-serif text-foreground mb-6"
-            delay={0.1}
-            stagger={0.08}
-          />
-          <LineReveal
-            text="Glimpses of sessions, serene spaces, and the incredible animals we serve."
-            as="p"
-            whileInView={false}
-            delay={0.45}
-            className="text-xl text-muted-foreground font-light leading-relaxed"
+      <section className="relative bg-card overflow-hidden">
+        <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
+          <div
+            className="absolute -top-40 -right-40 w-[55vw] h-[55vw] rounded-full blur-[140px] opacity-50"
+            style={{
+              background:
+                "radial-gradient(closest-side, hsl(var(--gold) / 0.28), hsl(var(--gold-deep) / 0.10), transparent 72%)",
+            }}
           />
         </div>
-      </div>
+        <div className="container mx-auto px-4 py-32 md:py-44 relative">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-end">
+            <div className="lg:col-span-7">
+              <span className="block mb-6 gold-rule" aria-hidden="true" />
+              <p className="text-xs uppercase tracking-[0.3em] text-primary mb-5 font-medium">
+                Field Notes
+              </p>
+              <WordReveal
+                text="Gallery"
+                as="h1"
+                className="text-5xl md:text-7xl font-serif text-foreground leading-[1.02] tracking-tight"
+                delay={0.1}
+                stagger={0.08}
+              />
+            </div>
+            <div className="lg:col-span-5 lg:pb-3 lg:pl-10 lg:border-l lg:border-border">
+              <LineReveal
+                text="Glimpses of sessions, serene spaces, and the incredible animals we serve."
+                as="p"
+                whileInView={false}
+                delay={0.45}
+                className="text-lg md:text-xl text-muted-foreground font-light leading-relaxed"
+              />
+            </div>
+          </div>
+        </div>
+        <div className="divider-gold" />
+      </section>
 
-      <div className="container mx-auto px-4 py-20">
+      <div className="container mx-auto px-4 py-24 md:py-32">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 auto-rows-[300px]">
           {images.map((image, index) => (
             <motion.div

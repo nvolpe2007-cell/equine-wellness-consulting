@@ -63,31 +63,48 @@ function PostCard({ post, index }: { post: NewsletterPost; index: number }) {
 export default function News() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Page header */}
-      <div className="bg-card py-20 border-b">
-        <div className="container mx-auto px-4 text-center max-w-4xl">
-          <p className="text-xs uppercase tracking-[0.25em] text-primary mb-4 font-medium">
-            The Worthy Horse News
-          </p>
-          <WordReveal
-            text="Notes for thoughtful horse owners."
-            as="h1"
-            className="text-3xl md:text-5xl font-serif text-foreground mb-6 leading-tight"
-            delay={0.1}
-            stagger={0.05}
-          />
-          <LineReveal
-            text="Industry notes, state-by-state updates, petitions worth following, and seasonal care reminders — written for owners who want to be informed partners in their horse's wellness."
-            as="p"
-            whileInView={false}
-            delay={0.5}
-            className="text-lg md:text-xl text-muted-foreground font-light leading-relaxed"
+      {/* Editorial header */}
+      <section className="relative bg-card overflow-hidden">
+        <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
+          <div
+            className="absolute -top-40 -left-32 w-[55vw] h-[55vw] rounded-full blur-[140px] opacity-55"
+            style={{
+              background:
+                "radial-gradient(closest-side, hsl(var(--gold-light) / 0.30), hsl(var(--gold) / 0.14), transparent 72%)",
+            }}
           />
         </div>
-      </div>
+        <div className="container mx-auto px-4 py-32 md:py-44 relative">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-end">
+            <div className="lg:col-span-7">
+              <span className="block mb-6 gold-rule" aria-hidden="true" />
+              <p className="text-xs uppercase tracking-[0.3em] text-primary mb-5 font-medium">
+                The Worthy Horse News
+              </p>
+              <WordReveal
+                text="Notes for thoughtful horse owners."
+                as="h1"
+                className="text-5xl md:text-7xl font-serif text-foreground leading-[1.02] tracking-tight"
+                delay={0.1}
+                stagger={0.05}
+              />
+            </div>
+            <div className="lg:col-span-5 lg:pb-3 lg:pl-10 lg:border-l lg:border-border">
+              <LineReveal
+                text="Industry notes, state-by-state updates, petitions worth following, and seasonal care reminders — written for owners who want to be informed partners in their horse's wellness."
+                as="p"
+                whileInView={false}
+                delay={0.5}
+                className="text-lg md:text-xl text-muted-foreground font-light leading-relaxed"
+              />
+            </div>
+          </div>
+        </div>
+        <div className="divider-gold" />
+      </section>
 
       {/* Signup */}
-      <div className="container mx-auto px-4 pt-16 max-w-2xl">
+      <div className="container mx-auto px-4 pt-20 max-w-2xl">
         <NewsletterSignup
           variant="hero"
           source="news_page"

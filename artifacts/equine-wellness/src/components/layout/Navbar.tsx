@@ -71,7 +71,7 @@ export function Navbar() {
           ))}
           <a
             href="tel:+13104884389"
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            className="bg-gold-metallic shadow-gold-glow inline-flex h-10 items-center justify-center gap-2 rounded-full px-5 py-2 text-sm font-medium transition-all hover:shadow-gold-glow-lg hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             data-testid="link-nav-contact"
           >
             <Phone className="h-3.5 w-3.5" />
@@ -115,7 +115,7 @@ export function Navbar() {
           <div className="pt-4 mt-2 border-t">
             <a
               href="tel:+13104884389"
-              className="inline-flex w-full h-12 items-center justify-center gap-2 rounded-full bg-primary px-6 py-2 text-base font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+              className="bg-gold-metallic shadow-gold-glow inline-flex w-full h-12 items-center justify-center gap-2 rounded-full px-6 py-2 text-base font-medium transition-all hover:shadow-gold-glow-lg"
               onClick={() => setIsOpen(false)}
               data-testid="link-mobile-nav-contact"
             >

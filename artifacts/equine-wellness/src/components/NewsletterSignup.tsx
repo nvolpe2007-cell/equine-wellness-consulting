@@ -262,7 +262,7 @@ export function NewsletterSignup({
               "disabled:opacity-60 disabled:cursor-not-allowed",
               isFooter
                 ? "bg-primary-foreground text-primary hover:bg-primary-foreground/90"
-                : "bg-primary text-primary-foreground hover:bg-primary/90 hover:-translate-y-0.5 hover:shadow-md",
+                : "bg-gold-metallic shadow-gold-glow hover:shadow-gold-glow-lg hover:-translate-y-0.5",
             )}
             data-testid="button-newsletter-subscribe"
           >
