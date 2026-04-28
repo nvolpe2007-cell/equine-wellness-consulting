@@ -4,6 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 import fs from "fs";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
+import { imagetools } from "vite-imagetools";
 
 const rawPort = process.env.PORT;
 
@@ -107,6 +108,52 @@ function siteSeoPlugin(): Plugin {
   };
 }
 
+function imagetoolsGuardPlugin(): Plugin {
+  const cacheDir = path.resolve(
+    import.meta.dirname,
+    "node_modules/.cache/imagetools",
+  );
+  return {
+    name: "imagetools-guard",
+    enforce: "pre",
+    configureServer(server) {
+      server.middlewares.use(async (req, res, next) => {
+        const url = req.url ?? "";
+        const idx = url.indexOf("/@imagetools/");
+        if (idx === -1) {
+          next();
+          return;
+        }
+        const id = url.slice(idx + "/@imagetools/".length).split("?")[0];
+        if (!id || !/^[a-f0-9]+$/.test(id)) {
+          res.statusCode = 404;
+          res.setHeader("content-type", "text/plain");
+          res.end("not found");
+          return;
+        }
+        const filePath = `${cacheDir}/${id}`;
+        try {
+          const buf = await fs.promises.readFile(filePath);
+          let mime = "image/jpeg";
+          if (buf.length >= 12) {
+            const hex = buf.subarray(0, 12).toString("hex");
+            if (hex.startsWith("89504e47")) mime = "image/png";
+            else if (hex.startsWith("52494646") && buf.subarray(8, 12).toString() === "WEBP")
+              mime = "image/webp";
+            else if (buf.subarray(4, 8).toString() === "ftyp") mime = "image/avif";
+          }
+          res.setHeader("content-type", mime);
+          res.setHeader("cache-control", "no-cache");
+          res.end(buf);
+          return;
+        } catch {
+          next();
+        }
+      });
+    },
+  };
+}
+
 function sitemapPlugin(): Plugin {
   let outDir = "";
   return {
@@ -145,6 +192,19 @@ function sitemapPlugin(): Plugin {
 export default defineConfig({
   base: basePath,
   plugins: [
+    imagetoolsGuardPlugin(),
+    imagetools({
+      defaultDirectives: (url) => {
+        if (!url.searchParams.has("picture")) return new URLSearchParams();
+        const params = new URLSearchParams();
+        params.set("format", url.searchParams.get("format") ?? "avif;webp;jpg");
+        params.set("w", url.searchParams.get("w") ?? "400;800;1200");
+        params.set("as", "picture");
+        const quality = url.searchParams.get("quality");
+        if (quality) params.set("quality", quality);
+        return params;
+      },
+    }),
     react(),
     tailwindcss(),
     runtimeErrorOverlay(),

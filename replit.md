@@ -78,6 +78,33 @@ Where to get the values:
 - `VITE_GA4_MEASUREMENT_ID`: in Google Analytics → Admin → Data Streams →
   pick the web stream → copy the Measurement ID at the top.
 
+## Responsive images (equine-wellness)
+
+The site uses `vite-imagetools` + `sharp` to generate AVIF/WebP/JPEG variants
+at multiple widths for hero, card, gallery, and bio photos.
+
+- Image imports use the `?w=...&picture` query suffix
+  (e.g. `import barnHero from "@assets/.../barn-hero.jpg?w=640;1024;1600;2400&picture"`).
+- The `picture` marker is required (kept at the **end** of the query so the
+  TypeScript wildcard module declaration in `src/vite-env.d.ts` matches).
+- Render with `<ResponsiveImage>` (`src/components/ui/ResponsiveImage.tsx`),
+  which emits `<picture>` with AVIF + WebP `<source srcset sizes>` and a
+  JPEG fallback `<img>` (the fallback intentionally has no `srcset` — the
+  `<source>` elements carry it).
+- Hero images use `fetchPriority="high"` and no `loading` attribute (eager).
+  Below-the-fold images use `loading="lazy"`.
+- Default directives are configured in `vite.config.ts`'s `imagetools()`
+  call — `format=avif;webp;jpg`, default widths `400;800;1200`, `as=picture`.
+- A small `imagetoolsGuardPlugin` (in `vite.config.ts`, `enforce: "pre"`)
+  fronts the dev `/@imagetools/` middleware:
+  - empty / non-hex IDs return 404 (instead of vite-imagetools throwing 500
+    and showing the runtime-error overlay);
+  - valid hashes are served straight from the on-disk cache
+    (`node_modules/.cache/imagetools/<hash>`) so dev-server restarts don't
+    fail until each picture import has been re-evaluated.
+- `sharp` is registered in the root `package.json`
+  `pnpm.onlyBuiltDependencies` so its native binary builds at install time.
+
 ## Visual identity (equine-wellness)
 
 The site uses a "Full Luxury" palette: black background, ivory text, bright

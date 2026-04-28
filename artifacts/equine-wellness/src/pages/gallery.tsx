@@ -1,19 +1,22 @@
 import { motion } from "framer-motion";
 import { LineReveal } from "@/components/ui/AnimatedText";
-import susieWithHorse from "@assets/20260401_140719_1776528664269.jpg";
-import horseOnPad from "@assets/20260320_141245_1776528671943.jpg";
-import pemfRear from "@assets/20260407_112708_1776528693859.jpg";
-import pemfWhiteHorse from "@assets/20260407_121449_1776528702902.jpg";
-import redLightPad from "@assets/image_1776880244507.jpeg";
+import { ResponsiveImage, type PictureData } from "@/components/ui/ResponsiveImage";
+import susieWithHorse from "@assets/20260401_140719_1776528664269.jpg?w=400;800;1200&picture";
+import horseOnPad from "@assets/20260320_141245_1776528671943.jpg?w=400;800;1200&picture";
+import pemfRear from "@assets/20260407_112708_1776528693859.jpg?w=400;800;1200&picture";
+import pemfWhiteHorse from "@assets/20260407_121449_1776528702902.jpg?w=400;800;1200&picture";
+import redLightPad from "@assets/image_1776880244507.jpeg?w=400;800&picture";
+
+type GalleryImage = { src: PictureData; alt: string; colSpan: string; sizes: string };
 
 export default function Gallery() {
-  const images = [
-    { src: susieWithHorse, alt: "Susie on-site preparing for a session", colSpan: "col-span-1 md:col-span-2" },
-    { src: redLightPad, alt: "LED red light therapy pad glowing across a horse's back during a wellness session", colSpan: "col-span-1" },
-    { src: horseOnPad, alt: "A calm bay standing on the PEMF pad", colSpan: "col-span-1" },
-    { src: pemfWhiteHorse, alt: "PEMF session in the stall with a relaxed grey", colSpan: "col-span-1 md:col-span-2" },
-    { src: pemfRear, alt: "Magnawave PEMF loops in use during a session", colSpan: "col-span-1 md:col-span-2" },
-    { src: susieWithHorse, alt: "A quiet moment between sessions", colSpan: "col-span-1" },
+  const images: GalleryImage[] = [
+    { src: susieWithHorse, alt: "Susie on-site preparing for a session", colSpan: "col-span-1 md:col-span-2", sizes: "(min-width: 768px) 66vw, 100vw" },
+    { src: redLightPad, alt: "LED red light therapy pad glowing across a horse's back during a wellness session", colSpan: "col-span-1", sizes: "(min-width: 768px) 33vw, 100vw" },
+    { src: horseOnPad, alt: "A calm bay standing on the PEMF pad", colSpan: "col-span-1", sizes: "(min-width: 768px) 33vw, 100vw" },
+    { src: pemfWhiteHorse, alt: "PEMF session in the stall with a relaxed grey", colSpan: "col-span-1 md:col-span-2", sizes: "(min-width: 768px) 66vw, 100vw" },
+    { src: pemfRear, alt: "Magnawave PEMF loops in use during a session", colSpan: "col-span-1 md:col-span-2", sizes: "(min-width: 768px) 66vw, 100vw" },
+    { src: susieWithHorse, alt: "A quiet moment between sessions", colSpan: "col-span-1", sizes: "(min-width: 768px) 33vw, 100vw" },
   ];
 
   return (
@@ -61,11 +64,13 @@ export default function Gallery() {
               className={`relative group overflow-hidden rounded-xl bg-muted ${image.colSpan}`}
               data-testid={`img-gallery-${index}`}
             >
-              <img
-                src={image.src}
+              <ResponsiveImage
+                image={image.src}
                 alt={image.alt}
                 loading="lazy"
                 decoding="async"
+                sizes={image.sizes}
+                pictureClassName="block w-full h-full"
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">

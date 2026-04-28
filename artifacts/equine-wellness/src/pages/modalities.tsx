@@ -2,12 +2,13 @@ import { motion } from "framer-motion";
 import { Info, Plus, Minus } from "lucide-react";
 import { useState } from "react";
 import { LineReveal, AnimatedHeading } from "@/components/ui/AnimatedText";
-import massageHands from "@assets/0629_LOC_Horse02_CBH_t1170_1776529181857.jpg";
-import horseStall from "@assets/stock_images/horse-stall.jpg";
-import pemfWhiteHorse from "@assets/20260407_121449_1776528702902.jpg";
-import pemfRear from "@assets/20260407_112708_1776528693859.jpg";
-import redLightLeg from "@assets/image_1776880244507.jpeg";
-import susieWithHorse from "@assets/20260401_140719_1776528664269.jpg";
+import { ResponsiveImage, type PictureData } from "@/components/ui/ResponsiveImage";
+import massageHands from "@assets/0629_LOC_Horse02_CBH_t1170_1776529181857.jpg?w=400;800;1200&picture";
+import horseStall from "@assets/stock_images/horse-stall.jpg?w=400;800;1200&picture";
+import pemfWhiteHorse from "@assets/20260407_121449_1776528702902.jpg?w=400;800;1200&picture";
+import pemfRear from "@assets/20260407_112708_1776528693859.jpg?w=400;800;1200&picture";
+import redLightLeg from "@assets/image_1776880244507.jpeg?w=400;800;1200&picture";
+import susieWithHorse from "@assets/20260401_140719_1776528664269.jpg?w=400;800;1200&picture";
 
 type Modality = {
   id: string;
@@ -17,7 +18,7 @@ type Modality = {
   directAnswer: string;
   stats: string[];
   questions: { q: string; a: string }[];
-  image: string;
+  image: PictureData;
 };
 
 const modalities: Modality[] = [
@@ -326,11 +327,13 @@ export default function Modalities() {
                     transition={{ duration: 0.5 }}
                     className="aspect-[4/3] rounded-2xl overflow-hidden shadow-lg border group"
                   >
-                    <img
-                      src={modality.image}
+                    <ResponsiveImage
+                      image={modality.image}
                       alt={`${modality.title} session for horses — ${modality.subtitle}`}
                       loading="lazy"
                       decoding="async"
+                      sizes="(min-width: 1024px) 50vw, 100vw"
+                      pictureClassName="block w-full h-full"
                       className="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-105"
                     />
                   </motion.div>

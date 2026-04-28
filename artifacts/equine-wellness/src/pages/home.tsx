@@ -3,14 +3,15 @@ import { Link } from "wouter";
 import { ArrowRight, CheckCircle2, Phone } from "lucide-react";
 import { useRef } from "react";
 import { WordReveal, LineReveal, AnimatedHeading, AccentFlourish } from "@/components/ui/AnimatedText";
+import { ResponsiveImage } from "@/components/ui/ResponsiveImage";
 import { ServiceArea } from "@/components/sections/ServiceArea";
 import { Testimonials } from "@/components/sections/Testimonials";
-import barnHero from "@assets/stock_images/barn-hero.jpg";
-import barnExterior from "@assets/stock_images/barn-exterior.jpg";
-import horsePortrait from "@assets/stock_images/horse-portrait.jpg";
-import massageHands from "@assets/0629_LOC_Horse02_CBH_t1170_1776529181857.jpg";
-import pemfWhiteHorse from "@assets/20260407_121449_1776528702902.jpg";
-import redLightLeg from "@assets/image_1776880244507.jpeg";
+import barnHero from "@assets/stock_images/barn-hero.jpg?w=640;1024;1600;2400&picture";
+import barnExterior from "@assets/stock_images/barn-exterior.jpg?w=400;800;1200;1600&picture";
+import horsePortrait from "@assets/stock_images/horse-portrait.jpg?w=400;800;1200&picture";
+import massageHands from "@assets/0629_LOC_Horse02_CBH_t1170_1776529181857.jpg?w=400;800;1200&picture";
+import pemfWhiteHorse from "@assets/20260407_121449_1776528702902.jpg?w=400;800&picture";
+import redLightLeg from "@assets/image_1776880244507.jpeg?w=400;800&picture";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -36,11 +37,13 @@ export default function Home() {
       {/* Hero Section */}
       <section ref={heroRef} className="relative h-screen min-h-[760px] flex items-center justify-center overflow-hidden">
         <motion.div style={{ y: heroY, opacity: heroOpacity }} className="absolute inset-0 z-0">
-          <img
-            src={barnHero}
+          <ResponsiveImage
+            image={barnHero}
             alt="Sunlit barn aisle at dawn — equine bodywork session setting"
             fetchPriority="high"
             decoding="async"
+            sizes="100vw"
+            pictureClassName="block w-full h-full"
             className="w-full h-full object-cover object-center animate-ken-burns"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/70" />
@@ -178,11 +181,13 @@ export default function Home() {
               transition={{ duration: 0.4 }}
               className="overflow-hidden rounded-2xl shadow-xl"
             >
-              <img
-                src={barnExterior}
+              <ResponsiveImage
+                image={barnExterior}
                 alt="Quiet stable exterior at golden hour where Susie conducts equine wellness sessions"
                 loading="lazy"
                 decoding="async"
+                sizes="(min-width: 1024px) 720px, 100vw"
+                pictureClassName="block w-full"
                 className="w-full h-auto max-h-[420px] object-cover"
               />
             </motion.div>
@@ -274,11 +279,13 @@ export default function Home() {
                     className="lg:col-span-7 bg-card rounded-2xl overflow-hidden border shadow-sm hover:shadow-xl transition-shadow duration-500 group flex flex-col"
                   >
                     <div className="h-72 md:h-[460px] overflow-hidden relative">
-                      <img
-                        src={feature.img}
+                      <ResponsiveImage
+                        image={feature.img}
                         alt={`${feature.title} for horses — ${feature.tag}`}
                         loading="lazy"
                         decoding="async"
+                        sizes="(min-width: 1024px) 58vw, 100vw"
+                        pictureClassName="block w-full h-full"
                         className="w-full h-full object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-105"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-60" />
@@ -308,11 +315,13 @@ export default function Home() {
                         className="bg-card rounded-2xl overflow-hidden border shadow-sm hover:shadow-xl transition-shadow duration-500 group flex flex-col"
                       >
                         <div className="h-52 overflow-hidden relative">
-                          <img
-                            src={service.img}
+                          <ResponsiveImage
+                            image={service.img}
                             alt={`${service.title} for horses — ${service.tag}`}
                             loading="lazy"
                             decoding="async"
+                            sizes="(min-width: 1024px) 41vw, 100vw"
+                            pictureClassName="block w-full h-full"
                             className="w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -392,11 +401,13 @@ export default function Home() {
               className="relative"
             >
               <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl relative z-10">
-                <img
-                  src={horsePortrait}
+                <ResponsiveImage
+                  image={horsePortrait}
                   alt="Close-up portrait of a calm horse — illustrating the biomechanical advantage of attentive equine bodywork"
                   loading="lazy"
                   decoding="async"
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  pictureClassName="block w-full h-full"
                   className="w-full h-full object-cover"
                 />
               </div>

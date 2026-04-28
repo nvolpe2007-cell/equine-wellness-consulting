@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { WordReveal, LineReveal } from "@/components/ui/AnimatedText";
-import horsePortrait from "@assets/20260401_140719_1776529313797.jpg";
+import horsePortrait from "@assets/20260401_140719_1776529313797.jpg?w=400;800&picture";
+import { ResponsiveImage } from "@/components/ui/ResponsiveImage";
 
 export default function Bio() {
   return (
@@ -47,11 +48,13 @@ export default function Bio() {
               transition={{ delay: 0.2 }}
               className="rounded-2xl overflow-hidden shadow-xl aspect-[3/4]"
             >
-              <img
-                src={horsePortrait}
+              <ResponsiveImage
+                image={horsePortrait}
                 alt="Susie H. Lytal, MS, on-site between equine wellness sessions in the barn aisle"
                 loading="lazy"
                 decoding="async"
+                sizes="(min-width: 1024px) 40vw, 100vw"
+                pictureClassName="block w-full h-full"
                 className="w-full h-full object-cover"
               />
             </motion.div>
