@@ -63,46 +63,71 @@ export default function NewsPost() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-16 md:py-24 max-w-3xl">
-        <Link
-          href="/news"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 mb-10"
-          data-testid="link-back-to-news"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to The Worthy Horse News
-        </Link>
+      {/* Editorial article header */}
+      <section className="relative bg-card overflow-hidden">
+        <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
+          <div
+            className="absolute -top-40 -right-32 w-[55vw] h-[55vw] rounded-full blur-[140px] opacity-50"
+            style={{
+              background:
+                "radial-gradient(closest-side, hsl(var(--gold) / 0.26), hsl(var(--gold-deep) / 0.12), transparent 72%)",
+            }}
+          />
+        </div>
+        <div className="container mx-auto px-4 pt-20 pb-28 md:pt-28 md:pb-40 relative">
+          <Link
+            href="/news"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 mb-12"
+            data-testid="link-back-to-news"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to The Worthy Horse News
+          </Link>
 
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-end"
+          >
+            <div className="lg:col-span-7">
+              <span className="block mb-6 gold-rule" aria-hidden="true" />
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground mb-5">
+                <span className="inline-flex items-center gap-1.5">
+                  <Calendar className="h-3.5 w-3.5" />
+                  {formatPostDate(post.date)}
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Tag className="h-3.5 w-3.5" />
+                  <span className="uppercase tracking-wider text-primary font-medium">
+                    {post.category}
+                  </span>
+                </span>
+              </div>
+              <h1 className="font-serif text-4xl md:text-6xl text-foreground leading-[1.05] tracking-tight">
+                {post.title}
+              </h1>
+            </div>
+            <div className="lg:col-span-5 lg:pb-3 lg:pl-10 lg:border-l lg:border-border">
+              <p className="text-lg md:text-xl text-muted-foreground italic leading-relaxed mb-4">
+                {post.excerpt}
+              </p>
+              <p className="text-xs font-sans tracking-[0.3em] uppercase text-primary">
+                By Susie H. Lytal, MS &middot; Equine Biomechanist
+              </p>
+            </div>
+          </motion.div>
+        </div>
+        <div className="divider-gold" />
+      </section>
+
+      {/* Article body */}
+      <div className="container mx-auto px-4 py-20 md:py-28 max-w-3xl">
         <motion.article
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.5, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
         >
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground mb-4">
-            <span className="inline-flex items-center gap-1.5">
-              <Calendar className="h-3.5 w-3.5" />
-              {formatPostDate(post.date)}
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <Tag className="h-3.5 w-3.5" />
-              <span className="uppercase tracking-wider text-primary font-medium">
-                {post.category}
-              </span>
-            </span>
-          </div>
-
-          <h1 className="font-serif text-3xl md:text-5xl text-foreground leading-tight mb-6">
-            {post.title}
-          </h1>
-
-          <p className="text-sm font-sans tracking-wider uppercase text-primary mb-10">
-            By Susie H. Lytal, MS &middot; Equine Biomechanist
-          </p>
-
-          <p className="text-lg md:text-xl text-muted-foreground italic leading-relaxed mb-10">
-            {post.excerpt}
-          </p>
-
           <div className="space-y-5 text-foreground/90 leading-relaxed text-base md:text-lg">
             {post.body.map((paragraph, i) => (
               <p key={i}>{paragraph}</p>

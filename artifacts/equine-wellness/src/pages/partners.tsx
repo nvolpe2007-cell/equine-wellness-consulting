@@ -46,9 +46,6 @@ export default function Partners() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-end">
             <div className="lg:col-span-7">
               <span className="block mb-6 gold-rule" aria-hidden="true" />
-              <p className="text-xs uppercase tracking-[0.3em] text-primary mb-5 font-medium">
-                The Roster
-              </p>
               <WordReveal
                 text="Trusted Partners"
                 as="h1"
@@ -76,14 +73,8 @@ export default function Partners() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
           <aside className="lg:col-span-4 lg:sticky lg:top-28 lg:self-start">
             <span className="block mb-5 gold-rule" aria-hidden="true" />
-            <p className="text-xs uppercase tracking-[0.3em] text-primary mb-3 font-medium">
-              How I select
-            </p>
-            <h2 className="font-serif text-2xl md:text-3xl text-foreground mb-5 leading-tight">
-              The equipment behind every session.
-            </h2>
-            <p className="text-muted-foreground leading-relaxed">
-              I carefully select the equipment and products used during my sessions. Because I believe in these brands, I maintain referral partnerships with several of them. If you are interested in purchasing equipment or products for your own use, you may be able to receive a discount through my partner links.
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              I carefully select the equipment and products used during my sessions. Because I believe in these brands, I maintain referral partnerships with several of them. If you are interested in purchasing equipment or products for your own use, you may be able to receive a discount through my partner links below.
             </p>
           </aside>
 

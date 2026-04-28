@@ -9,7 +9,7 @@ import redLightPad from "@assets/image_1776880244507.jpeg";
 export default function Gallery() {
   const images = [
     { src: susieWithHorse, alt: "Susie on-site preparing for a session", colSpan: "col-span-1 md:col-span-2" },
-    { src: redLightPad, alt: "LED red light pad glowing across a horse's back during a wellness session", colSpan: "col-span-1" },
+    { src: redLightPad, alt: "LED red light therapy pad glowing across a horse's back during a wellness session", colSpan: "col-span-1" },
     { src: horseOnPad, alt: "A calm bay standing on the PEMF pad", colSpan: "col-span-1" },
     { src: pemfWhiteHorse, alt: "PEMF session in the stall with a relaxed grey", colSpan: "col-span-1 md:col-span-2" },
     { src: pemfRear, alt: "Magnawave PEMF loops in use during a session", colSpan: "col-span-1 md:col-span-2" },
@@ -32,9 +32,6 @@ export default function Gallery() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-end">
             <div className="lg:col-span-7">
               <span className="block mb-6 gold-rule" aria-hidden="true" />
-              <p className="text-xs uppercase tracking-[0.3em] text-primary mb-5 font-medium">
-                Field Notes
-              </p>
               <WordReveal
                 text="Gallery"
                 as="h1"

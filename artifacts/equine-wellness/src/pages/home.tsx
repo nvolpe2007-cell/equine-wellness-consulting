@@ -138,7 +138,7 @@ export default function Home() {
             {[
               { num: "MS", label: "Master of Science, Biomechanics" },
               { num: "6", label: "Wellness Modalities Offered" },
-              { num: "CESMT", label: "Certified Equine Sports Massage Therapist" },
+              { num: "Certified", label: "Equine Sports Massage Therapist" },
               { num: "100%", label: "Customized to Each Horse" },
             ].map((stat, i) => (
               <motion.div key={i} variants={fadeUp} transition={{ duration: 0.5 }}>
