@@ -48,6 +48,30 @@ uri = "file://artifacts/equine-wellness/public/images/gallery-aisle.png"
 type = "image"
 title = "Quiet stable aisle"
 
+[[generated]]
+id = "nqnU0uVgZb3_66M4ar57F"
+uri = "file://attached_assets/generated_images/lux-hero.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "Lf3P1rpjVNSAFfwpvifK4"
+uri = "file://attached_assets/generated_images/lux-stable-exterior.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "n5RlTI2ZKXOEtTA1MaWnS"
+uri = "file://attached_assets/generated_images/lux-horse-portrait.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "2o43yvnaFMNmdTNXceqLa"
+uri = "file://attached_assets/generated_images/lux-horse-refined.png"
+type = "image"
+title = "generated_image"
+
 [[outputs]]
 id = "d6cQ7vaXnt55vYlG-2Ulh"
 uri = "file://attached_assets/stock_images/massage-hands.jpg"
