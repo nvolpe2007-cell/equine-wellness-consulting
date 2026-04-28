@@ -136,8 +136,8 @@ export default function Home() {
               { num: "100%", label: "Customized to Each Horse" },
             ].map((stat, i) => (
               <motion.div key={i} variants={fadeUp} transition={{ duration: 0.5 }}>
-                <div className="text-3xl md:text-4xl font-serif text-white mb-1">{stat.num}</div>
-                <div className="text-xs md:text-sm text-white/75 uppercase tracking-wider leading-tight">{stat.label}</div>
+                <div className="text-3xl md:text-4xl font-serif text-primary-foreground mb-1">{stat.num}</div>
+                <div className="text-xs md:text-sm text-primary-foreground/80 uppercase tracking-wider leading-tight">{stat.label}</div>
               </motion.div>
             ))}
           </motion.div>
@@ -310,7 +310,7 @@ export default function Home() {
                 eyebrowClassName="inline-block text-xs font-sans tracking-[0.3em] text-accent uppercase mb-3"
                 text="The Biomechanical Advantage"
                 as="h2"
-                className="text-3xl md:text-5xl font-serif mb-6 text-white leading-tight"
+                className="text-3xl md:text-5xl font-serif mb-6 text-primary-foreground leading-tight"
               />
               <p className="text-primary-foreground/85 text-lg mb-8 leading-relaxed">
                 Working with an Equine Biomechanist means looking beyond the surface. It involves analyzing how the horse moves, identifying compensatory patterns, and applying specific modalities to support more efficient, comfortable movement.
@@ -332,7 +332,7 @@ export default function Home() {
                     className="flex items-start gap-3"
                   >
                     <CheckCircle2 className="h-6 w-6 text-accent shrink-0" />
-                    <span className="text-white/90">{item}</span>
+                    <span className="text-primary-foreground/90">{item}</span>
                   </motion.li>
                 ))}
               </ul>

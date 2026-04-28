@@ -78,6 +78,30 @@ Where to get the values:
 - `VITE_GA4_MEASUREMENT_ID`: in Google Analytics → Admin → Data Streams →
   pick the web stream → copy the Measurement ID at the top.
 
+## Visual identity (equine-wellness)
+
+The site uses a "Full Luxury" palette: black background, ivory text, gold
+primary/accent. Source of truth: `:root` block in
+`artifacts/equine-wellness/src/index.css`.
+
+- `--background 0 0% 6%` (near-black) / `--foreground 40 30% 96%` (ivory)
+- `--primary` and `--accent` `42 75% 58%` (warm gold) with
+  `--primary-foreground 0 0% 6%` so any `bg-primary` surface
+  (stats strip, "Biomechanical Advantage" section, gold buttons) MUST use
+  `text-primary-foreground` for AAA contrast — never `text-white`.
+- `--card 0 0% 10%` is used for the footer (`bg-card text-card-foreground`)
+  so it sits as a slightly-lighter band against the page background.
+- `--secondary 36 40% 30%` is bronze, kept for muted accents.
+
+Hardcoded `text-white` is only allowed over the dark hero photograph in
+`pages/home.tsx` and the gallery overlay in `pages/gallery.tsx`. Everywhere
+else, use semantic tokens (`text-foreground`, `text-muted-foreground`,
+`text-primary-foreground`) so the palette stays swappable.
+
+The `.dark {}` block in `index.css` is currently unused (no theme toggle in
+the app). If a system-preference dark mode is ever enabled, mirror the
+`:root` values into it or delete the block.
+
 ## Schema drift detection
 
 The signup flow once 500'd because `lib/db/src/schema/subscribers.ts` had
