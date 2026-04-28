@@ -32,6 +32,9 @@ export default function Gallery() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-end">
             <div className="lg:col-span-7">
               <span className="block mb-6 gold-rule" aria-hidden="true" />
+              <p className="text-xs uppercase tracking-[0.3em] text-primary mb-5 font-medium">
+                Gallery
+              </p>
               <WordReveal
                 text="Gallery"
                 as="h1"

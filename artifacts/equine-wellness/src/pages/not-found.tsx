@@ -1,5 +1,4 @@
-import { Link } from "wouter";
-import { AlertCircle, ArrowLeft } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 
 export default function NotFound() {
   return (
@@ -32,17 +31,9 @@ export default function NotFound() {
               404 Page Not Found
             </h1>
           </div>
-          <p className="text-lg text-muted-foreground leading-relaxed mb-12 max-w-xl mx-auto">
+          <p className="text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto">
             Did you forget to add the page to the router?
           </p>
-          <Link
-            href="/"
-            className="bg-gold-metallic shadow-gold-glow inline-flex h-12 items-center justify-center gap-2 rounded-full px-8 text-base font-medium transition-all hover:shadow-gold-glow-lg hover:-translate-y-0.5"
-            data-testid="link-not-found-home"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to home
-          </Link>
         </div>
       </div>
     </div>

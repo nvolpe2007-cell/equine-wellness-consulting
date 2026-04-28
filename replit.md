@@ -114,16 +114,15 @@ Reusable gold utilities (defined in the `@layer utilities` block of
   used by the "Where I Work" section (`components/sections/ServiceArea.tsx`).
 
 Sub-page editorial hero pattern (bio, modalities, gallery, news, partners,
-news-post): asymmetric 7/5 grid with a short `gold-rule` flourish, large
-left-aligned serif h1 in the 7-col (preserving each page's existing h1
-copy verbatim), and the lead paragraph offset behind a left border in the
-5-col, with a soft gold radial bloom corner accent and a bottom
-`divider-gold`. Section vertical rhythm uses `py-32 md:py-40/44`.
-Existing eyebrow lines (e.g. "The Worthy Horse News" on `/news`) are
-preserved where they were already present; new pages do not invent
-eyebrow text. The 404 page (`pages/not-found.tsx`) uses the same gold
-aurora + gold-rule + gold-metallic CTA chrome for visual consistency
-without changing its existing copy.
+news-post): asymmetric 7/5 grid with a short `gold-rule` flourish, a small
+uppercase eyebrow tag (mirroring the page's nav label — "About Susie",
+"Modalities", "Gallery", "Trusted Partners"; "The Worthy Horse News" on
+`/news`), large left-aligned serif h1 in the 7-col, and the lead
+paragraph offset behind a left border in the 5-col, with a soft gold
+radial bloom corner accent and a bottom `divider-gold`. Section vertical
+rhythm uses `py-32 md:py-40/44`. The 404 page (`pages/not-found.tsx`)
+uses matching gold aurora + gold-rule + serif treatment for visual
+consistency, with copy preserved exactly.
 
 Hardcoded `text-white` is only allowed over the dark hero photograph in
 `pages/home.tsx` and the gallery overlay in `pages/gallery.tsx`. Everywhere
