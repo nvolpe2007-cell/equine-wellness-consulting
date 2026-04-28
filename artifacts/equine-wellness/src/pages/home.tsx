@@ -423,8 +423,9 @@ export default function Home() {
       <Testimonials />
 
       {/* Disclaimer / Professionalism */}
-      <section className="py-16 bg-muted text-center">
-        <div className="container mx-auto px-4 max-w-4xl">
+      <section className="py-24 md:py-32 bg-muted text-center relative">
+        <div className="absolute top-0 inset-x-0 divider-gold" />
+        <div className="container mx-auto px-4 max-w-4xl relative">
           <h3 className="text-xl font-serif text-foreground mb-4">A Note on Veterinary Care</h3>
           <p className="text-muted-foreground text-sm leading-relaxed">
             Susie H. Lytal is a Certified Equine Sports Massage Therapist and Equine Biomechanist. She is not a veterinarian. The services offered through Equine Bodywork and Wellness Consulting are designed to support overall wellness and comfort. We do not diagnose, treat, cure, or prescribe for any illness, injury, or medical condition. We strongly advocate for a team approach to your horse's health and always recommend consulting with your primary veterinarian regarding any health concerns.

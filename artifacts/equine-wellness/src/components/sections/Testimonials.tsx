@@ -37,7 +37,7 @@ export function Testimonials() {
   return (
     <section
       aria-label="Client testimonials"
-      className="bg-background py-24"
+      className="bg-background py-32 md:py-40"
     >
       <div className="container mx-auto px-4">
         <motion.div

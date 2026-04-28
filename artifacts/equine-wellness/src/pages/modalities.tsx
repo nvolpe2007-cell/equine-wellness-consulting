@@ -311,7 +311,7 @@ export default function Modalities() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-20">
+      <div className="container mx-auto px-4 py-32 md:py-40">
         <div className="space-y-32">
           {modalities.map((modality, index) => (
             <motion.section
@@ -429,8 +429,9 @@ export default function Modalities() {
       </div>
 
       {/* General FAQ */}
-      <section className="bg-card border-t py-24">
-        <div className="container mx-auto px-4 max-w-4xl">
+      <section className="bg-card py-32 md:py-40 relative">
+        <div className="absolute top-0 inset-x-0 divider-gold" />
+        <div className="container mx-auto px-4 max-w-4xl relative">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}

@@ -114,7 +114,7 @@ export default function News() {
       </div>
 
       {/* Posts */}
-      <div className="container mx-auto px-4 py-20 max-w-3xl">
+      <div className="container mx-auto px-4 py-32 md:py-40 max-w-3xl">
         <div className="mb-12">
           <h2 className="font-serif text-2xl md:text-3xl text-foreground mb-2">
             Recent dispatches
