@@ -56,8 +56,8 @@ const palettes: Record<PaletteVariant, Record<string, string>> = {
  * PaletteStack — VERBATIM extraction of the live equine-wellness components,
  * for side-by-side palette comparison only:
  *   - Hero block from artifacts/equine-wellness/src/pages/home.tsx (lines 36–120)
- *   - One modality card from the same file's services map (lines 240–292),
- *     using the "Equine Sports Massage" entry
+ *   - One modality card from artifacts/equine-wellness/src/pages/modalities.tsx
+ *     (lines 295–375), using the "Equine Sports Massage" entry
  *   - One testimonial figure from
  *     artifacts/equine-wellness/src/components/sections/Testimonials.tsx
  *     (lines 60–85), using the first entry
@@ -134,61 +134,71 @@ export function PaletteStack({ variant }: { variant: PaletteVariant }) {
         </div>
       </section>
 
-      {/* Services Preview — extracted from home.tsx, single card variant */}
+      {/* Modality detail block — extracted from modalities.tsx (massage entry) */}
       <section className="py-24 bg-background">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-14 gap-6">
-            <div className="max-w-2xl">
-              <span className="inline-block text-xs font-sans tracking-[0.3em] text-primary uppercase mb-3">
-                What I Offer
-              </span>
-              <h2 className="text-3xl md:text-5xl font-serif text-foreground mb-4 leading-tight">
-                Wellness sessions, tailored.
-              </h2>
-              <p className="text-muted-foreground text-lg">
-                A comprehensive approach to equine comfort. Each session is tailored to your horse's unique biomechanical needs, drawing from a range of modalities to support optimal movement and well-being.
-              </p>
-            </div>
-            <a
-              href="#"
-              className="group inline-flex items-center text-primary font-medium hover:text-primary/80 transition-colors"
-            >
-              View all modalities
-              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </a>
-          </div>
+          <div className="space-y-32">
+            <section id="massage" className="scroll-mt-24">
+              <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-start">
+                <div className="w-full lg:w-1/2">
+                  <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-lg border group">
+                    <img
+                      src={massageHands}
+                      alt="Equine Sports Massage session for horses — Certified Application"
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-105"
+                    />
+                  </div>
+                </div>
+                <div className="w-full lg:w-1/2 space-y-6">
+                  <div>
+                    <span className="block text-sm font-sans tracking-widest text-primary uppercase mb-2">
+                      Certified Application
+                    </span>
+                    <h2 className="text-3xl md:text-4xl font-serif text-foreground">
+                      Equine Sports Massage
+                    </h2>
+                  </div>
+                  <div className="w-12 h-1 bg-accent rounded-full origin-left" />
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-card rounded-2xl overflow-hidden border shadow-sm hover:shadow-xl transition-shadow duration-500 group flex flex-col">
-              <div className="h-64 overflow-hidden relative">
-                <img
-                  src={massageHands}
-                  alt="Equine Sports Massage for horses — Certified Application"
-                  loading="lazy"
-                  decoding="async"
-                  className="w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  {/* Direct-answer callout */}
+                  <div className="rounded-xl border-l-4 border-accent bg-accent/5 p-5 md:p-6">
+                    <p className="text-xs font-sans tracking-[0.25em] text-accent uppercase mb-2">
+                      In short
+                    </p>
+                    <p className="text-base md:text-lg text-foreground leading-relaxed">
+                      Equine sports massage is a hands-on wellness modality that uses targeted manual techniques — compression, effleurage, friction, and stretching — to support muscular comfort, flexibility, and recovery. At Equine Bodywork and Wellness Consulting it is performed by Susie H. Lytal, MS, a Certified Equine Sports Massage Therapist, as wellness support — not a substitute for veterinary care.
+                    </p>
+                  </div>
+
+                  <p className="text-lg text-muted-foreground leading-relaxed">
+                    A focused, hands-on session designed to support muscular relaxation, enhance flexibility, and promote overall comfort. As a Certified Equine Sports Massage Therapist, Susie applies specific techniques to address areas of tension, which may help the horse move more freely and comfortably.
+                  </p>
+
+                  {/* Stats line */}
+                  <div className="pt-2">
+                    <p className="text-xs font-sans tracking-[0.25em] text-primary uppercase mb-3">
+                      By the numbers
+                    </p>
+                    <ul className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                      {[
+                        "60–90 min typical session",
+                        "Hands-on, no equipment required",
+                        "Performed by a Certified Equine Sports Massage Therapist",
+                      ].map((stat) => (
+                        <li
+                          key={stat}
+                          className="rounded-lg bg-card border border-border px-4 py-3 text-foreground"
+                        >
+                          {stat}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
               </div>
-              <div className="p-8 flex-1 flex flex-col">
-                <span className="text-[0.65rem] font-sans tracking-[0.2em] text-accent uppercase mb-2">
-                  Certified Application
-                </span>
-                <h3 className="text-xl font-serif text-foreground mb-3">
-                  Equine Sports Massage
-                </h3>
-                <p className="text-muted-foreground leading-relaxed flex-1">
-                  Targeted hands-on techniques that may support muscular relaxation, flexibility, and overall comfort.
-                </p>
-                <a
-                  href="#"
-                  className="mt-6 inline-flex items-center text-sm font-medium text-primary group/link"
-                >
-                  Learn more
-                  <ArrowRight className="ml-1.5 h-3.5 w-3.5 transition-transform group-hover/link:translate-x-1" />
-                </a>
-              </div>
-            </div>
+            </section>
           </div>
         </div>
       </section>
