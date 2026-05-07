@@ -1,5 +1,7 @@
-import { Router, type IRouter } from "express";
+import { Router, type IRouter, type Request, type Response, type NextFunction } from "express";
 import { z } from "zod";
+import { timingSafeEqual } from "node:crypto";
+import { desc } from "drizzle-orm";
 import { db, pvSurveyResponsesTable } from "@workspace/db";
 
 const router: IRouter = Router();
@@ -38,6 +40,30 @@ function rateLimited(ip: string): boolean {
   return entry.count > RATE_LIMIT;
 }
 
+function constantTimeEquals(a: string, b: string): boolean {
+  const ab = Buffer.from(a);
+  const bb = Buffer.from(b);
+  if (ab.length !== bb.length) return false;
+  return timingSafeEqual(ab, bb);
+}
+
+function requireAdmin(req: Request, res: Response, next: NextFunction): void {
+  const expected = process.env["NEWSLETTER_ADMIN_TOKEN"];
+  if (!expected) {
+    res
+      .status(503)
+      .json({ ok: false, error: "Admin not configured. Set NEWSLETTER_ADMIN_TOKEN." });
+    return;
+  }
+  const header = req.header("authorization") ?? "";
+  const provided = header.startsWith("Bearer ") ? header.slice(7) : "";
+  if (!provided || !constantTimeEquals(provided, expected)) {
+    res.status(401).json({ ok: false, error: "Unauthorized" });
+    return;
+  }
+  next();
+}
+
 router.post("/survey/pv-horse-keeping", async (req, res, next) => {
   try {
     const ip = String(req.ip ?? req.socket.remoteAddress ?? "unknown");
@@ -70,6 +96,21 @@ router.post("/survey/pv-horse-keeping", async (req, res, next) => {
     res.status(201).json({ ok: true });
   } catch (err) {
     next(err);
+  }
+});
+
+// --- Admin endpoints ---------------------------------------------------------
+
+router.get("/survey/admin/responses", requireAdmin, async (req, res, next) => {
+  try {
+    const rows = await db
+      .select()
+      .from(pvSurveyResponsesTable)
+      .orderBy(desc(pvSurveyResponsesTable.submittedAt));
+    return res.json({ ok: true, responses: rows, total: rows.length });
+  } catch (err) {
+    req.log?.error({ err }, "survey admin responses failed");
+    return next(err);
   }
 });
 

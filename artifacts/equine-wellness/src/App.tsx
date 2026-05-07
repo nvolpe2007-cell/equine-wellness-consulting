@@ -18,6 +18,7 @@ import Gallery from "@/pages/gallery";
 import News from "@/pages/news";
 import NewsPost from "@/pages/news-post";
 import Survey from "@/pages/survey";
+import SurveyAdmin from "@/pages/admin/survey";
 import NotFound from "@/pages/not-found";
 
 import { getPostBySlug } from "@/content/newsletter-posts";
@@ -211,6 +212,7 @@ function Router() {
               <Route path="/news" component={News} />
               <Route path="/news/:slug" component={NewsPost} />
               <Route path="/survey" component={Survey} />
+              <Route path="/admin/survey" component={SurveyAdmin} />
               <Route component={NotFound} />
             </Switch>
           </PageWrapper>
