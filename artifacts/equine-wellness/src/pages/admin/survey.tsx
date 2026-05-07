@@ -22,6 +22,7 @@ import {
   Send,
   X,
   CheckCircle,
+  Clock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -40,6 +41,7 @@ type SurveyResponse = {
   memberOfOrg: string | null;
   comments: string | null;
   submittedAt: string;
+  lastFollowupAt: string | null;
 };
 
 type SurveyStats = {
@@ -847,6 +849,12 @@ export default function SurveyAdmin() {
                             "No email"
                           )}
                         </p>
+                        {r.lastFollowupAt && (
+                          <p className="text-xs text-primary/70 truncate mt-0.5 inline-flex items-center gap-1">
+                            <Clock className="h-3 w-3 shrink-0" />
+                            Last contacted {formatDate(r.lastFollowupAt)}
+                          </p>
+                        )}
                         {r.preservationIdeas && (
                           <p className="text-xs text-muted-foreground/70 truncate mt-1 italic">
                             {truncate(r.preservationIdeas, 90)}

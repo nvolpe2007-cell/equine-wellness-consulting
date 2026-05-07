@@ -1,8 +1,8 @@
 import { Router, type IRouter, type Request, type Response, type NextFunction } from "express";
 import { z } from "zod";
 import { timingSafeEqual } from "node:crypto";
-import { desc, isNotNull } from "drizzle-orm";
-import { db, pvSurveyResponsesTable } from "@workspace/db";
+import { desc, isNotNull, max } from "drizzle-orm";
+import { db, pvSurveyResponsesTable, pvSurveyFollowupsTable } from "@workspace/db";
 import { getUncachableResendClient } from "../lib/resend";
 
 const router: IRouter = Router();
@@ -104,11 +104,33 @@ router.post("/survey/pv-horse-keeping", async (req, res, next) => {
 
 router.get("/survey/admin/responses", requireAdmin, async (req, res, next) => {
   try {
-    const rows = await db
-      .select()
-      .from(pvSurveyResponsesTable)
-      .orderBy(desc(pvSurveyResponsesTable.submittedAt));
-    return res.json({ ok: true, responses: rows, total: rows.length });
+    const [rows, followupRows] = await Promise.all([
+      db
+        .select()
+        .from(pvSurveyResponsesTable)
+        .orderBy(desc(pvSurveyResponsesTable.submittedAt)),
+      db
+        .select({
+          email: pvSurveyFollowupsTable.email,
+          lastFollowupAt: max(pvSurveyFollowupsTable.sentAt),
+        })
+        .from(pvSurveyFollowupsTable)
+        .groupBy(pvSurveyFollowupsTable.email),
+    ]);
+
+    const lastContactMap = new Map<string, string>();
+    for (const f of followupRows) {
+      if (f.email && f.lastFollowupAt) {
+        lastContactMap.set(f.email.toLowerCase().trim(), f.lastFollowupAt.toISOString());
+      }
+    }
+
+    const responses = rows.map((r) => ({
+      ...r,
+      lastFollowupAt: r.email ? (lastContactMap.get(r.email.toLowerCase().trim()) ?? null) : null,
+    }));
+
+    return res.json({ ok: true, responses, total: responses.length });
   } catch (err) {
     req.log?.error({ err }, "survey admin responses failed");
     return next(err);
@@ -324,6 +346,8 @@ router.post("/survey/admin/followup", requireAdmin, async (req, res, next) => {
 
     let sent = 0;
     let failed = 0;
+    const followupRecords: { email: string; subject: string }[] = [];
+
     for (const r of recipients) {
       if (!r.email) continue;
       const emailMsg = buildFollowUpEmail({ subject, body, recipientName: r.name });
@@ -340,12 +364,18 @@ router.post("/survey/admin/followup", requireAdmin, async (req, res, next) => {
           req.log?.error({ err: result.error, email: r.email }, "survey followup send failed");
         } else {
           sent += 1;
+          followupRecords.push({ email: r.email, subject });
         }
       } catch (err) {
         failed += 1;
         req.log?.error({ err, email: r.email }, "survey followup send threw");
       }
       await new Promise((resolve) => setTimeout(resolve, 60));
+    }
+
+    // Record all successful sends in the followups table.
+    if (followupRecords.length > 0) {
+      await db.insert(pvSurveyFollowupsTable).values(followupRecords);
     }
 
     req.log?.info({ sent, failed, total: recipients.length }, "survey followup dispatch complete");
