@@ -362,6 +362,7 @@ function ModalityNav({
               block: "start",
             })
           }
+          aria-current={activeId === m.id ? "true" : undefined}
           className={[
             "shrink-0 px-4 py-1.5 rounded-full text-sm font-sans font-medium border transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
             activeId === m.id
