@@ -124,7 +124,7 @@ export default function Home() {
           <p className="text-center text-[0.55rem] font-sans tracking-[0.28em] text-primary-foreground/50 uppercase mb-2">Practice at a Glance</p>
           <ul className="flex flex-wrap justify-center items-center gap-y-2 gap-x-0 text-[0.72rem] font-sans tracking-[0.18em] text-primary-foreground/85 uppercase">
             {[
-              "M.S., Biomechanics",
+              "M.S. Biology · Cal Poly Pomona",
               "Certified Equine Sports Massage Therapist",
               "Six Wellness Modalities",
               "Southern California",
@@ -374,7 +374,7 @@ export default function Home() {
               
               <ul className="space-y-4">
                 {[
-                  "Graduate-level education in biomechanics (MS)",
+                  "MS, Biology (Equine Biomechanics) — Cal Poly Pomona",
                   "Certified Equine Sports Massage Therapist",
                   "Comprehensive multi-modality approach",
                   "Collaborative relationship with veterinary professionals"

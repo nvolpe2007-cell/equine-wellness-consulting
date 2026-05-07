@@ -71,10 +71,10 @@ export default function Bio() {
               <ul className="space-y-4 text-muted-foreground">
                 <li className="flex flex-col">
                   <span className="font-medium text-foreground">
-                    Master of Science (MS), Biomechanics
+                    MS, Biology (Equine Biomechanics)
                   </span>
                   <span className="text-sm">
-                    Graduate-level study of how the equine body moves
+                    Cal Poly Pomona
                   </span>
                 </li>
                 <li className="flex flex-col">
@@ -131,9 +131,10 @@ export default function Bio() {
               >
                 <blockquote className="font-serif text-2xl md:text-3xl text-foreground leading-snug italic">
                   &ldquo;As an Equine Biomechanist with a Master&rsquo;s in
-                  Biomechanics, my goal is simple: to help horses move more
-                  comfortably, perform more efficiently, and live happier lives
-                  through informed, compassionate bodywork.&rdquo;
+                  Biology (Equine Biomechanics), my goal is simple: to help
+                  horses move more comfortably, perform more efficiently, and
+                  live happier lives through informed, compassionate
+                  bodywork.&rdquo;
                 </blockquote>
                 <figcaption className="mt-4 text-sm font-sans tracking-wider uppercase text-primary">
                   Susie H. Lytal, MS &middot; Equine Biomechanist &middot;
@@ -144,8 +145,9 @@ export default function Bio() {
               <p>
                 Susie H. Lytal, MS, brings a rigorous, scientific understanding
                 of anatomy and movement to every horse she works with. Her
-                graduate degree in Biomechanics, paired with extensive hands-on
-                certification as a Certified Equine Sports Massage Therapist, allows
+                MS in Biology (Equine Biomechanics) from Cal Poly Pomona, paired
+                with extensive hands-on certification as a Certified Equine
+                Sports Massage Therapist, allows
                 Susie to evaluate and support the equine athlete holistically
                 — from the elite competitor to the beloved pasture companion.
               </p>

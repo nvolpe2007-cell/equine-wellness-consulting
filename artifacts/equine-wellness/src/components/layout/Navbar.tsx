@@ -11,6 +11,7 @@ const links = [
   { href: "/gallery", label: "Gallery" },
   { href: "/news", label: "Newsletter" },
   { href: "/partners", label: "Trusted Partners" },
+  { href: "/survey", label: "PV Survey" },
 ];
 
 export function Navbar() {

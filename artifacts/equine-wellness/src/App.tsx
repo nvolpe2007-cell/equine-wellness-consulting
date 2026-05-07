@@ -17,6 +17,7 @@ import Partners from "@/pages/partners";
 import Gallery from "@/pages/gallery";
 import News from "@/pages/news";
 import NewsPost from "@/pages/news-post";
+import Survey from "@/pages/survey";
 import NotFound from "@/pages/not-found";
 
 import { getPostBySlug } from "@/content/newsletter-posts";
@@ -71,6 +72,14 @@ const pageMeta: Record<string, PageMeta> = {
     ogTitle: "Trusted Equipment Partners",
     ogDescription:
       "The equipment brands Susie uses and recommends: Magnawave, RevitaVet, TrueStim, and BeneFab.",
+  },
+  "/survey": {
+    title: "PV Horse Keeping Survey — Share Your Voice | Equine Bodywork and Wellness Consulting",
+    description:
+      "Share your perspective on the quality of horse keeping in Palos Verdes and what should be done to preserve equestrian culture in the Peninsula.",
+    ogTitle: "Palos Verdes Horse Keeping Survey",
+    ogDescription:
+      "Community survey on the quality of horse keeping in Palos Verdes — your voice helps preserve equestrian culture in the Peninsula.",
   },
   "/news": {
     title: "The Worthy Horse News — Newsletter for Thoughtful Horse Owners",
@@ -201,6 +210,7 @@ function Router() {
               <Route path="/gallery" component={Gallery} />
               <Route path="/news" component={News} />
               <Route path="/news/:slug" component={NewsPost} />
+              <Route path="/survey" component={Survey} />
               <Route component={NotFound} />
             </Switch>
           </PageWrapper>
