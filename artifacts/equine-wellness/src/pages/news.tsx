@@ -1,14 +1,33 @@
 import { Link } from "wouter";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { ease as easing } from "@/lib/motion";
 import { Calendar, Tag, ArrowRight } from "lucide-react";
 import { LineReveal } from "@/components/ui/AnimatedText";
 import { StaggerReveal, StaggerItem } from "@/components/ui/AnimatedText";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
-import { newsletterPosts, formatPostDate, type NewsletterPost } from "@/content/newsletter-posts";
+import {
+  newsletterPosts,
+  formatPostDate,
+  type NewsletterPost,
+  type NewsletterCategory,
+} from "@/content/newsletter-posts";
+import { useState, useMemo } from "react";
+import { useStickyVisible } from "@/hooks/useStickyVisible";
 
 const sortedPosts: NewsletterPost[] = [...newsletterPosts].sort(
   (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+);
+
+const ALL_CATEGORIES: NewsletterCategory[] = [
+  "Legislation",
+  "State Law",
+  "Petition",
+  "Seasonal Care",
+  "Industry",
+];
+
+const presentCategories = ALL_CATEGORIES.filter((cat) =>
+  sortedPosts.some((p) => p.category === cat),
 );
 
 function PostCard({ post }: { post: NewsletterPost }) {
@@ -63,11 +82,111 @@ function PostCard({ post }: { post: NewsletterPost }) {
   );
 }
 
+const FILTER_PILLS: Array<NewsletterCategory | "All"> = [
+  "All",
+  ...presentCategories,
+];
+
+function FilterPills({
+  active,
+  onChange,
+  ariaLabel,
+}: {
+  active: NewsletterCategory | "All";
+  onChange: (cat: NewsletterCategory | "All") => void;
+  ariaLabel: string;
+}) {
+  return (
+    <nav
+      aria-label={ariaLabel}
+      className="flex items-center gap-2 py-2.5 overflow-x-auto"
+    >
+      {FILTER_PILLS.map((cat) => (
+        <button
+          key={cat}
+          onClick={() => onChange(cat)}
+          aria-current={active === cat ? "true" : undefined}
+          className={[
+            "shrink-0 px-4 py-1.5 rounded-full text-sm font-sans font-medium border transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+            active === cat
+              ? "bg-primary text-primary-foreground border-primary shadow-gold-glow"
+              : "bg-card/80 text-muted-foreground border-border hover:text-foreground hover:border-primary/50",
+          ].join(" ")}
+        >
+          {cat}
+        </button>
+      ))}
+    </nav>
+  );
+}
+
+function CategoryFilterStrip({
+  active,
+  onChange,
+}: {
+  active: NewsletterCategory | "All";
+  onChange: (cat: NewsletterCategory | "All") => void;
+}) {
+  const reduce = useReducedMotion();
+  const show = useStickyVisible("news-hero");
+
+  return (
+    <>
+      {/* Inline strip — always visible below signup */}
+      <div className="container mx-auto px-4 max-w-3xl mt-10">
+        <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-3 font-medium">
+          Filter by topic
+        </p>
+        <FilterPills
+          active={active}
+          onChange={onChange}
+          ariaLabel="Filter by category"
+        />
+        <div className="divider-gold mt-4" />
+      </div>
+
+      {/* Sticky strip — separate instance, appears after hero scrolls out */}
+      <AnimatePresence>
+        {show && (
+          <motion.div
+            key="news-filter-nav"
+            initial={reduce ? { opacity: 0 } : { opacity: 0, y: -10 }}
+            animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
+            exit={reduce ? { opacity: 0 } : { opacity: 0, y: -10 }}
+            transition={{ duration: 0.22, ease: easing.out }}
+            className="fixed top-16 inset-x-0 z-40 bg-background/95 backdrop-blur border-b border-border"
+          >
+            <div className="container mx-auto px-4">
+              <FilterPills
+                active={active}
+                onChange={onChange}
+                ariaLabel="Filter by category (sticky)"
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
+
 export default function News() {
+  const [activeCategory, setActiveCategory] = useState<
+    NewsletterCategory | "All"
+  >("All");
+
+  const filteredPosts = useMemo(
+    () =>
+      activeCategory === "All"
+        ? sortedPosts
+        : sortedPosts.filter((p) => p.category === activeCategory),
+    [activeCategory],
+  );
+
   return (
     <div className="min-h-screen bg-background">
       {/* Editorial header */}
-      <section className="relative bg-card overflow-hidden">
+      <section id="news-hero" className="relative bg-card overflow-hidden">
         <div className="container mx-auto px-4 py-20 md:py-28 relative">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-end">
             <div className="lg:col-span-7">
@@ -108,8 +227,14 @@ export default function News() {
         />
       </div>
 
+      {/* Category filter strip */}
+      <CategoryFilterStrip
+        active={activeCategory}
+        onChange={setActiveCategory}
+      />
+
       {/* Posts */}
-      <div className="container mx-auto px-4 py-32 md:py-40 max-w-3xl">
+      <div className="container mx-auto px-4 py-16 md:py-24 max-w-3xl">
         <motion.div
           className="mb-12"
           initial={{ opacity: 0, y: 16 }}
@@ -118,18 +243,41 @@ export default function News() {
           transition={{ duration: 0.5, ease: easing.out }}
         >
           <h2 className="font-serif text-2xl md:text-3xl text-foreground mb-2">
-            Recent dispatches
+            {activeCategory === "All"
+              ? "Recent dispatches"
+              : `${activeCategory} dispatches`}
           </h2>
           <p className="text-muted-foreground">
-            A look at what we've been writing about lately.
+            {activeCategory === "All"
+              ? "A look at what we've been writing about lately."
+              : `Showing ${filteredPosts.length} post${filteredPosts.length === 1 ? "" : "s"} tagged "${activeCategory}".`}
           </p>
         </motion.div>
 
-        <StaggerReveal className="space-y-8" staggerChildren={0.08} viewportMargin="-40px">
-          {sortedPosts.map((post) => (
-            <PostCard key={post.id} post={post} />
-          ))}
-        </StaggerReveal>
+        <AnimatePresence mode="wait">
+          {filteredPosts.length > 0 ? (
+            <StaggerReveal
+              key={activeCategory}
+              className="space-y-8"
+              staggerChildren={0.08}
+              viewportMargin="-40px"
+            >
+              {filteredPosts.map((post) => (
+                <PostCard key={post.id} post={post} />
+              ))}
+            </StaggerReveal>
+          ) : (
+            <motion.p
+              key="empty"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="text-muted-foreground text-center py-16"
+            >
+              No posts in this category yet — check back soon.
+            </motion.p>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

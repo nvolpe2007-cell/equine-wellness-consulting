@@ -1,8 +1,9 @@
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Info, Plus } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { LineReveal, AnimatedHeading } from "@/components/ui/AnimatedText";
 import { ResponsiveImage, type PictureData } from "@/components/ui/ResponsiveImage";
+import { StickyNav } from "@/components/ui/StickyNav";
 import { spring, ease as easing } from "@/lib/motion";
 import massageHands from "@assets/0629_LOC_Horse02_CBH_t1170_1776529181857.jpg?w=400;800;1200&picture";
 import horseStall from "@assets/stock_images/horse-stall.jpg?w=400;800;1200&picture";
@@ -334,116 +335,27 @@ function ModalityFaqItem({ q, a }: { q: string; a: string }) {
   );
 }
 
-const MODALITY_LABELS: Record<string, string> = {
-  massage: "Massage",
-  pemf: "PEMF",
-  "red-light": "Red Light",
-  "cold-laser": "Cold Laser",
-  tens: "TENS",
-  tecar: "TECAR",
-};
-
-function ModalityNav({
-  modalities,
-  activeId,
-}: {
-  modalities: Modality[];
-  activeId: string | null;
-}) {
-  const reduce = useReducedMotion();
-  return (
-    <nav aria-label="Jump to modality" className="flex items-center gap-2 py-2.5 overflow-x-auto">
-      {modalities.map((m) => (
-        <button
-          key={m.id}
-          onClick={() =>
-            document.getElementById(m.id)?.scrollIntoView({
-              behavior: reduce ? "auto" : "smooth",
-              block: "start",
-            })
-          }
-          aria-current={activeId === m.id ? "true" : undefined}
-          className={[
-            "shrink-0 px-4 py-1.5 rounded-full text-sm font-sans font-medium border transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-            activeId === m.id
-              ? "bg-primary text-primary-foreground border-primary shadow-gold-glow"
-              : "bg-card/80 text-muted-foreground border-border hover:text-foreground hover:border-primary/50",
-          ].join(" ")}
-        >
-          {MODALITY_LABELS[m.id] ?? m.title}
-        </button>
-      ))}
-    </nav>
-  );
-}
+const MODALITY_SECTIONS = [
+  { id: "massage", label: "Massage" },
+  { id: "pemf", label: "PEMF" },
+  { id: "red-light", label: "Red Light" },
+  { id: "cold-laser", label: "Cold Laser" },
+  { id: "tens", label: "TENS" },
+  { id: "tecar", label: "TECAR" },
+];
 
 export default function Modalities() {
   const reduce = useReducedMotion();
-  const [showNav, setShowNav] = useState(false);
-  const [activeId, setActiveId] = useState<string | null>(null);
-  const heroRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const hero = heroRef.current;
-    if (!hero) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => setShowNav(!entry.isIntersecting),
-      { threshold: 0 },
-    );
-    obs.observe(hero);
-    return () => obs.disconnect();
-  }, []);
-
-  useEffect(() => {
-    const sectionEls = modalities
-      .map((m) => document.getElementById(m.id))
-      .filter(Boolean) as HTMLElement[];
-    if (sectionEls.length === 0) return;
-    const visible = new Map<string, IntersectionObserverEntry>();
-    const obs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            visible.set(entry.target.id, entry);
-          } else {
-            visible.delete(entry.target.id);
-          }
-        });
-        if (visible.size > 0) {
-          const topMost = [...visible.values()].reduce((prev, curr) =>
-            curr.boundingClientRect.top < prev.boundingClientRect.top
-              ? curr
-              : prev,
-          );
-          setActiveId(topMost.target.id);
-        }
-      },
-      { rootMargin: "-15% 0px -55% 0px", threshold: 0 },
-    );
-    sectionEls.forEach((el) => obs.observe(el));
-    return () => obs.disconnect();
-  }, []);
 
   return (
     <div className="min-h-screen bg-background">
-      <AnimatePresence>
-        {showNav && (
-          <motion.div
-            key="modality-nav"
-            initial={reduce ? { opacity: 0 } : { opacity: 0, y: -10 }}
-            animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
-            exit={reduce ? { opacity: 0 } : { opacity: 0, y: -10 }}
-            transition={{ duration: 0.22, ease: easing.out }}
-            className="fixed top-16 inset-x-0 z-40 bg-background/95 backdrop-blur border-b border-border"
-          >
-            <div className="container mx-auto px-4">
-              <ModalityNav modalities={modalities} activeId={activeId} />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <StickyNav
+        sections={MODALITY_SECTIONS}
+        heroId="modality-hero"
+        ariaLabel="Jump to modality"
+      />
       {/* Editorial Header */}
-      <section ref={heroRef} className="relative bg-card overflow-hidden">
+      <section id="modality-hero" className="relative bg-card overflow-hidden">
         <div className="container mx-auto px-4 py-20 md:py-28 relative">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-end">
             <div className="lg:col-span-7">
