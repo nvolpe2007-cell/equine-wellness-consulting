@@ -114,4 +114,81 @@ router.get("/survey/admin/responses", requireAdmin, async (req, res, next) => {
   }
 });
 
+router.get("/survey/admin/stats", requireAdmin, async (req, res, next) => {
+  try {
+    const rows = await db
+      .select({
+        qualityRating: pvSurveyResponsesTable.qualityRating,
+        futureConcernLevel: pvSurveyResponsesTable.futureConcernLevel,
+        challenges: pvSurveyResponsesTable.challenges,
+        submittedAt: pvSurveyResponsesTable.submittedAt,
+      })
+      .from(pvSurveyResponsesTable)
+      .orderBy(pvSurveyResponsesTable.submittedAt);
+
+    const total = rows.length;
+
+    const qualityRatings = rows
+      .map((r) => r.qualityRating)
+      .filter((v): v is number => v != null);
+    const avgQuality =
+      qualityRatings.length > 0
+        ? Math.round((qualityRatings.reduce((a, b) => a + b, 0) / qualityRatings.length) * 10) / 10
+        : null;
+
+    const concernLevels = rows
+      .map((r) => r.futureConcernLevel)
+      .filter((v): v is number => v != null);
+    const avgConcern =
+      concernLevels.length > 0
+        ? Math.round((concernLevels.reduce((a, b) => a + b, 0) / concernLevels.length) * 10) / 10
+        : null;
+
+    const challengeFreq: Record<string, number> = {};
+    for (const row of rows) {
+      if (!row.challenges) continue;
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(row.challenges);
+      } catch {
+        continue;
+      }
+      if (!Array.isArray(parsed)) continue;
+      for (const item of parsed) {
+        if (typeof item !== "string" || !item) continue;
+        challengeFreq[item] = (challengeFreq[item] ?? 0) + 1;
+      }
+    }
+    const challenges = Object.entries(challengeFreq)
+      .map(([label, count]) => ({ label, count }))
+      .sort((a, b) => b.count - a.count);
+
+    const weeklyMap: Record<string, number> = {};
+    for (const row of rows) {
+      const d = new Date(row.submittedAt);
+      const day = d.getDay();
+      const monday = new Date(d);
+      monday.setDate(d.getDate() - ((day + 6) % 7));
+      monday.setHours(0, 0, 0, 0);
+      const key = monday.toISOString().slice(0, 10);
+      weeklyMap[key] = (weeklyMap[key] ?? 0) + 1;
+    }
+    const weeklySubmissions = Object.entries(weeklyMap)
+      .map(([week, count]) => ({ week, count }))
+      .sort((a, b) => a.week.localeCompare(b.week));
+
+    return res.json({
+      ok: true,
+      total,
+      avgQuality,
+      avgConcern,
+      challenges,
+      weeklySubmissions,
+    });
+  } catch (err) {
+    req.log?.error({ err }, "survey admin stats failed");
+    return next(err);
+  }
+});
+
 export default router;
