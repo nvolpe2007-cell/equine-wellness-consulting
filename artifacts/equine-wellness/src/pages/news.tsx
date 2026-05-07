@@ -1,7 +1,9 @@
 import { Link } from "wouter";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
+import { ease as easing } from "@/lib/motion";
 import { Calendar, Tag, ArrowRight } from "lucide-react";
 import { LineReveal } from "@/components/ui/AnimatedText";
+import { StaggerReveal, StaggerItem } from "@/components/ui/AnimatedText";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
 import { newsletterPosts, formatPostDate, type NewsletterPost } from "@/content/newsletter-posts";
 
@@ -9,54 +11,55 @@ const sortedPosts: NewsletterPost[] = [...newsletterPosts].sort(
   (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
 );
 
-function PostCard({ post, index }: { post: NewsletterPost; index: number }) {
+function PostCard({ post }: { post: NewsletterPost }) {
+  const reduce = useReducedMotion();
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.5, delay: index * 0.05, ease: [0.22, 1, 0.36, 1] }}
-      className="bg-card border border-border rounded-2xl p-6 md:p-8 shadow-sm"
-      data-testid={`post-${post.id}`}
-    >
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground mb-3">
-        <span className="inline-flex items-center gap-1.5">
-          <Calendar className="h-3.5 w-3.5" />
-          {formatPostDate(post.date)}
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <Tag className="h-3.5 w-3.5" />
-          <span className="uppercase tracking-wider text-primary font-medium">
-            {post.category}
+    <StaggerItem>
+      <motion.article
+        whileHover={reduce ? undefined : { y: -4 }}
+        transition={{ type: "spring", stiffness: 380, damping: 28 }}
+        className="bg-card border border-border rounded-2xl p-6 md:p-8 shadow-sm hover:shadow-lg transition-shadow duration-500"
+        data-testid={`post-${post.id}`}
+      >
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground mb-3">
+          <span className="inline-flex items-center gap-1.5">
+            <Calendar className="h-3.5 w-3.5" />
+            {formatPostDate(post.date)}
           </span>
-        </span>
-      </div>
+          <span className="inline-flex items-center gap-1.5">
+            <Tag className="h-3.5 w-3.5" />
+            <span className="uppercase tracking-wider text-primary font-medium">
+              {post.category}
+            </span>
+          </span>
+        </div>
 
-      <h3 className="font-serif text-xl md:text-2xl text-foreground mb-3 leading-snug">
-        <Link
-          href={`/news/${post.slug}`}
-          className="hover:text-primary transition-colors"
-          data-testid={`link-post-title-${post.id}`}
-        >
-          {post.title}
-        </Link>
-      </h3>
+        <h3 className="font-serif text-xl md:text-2xl text-foreground mb-3 leading-snug">
+          <Link
+            href={`/news/${post.slug}`}
+            className="hover:text-primary transition-colors"
+            data-testid={`link-post-title-${post.id}`}
+          >
+            {post.title}
+          </Link>
+        </h3>
 
-      <p className="text-muted-foreground leading-relaxed italic">
-        {post.excerpt}
-      </p>
+        <p className="text-muted-foreground leading-relaxed italic">
+          {post.excerpt}
+        </p>
 
-      <div className="mt-5">
-        <Link
-          href={`/news/${post.slug}`}
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80"
-          data-testid={`link-read-full-${post.id}`}
-        >
-          Read full dispatch
-          <ArrowRight className="h-4 w-4" />
-        </Link>
-      </div>
-    </motion.article>
+        <div className="mt-5">
+          <Link
+            href={`/news/${post.slug}`}
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors group"
+            data-testid={`link-read-full-${post.id}`}
+          >
+            Read full dispatch
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </Link>
+        </div>
+      </motion.article>
+    </StaggerItem>
   );
 }
 
@@ -76,7 +79,7 @@ export default function News() {
                 className="text-5xl md:text-7xl font-serif text-foreground leading-[1.02] tracking-tight"
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+                transition={{ duration: 0.65, ease: easing.out, delay: 0.1 }}
               >
                 Notes for thoughtful horse owners.
               </motion.h1>
@@ -107,20 +110,26 @@ export default function News() {
 
       {/* Posts */}
       <div className="container mx-auto px-4 py-32 md:py-40 max-w-3xl">
-        <div className="mb-12">
+        <motion.div
+          className="mb-12"
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, ease: easing.out }}
+        >
           <h2 className="font-serif text-2xl md:text-3xl text-foreground mb-2">
             Recent dispatches
           </h2>
           <p className="text-muted-foreground">
             A look at what we've been writing about lately.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="space-y-8">
-          {sortedPosts.map((post, idx) => (
-            <PostCard key={post.id} post={post} index={idx} />
+        <StaggerReveal className="space-y-8" staggerChildren={0.08} viewportMargin="-40px">
+          {sortedPosts.map((post) => (
+            <PostCard key={post.id} post={post} />
           ))}
-        </div>
+        </StaggerReveal>
       </div>
     </div>
   );

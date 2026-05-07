@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
+import { ease as easing } from "@/lib/motion";
 import { WordReveal, LineReveal } from "@/components/ui/AnimatedText";
+import { StaggerReveal, StaggerItem } from "@/components/ui/AnimatedText";
 import horsePortrait from "@assets/20260401_140719_1776529313797.jpg?w=400;800&picture";
 import { ResponsiveImage } from "@/components/ui/ResponsiveImage";
 
@@ -19,7 +21,7 @@ export default function Bio() {
                 className="text-5xl md:text-7xl font-serif text-foreground leading-[1.02] tracking-tight"
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+                transition={{ duration: 0.65, ease: easing.out, delay: 0.1 }}
               >
                 Meet Susie H. Lytal, MS
               </motion.h1>
@@ -45,7 +47,7 @@ export default function Bio() {
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.2, duration: 0.6, ease: easing.out }}
               className="rounded-2xl overflow-hidden shadow-xl aspect-[3/4]"
             >
               <ResponsiveImage
@@ -62,46 +64,43 @@ export default function Bio() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.35, duration: 0.6, ease: easing.out }}
               className="bg-card p-8 rounded-xl border shadow-sm"
             >
               <h3 className="font-serif text-xl text-foreground mb-4 border-b pb-4">
                 Credentials &amp; Training
               </h3>
-              <ul className="space-y-4 text-muted-foreground">
-                <li className="flex flex-col">
-                  <span className="font-medium text-foreground">
-                    MS, Biology (Equine Biomechanics)
-                  </span>
-                  <span className="text-sm">
-                    Cal Poly Pomona
-                  </span>
-                </li>
-                <li className="flex flex-col">
-                  <span className="font-medium text-foreground">
-                    Certified Equine Sports Massage Therapist
-                  </span>
-                  <span className="text-sm">
-                    Accredited certification program
-                  </span>
-                </li>
-                <li className="flex flex-col">
-                  <span className="font-medium text-foreground">
-                    Equine Biomechanist
-                  </span>
-                  <span className="text-sm">
-                    Professional designation, applied in every session
-                  </span>
-                </li>
-                <li className="flex flex-col">
-                  <span className="font-medium text-foreground">
-                    Founder, Equine Bodywork and Wellness Consulting
-                  </span>
-                  <span className="text-sm">
-                    Serving the Southern California region by appointment
-                  </span>
-                </li>
-              </ul>
+              <StaggerReveal
+                className="space-y-4 text-muted-foreground"
+                staggerChildren={0.09}
+                delayChildren={0.1}
+              >
+                {[
+                  {
+                    title: "MS, Biology (Equine Biomechanics)",
+                    sub: "Cal Poly Pomona",
+                  },
+                  {
+                    title: "Certified Equine Sports Massage Therapist",
+                    sub: "Accredited certification program",
+                  },
+                  {
+                    title: "Equine Biomechanist",
+                    sub: "Professional designation, applied in every session",
+                  },
+                  {
+                    title: "Founder, Equine Bodywork and Wellness Consulting",
+                    sub: "Serving the Southern California region by appointment",
+                  },
+                ].map((item) => (
+                  <StaggerItem key={item.title}>
+                    <span className="font-medium text-foreground block">
+                      {item.title}
+                    </span>
+                    <span className="text-sm">{item.sub}</span>
+                  </StaggerItem>
+                ))}
+              </StaggerReveal>
             </motion.div>
           </div>
 
@@ -110,7 +109,7 @@ export default function Bio() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.3, duration: 0.6, ease: easing.out }}
               className="prose prose-lg prose-stone dark:prose-invert max-w-none"
             >
               <WordReveal
@@ -126,7 +125,7 @@ export default function Bio() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-80px" }}
-                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 0.7, ease: easing.out }}
                 className="not-prose my-8 border-l-4 border-accent pl-6 md:pl-8"
               >
                 <blockquote className="font-serif text-2xl md:text-3xl text-foreground leading-snug italic">
@@ -142,25 +141,34 @@ export default function Bio() {
                 </figcaption>
               </motion.figure>
 
-              <p>
-                Susie H. Lytal, MS, brings a rigorous, scientific understanding
-                of anatomy and movement to every horse she works with. Her
-                MS in Biology (Equine Biomechanics) from Cal Poly Pomona, paired
-                with extensive hands-on certification as a Certified Equine
-                Sports Massage Therapist, allows
-                Susie to evaluate and support the equine athlete holistically
-                — from the elite competitor to the beloved pasture companion.
-              </p>
-
-              <p>
-                Susie founded{" "}
-                <strong>Equine Bodywork and Wellness Consulting</strong> to
-                bridge the gap between academic biomechanics and practical
-                barn-aisle care. Equine Bodywork and Wellness Consulting offers
-                six modalities — sports massage, PEMF (Magnawave), red light
-                (RevitaVet), cold laser, TENS (TrueStim), and TECAR — chosen
-                and combined for each individual horse.
-              </p>
+              <StaggerReveal
+                className="space-y-5"
+                staggerChildren={0.1}
+                viewportMargin="-60px"
+              >
+                <StaggerItem>
+                  <p>
+                    Susie H. Lytal, MS, brings a rigorous, scientific understanding
+                    of anatomy and movement to every horse she works with. Her
+                    MS in Biology (Equine Biomechanics) from Cal Poly Pomona, paired
+                    with extensive hands-on certification as a Certified Equine
+                    Sports Massage Therapist, allows
+                    Susie to evaluate and support the equine athlete holistically
+                    — from the elite competitor to the beloved pasture companion.
+                  </p>
+                </StaggerItem>
+                <StaggerItem>
+                  <p>
+                    Susie founded{" "}
+                    <strong>Equine Bodywork and Wellness Consulting</strong> to
+                    bridge the gap between academic biomechanics and practical
+                    barn-aisle care. Equine Bodywork and Wellness Consulting offers
+                    six modalities — sports massage, PEMF (Magnawave), red light
+                    (RevitaVet), cold laser, TENS (TrueStim), and TECAR — chosen
+                    and combined for each individual horse.
+                  </p>
+                </StaggerItem>
+              </StaggerReveal>
 
               <WordReveal
                 text="The Philosophy"
@@ -169,27 +177,37 @@ export default function Bio() {
                 className="font-serif text-2xl text-foreground mt-12 mb-6"
                 stagger={0.06}
               />
-              <p>
-                A session with Susie is never a one-size-fits-all routine.
-                Because Susie understands the complex kinetic chains of the
-                equine body, she tailors her modalities to address specific
-                areas of tension or restriction.
-              </p>
 
-              <p>
-                Susie believes deeply in a team approach to equine wellness.
-                She works collaboratively alongside owners, trainers, farriers,
-                and veterinarians. While her work may meaningfully support a
-                horse&rsquo;s comfort and muscular health, Susie is clear about
-                her role: she provides wellness support, not medical diagnosis
-                or any kind of veterinary care.
-              </p>
+              <StaggerReveal
+                className="space-y-5"
+                staggerChildren={0.1}
+                viewportMargin="-60px"
+              >
+                <StaggerItem>
+                  <p>
+                    A session with Susie is never a one-size-fits-all routine.
+                    Because Susie understands the complex kinetic chains of the
+                    equine body, she tailors her modalities to address specific
+                    areas of tension or restriction.
+                  </p>
+                </StaggerItem>
+                <StaggerItem>
+                  <p>
+                    Susie believes deeply in a team approach to equine wellness.
+                    She works collaboratively alongside owners, trainers, farriers,
+                    and veterinarians. While her work may meaningfully support a
+                    horse&rsquo;s comfort and muscular health, Susie is clear about
+                    her role: she provides wellness support, not medical diagnosis
+                    or any kind of veterinary care.
+                  </p>
+                </StaggerItem>
+              </StaggerReveal>
 
               <motion.div
                 initial={{ opacity: 0.4, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-80px" }}
-                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 0.7, ease: easing.out }}
                 className="bg-muted p-8 rounded-xl my-10 border-l-4 border-primary not-prose"
               >
                 <LineReveal
@@ -209,12 +227,14 @@ export default function Bio() {
                 </p>
               </motion.div>
 
-              <p>
-                Outside of sessions, Susie is continually expanding her
-                knowledge, staying current with the latest research in equine
-                biomechanics, and maintaining her own connection to the horses
-                that inspire her work every day.
-              </p>
+              <StaggerItem>
+                <p>
+                  Outside of sessions, Susie is continually expanding her
+                  knowledge, staying current with the latest research in equine
+                  biomechanics, and maintaining her own connection to the horses
+                  that inspire her work every day.
+                </p>
+              </StaggerItem>
             </motion.div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { Link } from "wouter";
 import { ArrowRight, CheckCircle2, Phone } from "lucide-react";
 import { useRef } from "react";
@@ -6,6 +6,9 @@ import { WordReveal, LineReveal, AnimatedHeading, AccentFlourish } from "@/compo
 import { ResponsiveImage } from "@/components/ui/ResponsiveImage";
 import { ServiceArea } from "@/components/sections/ServiceArea";
 import { Testimonials } from "@/components/sections/Testimonials";
+import { CountUp } from "@/components/ui/CountUp";
+import { useMagneticEffect } from "@/hooks/useMagneticEffect";
+import { spring } from "@/lib/motion";
 import barnHero from "@assets/stock_images/barn-hero.jpg?w=640;1024;1600;2400&picture";
 import barnExterior from "@assets/stock_images/barn-exterior.jpg?w=400;800;1200;1600&picture";
 import horsePortrait from "@assets/stock_images/horse-portrait.jpg?w=400;800;1200&picture";
@@ -23,8 +26,75 @@ const stagger = {
   visible: { transition: { staggerChildren: 0.08 } },
 };
 
+const stats = [
+  { value: 6, suffix: "", label: "Wellness Modalities" },
+  { value: 90, suffix: " min", label: "Typical Session" },
+  { value: 100, suffix: "%", label: "Tailored to Your Horse" },
+];
+
+function MagneticAnchor({
+  href,
+  className,
+  children,
+  "data-testid": testId,
+}: {
+  href: string;
+  className: string;
+  children: React.ReactNode;
+  "data-testid"?: string;
+}) {
+  const { ref, x, y, onMouseMove, onMouseLeave } =
+    useMagneticEffect<HTMLAnchorElement>(0.25);
+  return (
+    <motion.a
+      ref={ref}
+      href={href}
+      className={className}
+      style={{ x, y }}
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
+      data-testid={testId}
+      whileTap={{ scale: 0.97 }}
+      transition={spring.snappy}
+    >
+      {children}
+    </motion.a>
+  );
+}
+
+function MagneticLink({
+  href,
+  className,
+  children,
+  "data-testid": testId,
+}: {
+  href: string;
+  className: string;
+  children: React.ReactNode;
+  "data-testid"?: string;
+}) {
+  const { ref, x, y, onMouseMove, onMouseLeave } =
+    useMagneticEffect<HTMLDivElement>(0.25);
+  return (
+    <motion.div
+      ref={ref}
+      style={{ x, y }}
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
+      className="inline-block"
+      whileTap={{ scale: 0.97 }}
+      transition={spring.snappy}
+    >
+      <Link href={href} className={className} data-testid={testId}>
+        {children}
+      </Link>
+    </motion.div>
+  );
+}
+
 export default function Home() {
   const heroRef = useRef<HTMLElement | null>(null);
+  const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
@@ -91,25 +161,24 @@ export default function Home() {
               Professional equine bodywork and wellness consulting, grounded in graduate-level biomechanics expertise.
             </motion.p>
             <motion.div variants={fadeUp} transition={{ duration: 0.6 }} className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link
+              <MagneticLink
                 href="/modalities"
-                className="group bg-gold-metallic shadow-gold-glow inline-flex h-12 items-center justify-center rounded-full px-8 text-base font-medium transition-all hover:shadow-gold-glow-lg hover:-translate-y-0.5 w-full sm:w-auto"
+                className="group bg-gold-metallic shadow-gold-glow inline-flex h-12 items-center justify-center rounded-full px-8 text-base font-medium hover:shadow-gold-glow-lg w-full sm:w-auto"
                 data-testid="link-hero-modalities"
               >
                 Explore Modalities
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Link>
-              <Link
+              </MagneticLink>
+              <MagneticLink
                 href="/bio"
-                className="inline-flex h-12 items-center justify-center rounded-full bg-white/10 px-8 text-base font-medium text-white backdrop-blur-md transition-all hover:bg-white/20 hover:-translate-y-0.5 w-full sm:w-auto border border-white/20"
+                className="inline-flex h-12 items-center justify-center rounded-full bg-white/10 px-8 text-base font-medium text-white backdrop-blur-md hover:bg-white/20 w-full sm:w-auto border border-white/20"
                 data-testid="link-hero-bio"
               >
                 Meet Susie
-              </Link>
+              </MagneticLink>
             </motion.div>
           </motion.div>
         </div>
-
       </section>
 
       {/* Credentials Band */}
@@ -138,6 +207,30 @@ export default function Home() {
             ))}
           </ul>
         </motion.div>
+      </section>
+
+      {/* Stats Strip */}
+      <section className="bg-card border-b border-border">
+        <div className="container mx-auto px-4 py-10 md:py-12">
+          <motion.ul
+            className="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-16 md:gap-24"
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.6 }}
+          >
+            {stats.map((stat, i) => (
+              <li key={stat.label} className="text-center">
+                <p className="text-4xl md:text-5xl font-serif text-primary leading-none mb-1">
+                  <CountUp to={stat.value} suffix={stat.suffix} duration={1.4 + i * 0.15} />
+                </p>
+                <p className="text-xs font-sans tracking-[0.22em] text-muted-foreground uppercase mt-2">
+                  {stat.label}
+                </p>
+              </li>
+            ))}
+          </motion.ul>
+        </div>
       </section>
 
       {/* Intro / Philosophy */}
@@ -177,8 +270,8 @@ export default function Home() {
               Every horse is a complex athlete, whether they are performing at the highest levels of competition or carrying you safely down the trail. My approach to equine wellness combines a deep, scientific understanding of biomechanics with highly attuned, hands-on application. We don't just look at the symptoms; we support the whole horse.
             </p>
             <motion.div
-              whileHover={{ scale: 1.01 }}
-              transition={{ duration: 0.4 }}
+              whileHover={reduce ? undefined : { scale: 1.01 }}
+              transition={spring.gentle}
               className="overflow-hidden rounded-2xl shadow-xl"
             >
               <ResponsiveImage
@@ -239,7 +332,7 @@ export default function Home() {
             </motion.div>
           </div>
 
-          {/* Asymmetric: feature card (7 cols) + two stacked (5 cols) */}
+          {/* Asymmetric service cards with spring lift */}
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -275,8 +368,9 @@ export default function Home() {
                     key={feature.title}
                     variants={fadeUp}
                     transition={{ duration: 0.6 }}
-                    whileHover={{ y: -6 }}
+                    whileHover={reduce ? undefined : { y: -6 }}
                     className="lg:col-span-7 bg-card rounded-2xl overflow-hidden border shadow-sm hover:shadow-xl transition-shadow duration-500 group flex flex-col"
+                    style={{ transition: "box-shadow 0.5s" }}
                   >
                     <div className="h-72 md:h-[460px] overflow-hidden relative">
                       <ResponsiveImage
@@ -311,7 +405,7 @@ export default function Home() {
                         key={service.title}
                         variants={fadeUp}
                         transition={{ duration: 0.6 }}
-                        whileHover={{ y: -6 }}
+                        whileHover={reduce ? undefined : { y: -6 }}
                         className="bg-card rounded-2xl overflow-hidden border shadow-sm hover:shadow-xl transition-shadow duration-500 group flex flex-col"
                       >
                         <div className="h-52 overflow-hidden relative">
@@ -371,7 +465,7 @@ export default function Home() {
               <p className="text-primary-foreground/85 text-lg mb-8 leading-relaxed">
                 Working with an Equine Biomechanist means looking beyond the surface. It involves analyzing how the horse moves, identifying compensatory patterns, and applying specific modalities to support more efficient, comfortable movement.
               </p>
-              
+
               <ul className="space-y-4">
                 {[
                   "MS, Biology (Equine Biomechanics) — Cal Poly Pomona",
@@ -452,14 +546,14 @@ export default function Home() {
               Reach out to discuss your horse's needs and schedule a session. We'll develop a personalized plan to support their comfort and performance.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <a
+              <MagneticAnchor
                 href="tel:+13104884389"
-                className="group bg-gold-metallic shadow-gold-glow inline-flex h-14 items-center justify-center gap-2 rounded-full px-10 text-base font-medium transition-all hover:shadow-gold-glow-lg hover:-translate-y-0.5"
+                className="group bg-gold-metallic shadow-gold-glow inline-flex h-14 items-center justify-center gap-2 rounded-full px-10 text-base font-medium hover:shadow-gold-glow-lg"
                 data-testid="link-cta-phone"
               >
                 <Phone className="h-4 w-4" />
                 Call (310) 488-4389
-              </a>
+              </MagneticAnchor>
             </div>
           </motion.div>
         </div>

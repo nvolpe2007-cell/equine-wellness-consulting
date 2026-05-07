@@ -1,33 +1,40 @@
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ExternalLink } from "lucide-react";
 import { LineReveal } from "@/components/ui/AnimatedText";
+import { StaggerReveal, StaggerItem } from "@/components/ui/AnimatedText";
+import { spring } from "@/lib/motion";
 
 export default function Partners() {
+  const reduce = useReducedMotion();
   const partners = [
     {
       name: "Magnawave",
-      description: "Industry-leading PEMF (Pulsed Electromagnetic Field) equipment. Magnawave systems are used to support cellular function, relaxation, and overall wellness in horses.",
+      description:
+        "Industry-leading PEMF (Pulsed Electromagnetic Field) equipment. Magnawave systems are used to support cellular function, relaxation, and overall wellness in horses.",
       role: "PEMF Equipment Provider",
-      link: "#"
+      link: "#",
     },
     {
       name: "RevitaVet",
-      description: "Advanced red light and infrared technology. RevitaVet systems deliver targeted light application to support soft tissue health and comfort.",
+      description:
+        "Advanced red light and infrared technology. RevitaVet systems deliver targeted light application to support soft tissue health and comfort.",
       role: "Red Light Equipment Provider",
-      link: "#"
+      link: "#",
     },
     {
       name: "TrueStim",
-      description: "Innovative TENS (Transcutaneous Electrical Nerve Stimulation) devices designed to support muscular relaxation and comfort during sessions.",
+      description:
+        "Innovative TENS (Transcutaneous Electrical Nerve Stimulation) devices designed to support muscular relaxation and comfort during sessions.",
       role: "TENS Equipment Provider",
-      link: "#"
+      link: "#",
     },
     {
       name: "BeneFab",
-      description: "High-quality equine wellness products, including ceramic-infused fabrics that may help support circulation and comfort for your horse between sessions.",
+      description:
+        "High-quality equine wellness products, including ceramic-infused fabrics that may help support circulation and comfort for your horse between sessions.",
       role: "Equine Wellness Products",
-      link: "#"
-    }
+      link: "#",
+    },
   ];
 
   return (
@@ -63,7 +70,6 @@ export default function Partners() {
         <div className="divider-gold" />
       </section>
 
-      {/* Asymmetric: sticky intro column + partner cards */}
       <div className="container mx-auto px-4 py-24 md:py-32">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
           <aside className="lg:col-span-4 lg:sticky lg:top-28 lg:self-start">
@@ -73,40 +79,58 @@ export default function Partners() {
             </p>
           </aside>
 
-          <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-            {partners.map((partner, index) => (
-              <motion.div
-                key={partner.name}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-card border rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow flex flex-col h-full"
-              >
-                <div className="mb-6">
-                  <span className="text-xs font-sans tracking-widest text-primary uppercase mb-2 block">
-                    {partner.role}
-                  </span>
-                  <h3 className="text-2xl font-serif text-foreground mb-4">{partner.name}</h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    {partner.description}
-                  </p>
-                </div>
+          <StaggerReveal
+            className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8"
+            staggerChildren={0.1}
+          >
+            {partners.map((partner) => (
+              <StaggerItem key={partner.name}>
+                <motion.div
+                  className="bg-card border rounded-2xl p-8 shadow-sm flex flex-col h-full cursor-default"
+                  initial="rest"
+                  whileHover={reduce ? undefined : "hover"}
+                  animate="rest"
+                  variants={{
+                    rest: {
+                      y: 0,
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
+                    },
+                    hover: {
+                      y: -6,
+                      boxShadow:
+                        "0 20px 40px rgba(0,0,0,0.25), 0 0 20px rgba(198,163,40,0.07)",
+                      transition: spring.snappy,
+                    },
+                  }}
+                >
+                  <div className="mb-6">
+                    <span className="text-xs font-sans tracking-widest text-primary uppercase mb-2 block">
+                      {partner.role}
+                    </span>
+                    <h3 className="text-2xl font-serif text-foreground mb-4">
+                      {partner.name}
+                    </h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      {partner.description}
+                    </p>
+                  </div>
 
-                <div className="mt-auto pt-6">
-                  <a
-                    href={partner.link}
-                    className="inline-flex items-center text-sm font-medium text-accent hover:text-accent/80 transition-colors group"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-testid={`link-partner-${partner.name.toLowerCase()}`}
-                  >
-                    Visit {partner.name}
-                    <ExternalLink className="ml-2 h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                  </a>
-                </div>
-              </motion.div>
+                  <div className="mt-auto pt-6">
+                    <a
+                      href={partner.link}
+                      className="inline-flex items-center text-sm font-medium text-accent hover:text-accent/80 transition-colors group"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      data-testid={`link-partner-${partner.name.toLowerCase()}`}
+                    >
+                      Visit {partner.name}
+                      <ExternalLink className="ml-2 h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                    </a>
+                  </div>
+                </motion.div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerReveal>
         </div>
       </div>
     </div>

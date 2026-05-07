@@ -1,8 +1,9 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Info, Plus, Minus } from "lucide-react";
 import { useState } from "react";
 import { LineReveal, AnimatedHeading } from "@/components/ui/AnimatedText";
 import { ResponsiveImage, type PictureData } from "@/components/ui/ResponsiveImage";
+import { spring, ease as easing } from "@/lib/motion";
 import massageHands from "@assets/0629_LOC_Horse02_CBH_t1170_1776529181857.jpg?w=400;800;1200&picture";
 import horseStall from "@assets/stock_images/horse-stall.jpg?w=400;800;1200&picture";
 import pemfWhiteHorse from "@assets/20260407_121449_1776528702902.jpg?w=400;800;1200&picture";
@@ -227,10 +228,12 @@ const generalFaqs = [
 
 function FaqItem({ q, a, index }: { q: string; a: string; index: number }) {
   const [open, setOpen] = useState(false);
+  const reduce = useReducedMotion();
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={reduce ? false : { opacity: 0, y: 12 }}
+      whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.05, duration: 0.5 }}
       className="border-b border-border last:border-b-0"
@@ -243,23 +246,97 @@ function FaqItem({ q, a, index }: { q: string; a: string; index: number }) {
         <h3 className="text-lg md:text-xl font-serif text-foreground group-hover:text-primary transition-colors">
           {q}
         </h3>
-        <span className="shrink-0 h-9 w-9 rounded-full border border-border flex items-center justify-center text-primary transition-all group-hover:border-primary group-hover:bg-primary/5">
-          {open ? <Minus className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-        </span>
+        <motion.span
+          className="shrink-0 h-9 w-9 rounded-full border border-border flex items-center justify-center text-primary group-hover:border-primary group-hover:bg-primary/5 transition-colors"
+          animate={reduce ? undefined : { rotate: open ? 45 : 0 }}
+          transition={spring.snappy}
+        >
+          <Plus className="h-4 w-4" />
+        </motion.span>
       </button>
-      <motion.div
-        initial={false}
-        animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }}
-        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-        className="overflow-hidden"
-      >
-        <p className="text-muted-foreground leading-relaxed pb-6 pr-12 max-w-3xl">{a}</p>
-      </motion.div>
+
+      {reduce ? (
+        open && (
+          <div className="overflow-hidden">
+            <p className="text-muted-foreground leading-relaxed pb-6 pr-12 max-w-3xl">{a}</p>
+          </div>
+        )
+      ) : (
+        <AnimatePresence initial={false}>
+          {open && (
+            <motion.div
+              key="content"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.32, ease: easing.out }}
+              className="overflow-hidden"
+            >
+              <p className="text-muted-foreground leading-relaxed pb-6 pr-12 max-w-3xl">
+                {a}
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
     </motion.div>
   );
 }
 
+function ModalityFaqItem({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false);
+  const reduce = useReducedMotion();
+
+  return (
+    <div className="py-5 first:pt-0 last:pb-0 border-b border-border last:border-b-0">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between gap-4 cursor-pointer text-left group"
+        aria-expanded={open}
+      >
+        <h4 className="text-base md:text-lg font-serif text-foreground group-hover:text-primary transition-colors">
+          {q}
+        </h4>
+        <motion.span
+          className="shrink-0 h-7 w-7 rounded-full border border-border flex items-center justify-center text-primary"
+          animate={reduce ? undefined : { rotate: open ? 45 : 0 }}
+          transition={spring.snappy}
+        >
+          <Plus className="h-3.5 w-3.5" />
+        </motion.span>
+      </button>
+
+      {reduce ? (
+        open && (
+          <div>
+            <p className="text-muted-foreground leading-relaxed mt-3 pr-10">{a}</p>
+          </div>
+        )
+      ) : (
+        <AnimatePresence initial={false}>
+          {open && (
+            <motion.div
+              key="content"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3, ease: easing.out }}
+              className="overflow-hidden"
+            >
+              <p className="text-muted-foreground leading-relaxed mt-3 pr-10">
+                {a}
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
+    </div>
+  );
+}
+
 export default function Modalities() {
+  const reduce = useReducedMotion();
+
   return (
     <div className="min-h-screen bg-background">
       {/* Editorial Header */}
@@ -275,7 +352,7 @@ export default function Modalities() {
                 className="text-5xl md:text-7xl font-serif text-foreground leading-[1.02] tracking-tight"
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+                transition={{ duration: 0.65, ease: easing.out, delay: 0.1 }}
               >
                 Wellness Modalities
               </motion.h1>
@@ -323,8 +400,8 @@ export default function Modalities() {
               >
                 <div className="w-full lg:w-1/2">
                   <motion.div
-                    whileHover={{ scale: 1.015 }}
-                    transition={{ duration: 0.5 }}
+                    whileHover={reduce ? undefined : { scale: 1.015 }}
+                    transition={spring.gentle}
                     className="aspect-[4/3] rounded-2xl overflow-hidden shadow-lg border group"
                   >
                     <ResponsiveImage
@@ -356,7 +433,6 @@ export default function Modalities() {
                     className="w-12 h-1 bg-accent rounded-full origin-left"
                   />
 
-                  {/* Direct-answer callout */}
                   <div className="rounded-xl border-l-4 border-accent bg-accent/5 p-5 md:p-6">
                     <p className="text-xs font-sans tracking-[0.25em] text-accent uppercase mb-2">
                       In short
@@ -370,7 +446,6 @@ export default function Modalities() {
                     {modality.description}
                   </p>
 
-                  {/* Stats line */}
                   <div className="pt-2">
                     <p className="text-xs font-sans tracking-[0.25em] text-primary uppercase mb-3">
                       By the numbers
@@ -389,7 +464,7 @@ export default function Modalities() {
                 </div>
               </div>
 
-              {/* Per-modality common questions */}
+              {/* Per-modality common questions — AnimatePresence accordions */}
               <div className="mt-12 lg:mt-16 max-w-4xl mx-auto bg-card border border-border rounded-2xl p-6 md:p-10">
                 <p className="text-xs font-sans tracking-[0.25em] text-primary uppercase mb-3">
                   Common questions
@@ -397,24 +472,9 @@ export default function Modalities() {
                 <h3 className="text-2xl font-serif text-foreground mb-6">
                   About {modality.title}
                 </h3>
-                <div className="divide-y divide-border">
+                <div>
                   {modality.questions.map((qa) => (
-                    <details
-                      key={qa.q}
-                      className="group py-5 first:pt-0 last:pb-0"
-                    >
-                      <summary className="flex items-center justify-between gap-4 cursor-pointer list-none">
-                        <h4 className="text-base md:text-lg font-serif text-foreground group-hover:text-primary transition-colors">
-                          {qa.q}
-                        </h4>
-                        <span className="shrink-0 h-7 w-7 rounded-full border border-border flex items-center justify-center text-primary group-open:rotate-45 transition-transform">
-                          <Plus className="h-3.5 w-3.5" />
-                        </span>
-                      </summary>
-                      <p className="text-muted-foreground leading-relaxed mt-3 pr-10">
-                        {qa.a}
-                      </p>
-                    </details>
+                    <ModalityFaqItem key={qa.q} q={qa.q} a={qa.a} />
                   ))}
                 </div>
               </div>

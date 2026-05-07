@@ -1,7 +1,8 @@
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AnimatePresence, motion } from "framer-motion";
-import { useEffect } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { ease as easing } from "@/lib/motion";
+import { useEffect, useRef } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
@@ -25,6 +26,21 @@ import { getPostBySlug } from "@/content/newsletter-posts";
 import { trackPageView, initAnalyticsConsent } from "@/lib/analytics";
 
 const queryClient = new QueryClient();
+
+const NAV_ORDER = [
+  "/",
+  "/bio",
+  "/modalities",
+  "/gallery",
+  "/news",
+  "/partners",
+  "/survey",
+];
+
+function getNavIndex(path: string): number {
+  const base = path.split("/")[1] ? `/${path.split("/")[1]}` : "/";
+  return NAV_ORDER.indexOf(base);
+}
 
 type PageMeta = {
   title: string;
@@ -138,13 +154,28 @@ function setRobots(content: string | null) {
   tag.setAttribute("content", content);
 }
 
-function PageWrapper({ children }: { children: React.ReactNode }) {
+function PageWrapper({
+  children,
+  direction,
+}: {
+  children: React.ReactNode;
+  direction: "forward" | "back" | "none";
+}) {
+  const reduce = useReducedMotion();
+
+  if (reduce) {
+    return <div>{children}</div>;
+  }
+
+  const xEnter = direction === "back" ? -28 : direction === "forward" ? 28 : 0;
+  const xExit = direction === "back" ? 28 : direction === "forward" ? -28 : 0;
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -8 }}
-      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      initial={{ opacity: 0, x: xEnter }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: xExit }}
+      transition={{ duration: 0.28, ease: easing.out }}
     >
       {children}
     </motion.div>
@@ -153,6 +184,23 @@ function PageWrapper({ children }: { children: React.ReactNode }) {
 
 function Router() {
   const [location] = useLocation();
+  const prevLocationRef = useRef<string>(location);
+  const directionRef = useRef<"forward" | "back" | "none">("none");
+
+  // Compute direction synchronously during render so PageWrapper always
+  // receives the correct value for the current navigation (not the previous one).
+  if (prevLocationRef.current !== location) {
+    const prevIdx = getNavIndex(prevLocationRef.current);
+    const nextIdx = getNavIndex(location);
+    if (prevIdx === -1 || nextIdx === -1 || prevIdx === nextIdx) {
+      directionRef.current = "none";
+    } else if (nextIdx > prevIdx) {
+      directionRef.current = "forward";
+    } else {
+      directionRef.current = "back";
+    }
+    prevLocationRef.current = location;
+  }
 
   useEffect(() => {
     initAnalyticsConsent();
@@ -202,7 +250,7 @@ function Router() {
       <Navbar />
       <main className="flex-1">
         <AnimatePresence mode="wait" initial={false}>
-          <PageWrapper key={location}>
+          <PageWrapper key={location} direction={directionRef.current}>
             <Switch location={location}>
               <Route path="/" component={Home} />
               <Route path="/bio" component={Bio} />

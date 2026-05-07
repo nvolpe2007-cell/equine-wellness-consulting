@@ -1,6 +1,8 @@
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Quote } from "lucide-react";
 import { AnimatedHeading } from "@/components/ui/AnimatedText";
+import { StaggerReveal, StaggerItem } from "@/components/ui/AnimatedText";
+import { spring } from "@/lib/motion";
 
 type Testimonial = {
   quote: string;
@@ -34,6 +36,8 @@ const testimonials: Testimonial[] = [
 ];
 
 export function Testimonials() {
+  const reduce = useReducedMotion();
+
   return (
     <section
       aria-label="Client testimonials"
@@ -56,35 +60,50 @@ export function Testimonials() {
           />
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <StaggerReveal
+          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+          staggerChildren={0.1}
+          viewportMargin="-50px"
+        >
           {testimonials.map((t, i) => (
-            <motion.figure
-              key={`${t.name}-${t.horse}`}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.6, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-              className="relative bg-card border border-border rounded-2xl p-8 shadow-sm hover:shadow-lg transition-shadow duration-500 flex flex-col"
-              data-testid={`testimonial-${i}`}
-            >
-              {/* TODO: replace with real quote */}
-              <Quote
-                aria-hidden="true"
-                className="absolute -top-4 left-6 h-8 w-8 text-accent bg-card p-1.5 rounded-full border border-border"
-              />
-              <blockquote className="font-serif italic text-xl md:text-2xl leading-snug text-foreground flex-1">
-                &ldquo;{t.quote}&rdquo;
-              </blockquote>
-              <span
-                aria-hidden="true"
-                className="block w-12 h-1 bg-accent rounded-full mt-6"
-              />
-              <figcaption className="mt-4 text-sm font-sans tracking-wider uppercase text-primary">
-                {t.name}, {t.discipline} &mdash; &ldquo;{t.horse}&rdquo;
-              </figcaption>
-            </motion.figure>
+            <StaggerItem key={`${t.name}-${t.horse}`}>
+              <motion.figure
+                className="relative bg-card border border-border rounded-2xl p-8 shadow-sm flex flex-col h-full"
+                data-testid={`testimonial-${i}`}
+                initial="rest"
+                whileHover={reduce ? undefined : "hover"}
+                animate="rest"
+                variants={{
+                  rest: {
+                    y: 0,
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
+                  },
+                  hover: {
+                    y: -6,
+                    boxShadow:
+                      "0 20px 40px rgba(0,0,0,0.28), 0 0 0 1px hsl(46 92% 62% / 0.12)",
+                    transition: spring.snappy,
+                  },
+                }}
+              >
+                <Quote
+                  aria-hidden="true"
+                  className="absolute -top-4 left-6 h-8 w-8 text-accent bg-card p-1.5 rounded-full border border-border"
+                />
+                <blockquote className="font-serif italic text-xl md:text-2xl leading-snug text-foreground flex-1">
+                  &ldquo;{t.quote}&rdquo;
+                </blockquote>
+                <span
+                  aria-hidden="true"
+                  className="block w-12 h-1 bg-accent rounded-full mt-6"
+                />
+                <figcaption className="mt-4 text-sm font-sans tracking-wider uppercase text-primary">
+                  {t.name}, {t.discipline} &mdash; &ldquo;{t.horse}&rdquo;
+                </figcaption>
+              </motion.figure>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerReveal>
       </div>
     </section>
   );
