@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   BarChart,
   Bar,
@@ -9,7 +9,20 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { Download, RefreshCw, LogOut, Lock, Star, AlertCircle, Users, TrendingUp } from "lucide-react";
+import {
+  Download,
+  RefreshCw,
+  LogOut,
+  Lock,
+  Star,
+  AlertCircle,
+  Users,
+  TrendingUp,
+  Mail,
+  Send,
+  X,
+  CheckCircle,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const STORAGE_KEY = "survey_admin_token";
@@ -213,6 +226,7 @@ function LoginGate({ onLogin }: { onLogin: (token: string) => void }) {
 }
 
 type LoadState = "idle" | "loading" | "error";
+type SendState = "idle" | "sending" | "success" | "error";
 
 const GOLD = "hsl(46 92% 62%)";
 const GOLD_DEEP = "hsl(38 80% 44%)";
@@ -242,7 +256,7 @@ function StatCard({
   );
 }
 
-function StatsSection({ stats }: { stats: SurveyStats }) {
+function StatsSection({ stats, emailCount }: { stats: SurveyStats; emailCount: number }) {
   const shortLabel = (label: string) => {
     const map: Record<string, string> = {
       "High cost of boarding or land": "High Cost",
@@ -277,11 +291,17 @@ function StatsSection({ stats }: { stats: SurveyStats }) {
       className="mb-8 space-y-6"
     >
       {/* KPI strip */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <StatCard
           label="Total Responses"
           value={stats.total}
           icon={Users}
+        />
+        <StatCard
+          label="With Email"
+          value={emailCount}
+          sub={emailCount === 1 ? "can receive follow-up" : "can receive follow-up"}
+          icon={Mail}
         />
         <StatCard
           label="Avg. Quality Rating"
@@ -414,6 +434,215 @@ function StatsSection({ stats }: { stats: SurveyStats }) {
   );
 }
 
+type FollowUpResult = {
+  mode: "test" | "broadcast";
+  sent: number;
+  failed: number;
+  total: number;
+};
+
+function FollowUpModal({
+  token,
+  emailCount,
+  onClose,
+}: {
+  token: string;
+  emailCount: number;
+  onClose: () => void;
+}) {
+  const [subject, setSubject] = useState("");
+  const [body, setBody] = useState("");
+  const [testEmail, setTestEmail] = useState("");
+  const [sendState, setSendState] = useState<SendState>("idle");
+  const [error, setError] = useState("");
+  const [result, setResult] = useState<FollowUpResult | null>(null);
+
+  async function send(isTest: boolean) {
+    if (!subject.trim() || !body.trim()) return;
+    if (isTest && !testEmail.trim()) return;
+    setSendState("sending");
+    setError("");
+    setResult(null);
+    try {
+      const payload: Record<string, string> = { subject, body };
+      if (isTest) payload["testEmail"] = testEmail.trim();
+      const res = await fetch("/api/survey/admin/followup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+      const data = (await res.json()) as { ok: boolean; error?: string } & Partial<FollowUpResult>;
+      if (!data.ok) {
+        setError(data.error ?? "Send failed.");
+        setSendState("error");
+        return;
+      }
+      setResult({
+        mode: data.mode ?? (isTest ? "test" : "broadcast"),
+        sent: data.sent ?? 0,
+        failed: data.failed ?? 0,
+        total: data.total ?? (isTest ? 1 : emailCount),
+      });
+      setSendState("success");
+    } catch {
+      setError("Network error. Please try again.");
+      setSendState("error");
+    }
+  }
+
+  const isBusy = sendState === "sending";
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: "rgba(0,0,0,0.6)" }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96, y: 12 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: 12 }}
+        transition={{ duration: 0.25 }}
+        className="bg-card border border-border rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden"
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-5 border-b border-border">
+          <div>
+            <h2 className="font-serif text-lg text-foreground">Send Follow-up Email</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {emailCount} respondent{emailCount !== 1 ? "s" : ""} with email addresses
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="h-8 w-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* Success state */}
+        {sendState === "success" && result && (
+          <div className="px-6 py-8 flex flex-col items-center gap-4 text-center">
+            <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center">
+              <CheckCircle className="h-7 w-7 text-primary" />
+            </div>
+            {result.mode === "test" ? (
+              <>
+                <p className="font-medium text-foreground">Test email sent</p>
+                <p className="text-sm text-muted-foreground">
+                  A preview was delivered to <strong>{testEmail}</strong>. Review it, then send the real follow-up when ready.
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="font-medium text-foreground">Follow-up sent</p>
+                <p className="text-sm text-muted-foreground">
+                  {result.sent} of {result.total} email{result.total !== 1 ? "s" : ""} delivered successfully
+                  {result.failed > 0 ? ` (${result.failed} failed)` : "."}
+                </p>
+              </>
+            )}
+            <div className="flex gap-3 mt-2">
+              {result.mode === "test" && (
+                <button
+                  onClick={() => { setSendState("idle"); setResult(null); }}
+                  className="px-4 py-2 rounded-full border border-border text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Back to compose
+                </button>
+              )}
+              <button
+                onClick={onClose}
+                className="px-4 py-2 rounded-full bg-gold-metallic shadow-gold-glow text-sm font-medium hover:shadow-gold-glow-lg transition-all"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Compose form */}
+        {sendState !== "success" && (
+          <div className="px-6 py-5 space-y-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-foreground">Subject</label>
+              <input
+                type="text"
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                placeholder="Thank you for your survey response"
+                disabled={isBusy}
+                className="w-full bg-background border border-border rounded-lg px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-colors disabled:opacity-60"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-foreground">Message</label>
+              <textarea
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                placeholder="Thank you so much for taking the time to fill out our PV Horse Keeping survey. Your input means a great deal to us…"
+                rows={7}
+                disabled={isBusy}
+                className="w-full bg-background border border-border rounded-lg px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-colors resize-y disabled:opacity-60"
+              />
+              <p className="text-[11px] text-muted-foreground">Separate paragraphs with a blank line. Recipients will be greeted by name when available.</p>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-foreground">
+                Test email <span className="font-normal text-muted-foreground">(optional)</span>
+              </label>
+              <input
+                type="email"
+                value={testEmail}
+                onChange={(e) => setTestEmail(e.target.value)}
+                placeholder="you@example.com"
+                disabled={isBusy}
+                className="w-full bg-background border border-border rounded-lg px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-colors disabled:opacity-60"
+              />
+            </div>
+
+            {(sendState === "error") && error && (
+              <div className="flex items-start gap-2 text-sm text-destructive bg-destructive/10 border border-destructive/30 rounded-lg px-3 py-2.5">
+                <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+                {error}
+              </div>
+            )}
+
+            <div className="flex items-center gap-3 pt-1 border-t border-border">
+              <button
+                type="button"
+                onClick={() => send(true)}
+                disabled={isBusy || !subject.trim() || !body.trim() || !testEmail.trim()}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border text-sm text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Mail className="h-4 w-4" />
+                Send test
+              </button>
+              <button
+                type="button"
+                onClick={() => send(false)}
+                disabled={isBusy || !subject.trim() || !body.trim() || emailCount === 0}
+                className="ml-auto inline-flex items-center gap-2 px-5 py-2 rounded-full bg-gold-metallic shadow-gold-glow text-sm font-medium hover:shadow-gold-glow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Send className="h-4 w-4" />
+                {isBusy
+                  ? "Sending…"
+                  : `Send to ${emailCount} respondent${emailCount !== 1 ? "s" : ""}`}
+              </button>
+            </div>
+          </div>
+        )}
+      </motion.div>
+    </div>
+  );
+}
+
 export default function SurveyAdmin() {
   const [token, setToken] = useState<string>(
     () => sessionStorage.getItem(STORAGE_KEY) ?? ""
@@ -423,6 +652,9 @@ export default function SurveyAdmin() {
   const [loadState, setLoadState] = useState<LoadState>("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const [expanded, setExpanded] = useState<number | null>(null);
+  const [showFollowUp, setShowFollowUp] = useState(false);
+
+  const emailCount = responses.filter((r) => r.email).length;
 
   const fetchData = useCallback(
     async (tkn: string) => {
@@ -505,7 +737,7 @@ export default function SurveyAdmin() {
                 : `${responses.length} response${responses.length !== 1 ? "s" : ""}`}
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap justify-end">
             <button
               onClick={() => fetchData(token)}
               disabled={loadState === "loading"}
@@ -514,6 +746,15 @@ export default function SurveyAdmin() {
               <RefreshCw className={cn("h-4 w-4", loadState === "loading" && "animate-spin")} />
               Refresh
             </button>
+            {emailCount > 0 && loadState === "idle" && (
+              <button
+                onClick={() => setShowFollowUp(true)}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/40 text-sm text-primary hover:bg-primary/5 transition-colors"
+              >
+                <Mail className="h-4 w-4" />
+                Follow-up ({emailCount})
+              </button>
+            )}
             {responses.length > 0 && (
               <button
                 onClick={() => downloadCsv(responses)}
@@ -546,8 +787,8 @@ export default function SurveyAdmin() {
         {/* Loading state */}
         {loadState === "loading" && (
           <div className="space-y-3">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-              {Array.from({ length: 3 }).map((_, i) => (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+              {Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="h-20 rounded-xl bg-card border border-border animate-pulse" />
               ))}
             </div>
@@ -568,7 +809,7 @@ export default function SurveyAdmin() {
         {/* Stats + Response list */}
         {loadState === "idle" && responses.length > 0 && (
           <>
-            {stats && <StatsSection stats={stats} />}
+            {stats && <StatsSection stats={stats} emailCount={emailCount} />}
 
             <div className="flex items-center gap-2 mb-4">
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -596,7 +837,16 @@ export default function SurveyAdmin() {
                         <p className="text-sm font-medium text-foreground truncate">
                           {r.name ?? <span className="text-muted-foreground italic">Anonymous</span>}
                         </p>
-                        <p className="text-xs text-muted-foreground truncate">{r.email ?? "No email"}</p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {r.email ? (
+                            <span className="inline-flex items-center gap-1">
+                              <Mail className="h-3 w-3 text-primary/60" />
+                              {r.email}
+                            </span>
+                          ) : (
+                            "No email"
+                          )}
+                        </p>
                         {r.preservationIdeas && (
                           <p className="text-xs text-muted-foreground/70 truncate mt-1 italic">
                             {truncate(r.preservationIdeas, 90)}
@@ -648,6 +898,17 @@ export default function SurveyAdmin() {
           </>
         )}
       </div>
+
+      {/* Follow-up modal */}
+      <AnimatePresence>
+        {showFollowUp && (
+          <FollowUpModal
+            token={token}
+            emailCount={emailCount}
+            onClose={() => setShowFollowUp(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

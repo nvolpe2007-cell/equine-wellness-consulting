@@ -1,8 +1,9 @@
 import { Router, type IRouter, type Request, type Response, type NextFunction } from "express";
 import { z } from "zod";
 import { timingSafeEqual } from "node:crypto";
-import { desc } from "drizzle-orm";
+import { desc, isNotNull } from "drizzle-orm";
 import { db, pvSurveyResponsesTable } from "@workspace/db";
+import { getUncachableResendClient } from "../lib/resend";
 
 const router: IRouter = Router();
 
@@ -187,6 +188,169 @@ router.get("/survey/admin/stats", requireAdmin, async (req, res, next) => {
     });
   } catch (err) {
     req.log?.error({ err }, "survey admin stats failed");
+    return next(err);
+  }
+});
+
+// --- Survey follow-up email --------------------------------------------------
+
+function escHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function buildFollowUpEmail(opts: {
+  subject: string;
+  body: string;
+  recipientName: string | null;
+}): { subject: string; html: string; text: string } {
+  const safeName = opts.recipientName ? escHtml(opts.recipientName) : null;
+  const greeting = safeName ? `Hi ${safeName},` : "Hi there,";
+  const bodyHtml = escHtml(opts.body)
+    .split(/\n\n+/)
+    .map((p) => `<p style="margin:0 0 16px;">${p.replace(/\n/g, "<br />")}</p>`)
+    .join("\n");
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>${escHtml(opts.subject)}</title>
+  </head>
+  <body style="margin:0;padding:0;background:#f6f1ea;font-family:Georgia,'Times New Roman',serif;color:#2b2522;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f6f1ea;padding:32px 0;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.04);">
+            <tr>
+              <td style="padding:28px 32px;background:#5b3a29;color:#fff;">
+                <div style="font-size:11px;letter-spacing:0.22em;text-transform:uppercase;opacity:0.85;">Equine Bodywork &amp; Wellness</div>
+                <div style="font-size:20px;margin-top:6px;font-style:italic;">PV Horse Keeping Survey — Follow-up</div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:32px;font-size:16px;line-height:1.65;color:#2b2522;">
+                <p style="margin:0 0 16px;">${greeting}</p>
+                ${bodyHtml}
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:20px 32px 28px;border-top:1px solid #ece4d9;font-size:12px;color:#6e6359;text-align:center;line-height:1.6;">
+                You are receiving this because you left your email address on the PV Horse Keeping survey.<br />
+                If you have questions, simply reply to this email.
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`;
+
+  const textGreeting = opts.recipientName ? `Hi ${opts.recipientName},\n\n` : "Hi there,\n\n";
+  const text = textGreeting + opts.body + "\n\n---\nYou received this because you left your email on the PV Horse Keeping survey.";
+
+  return { subject: opts.subject, html, text };
+}
+
+const followupSchema = z.object({
+  subject: z.string().trim().min(1, "Subject is required").max(180),
+  body: z.string().trim().min(1, "Body is required").max(20_000),
+  testEmail: z.string().trim().toLowerCase().email().optional(),
+});
+
+router.post("/survey/admin/followup", requireAdmin, async (req, res, next) => {
+  const parsed = followupSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res
+      .status(400)
+      .json({ ok: false, error: parsed.error.issues[0]?.message ?? "Invalid input" });
+  }
+  const { subject, body, testEmail } = parsed.data;
+
+  let resend;
+  try {
+    resend = await getUncachableResendClient();
+  } catch (err) {
+    req.log?.error({ err }, "resend client unavailable");
+    return res.status(503).json({ ok: false, error: "Email service is not connected." });
+  }
+
+  if (testEmail) {
+    const found = await db
+      .select({ name: pvSurveyResponsesTable.name })
+      .from(pvSurveyResponsesTable)
+      .where(isNotNull(pvSurveyResponsesTable.email))
+      .limit(1);
+    const name = found[0]?.name ?? null;
+    const email = buildFollowUpEmail({ subject, body, recipientName: name });
+    const result = await resend.client.emails.send({
+      from: resend.fromEmail,
+      to: testEmail,
+      subject: email.subject,
+      html: email.html,
+      text: email.text,
+    });
+    if (result.error) {
+      return res
+        .status(502)
+        .json({ ok: false, error: `Test send failed: ${result.error.message ?? "unknown"}` });
+    }
+    return res.json({ ok: true, mode: "test", sent: 1, failed: 0, total: 1 });
+  }
+
+  try {
+    const rows = await db
+      .select({
+        email: pvSurveyResponsesTable.email,
+        name: pvSurveyResponsesTable.name,
+      })
+      .from(pvSurveyResponsesTable)
+      .where(isNotNull(pvSurveyResponsesTable.email));
+
+    // Deduplicate by normalized email — keep the first name seen for each address.
+    const seen = new Map<string, string | null>();
+    for (const r of rows) {
+      if (!r.email) continue;
+      const key = r.email.toLowerCase().trim();
+      if (!seen.has(key)) seen.set(key, r.name);
+    }
+    const recipients = Array.from(seen.entries()).map(([email, name]) => ({ email, name }));
+
+    let sent = 0;
+    let failed = 0;
+    for (const r of recipients) {
+      if (!r.email) continue;
+      const emailMsg = buildFollowUpEmail({ subject, body, recipientName: r.name });
+      try {
+        const result = await resend.client.emails.send({
+          from: resend.fromEmail,
+          to: r.email,
+          subject: emailMsg.subject,
+          html: emailMsg.html,
+          text: emailMsg.text,
+        });
+        if (result.error) {
+          failed += 1;
+          req.log?.error({ err: result.error, email: r.email }, "survey followup send failed");
+        } else {
+          sent += 1;
+        }
+      } catch (err) {
+        failed += 1;
+        req.log?.error({ err, email: r.email }, "survey followup send threw");
+      }
+      await new Promise((resolve) => setTimeout(resolve, 60));
+    }
+
+    req.log?.info({ sent, failed, total: recipients.length }, "survey followup dispatch complete");
+    return res.json({ ok: true, mode: "broadcast", sent, failed, total: recipients.length });
+  } catch (err) {
     return next(err);
   }
 });
