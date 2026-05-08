@@ -41,6 +41,7 @@ const STATIC_URLS: StaticUrl[] = [
   { loc: "/gallery", changefreq: "monthly", priority: "0.6" },
   { loc: "/partners", changefreq: "monthly", priority: "0.6" },
   { loc: "/news", changefreq: "weekly", priority: "0.7" },
+  { loc: "/survey", changefreq: "monthly", priority: "0.5" },
 ];
 
 function readNewsletterPosts(): Array<{ slug: string; date: string }> {
@@ -88,6 +89,12 @@ function siteSeoPlugin(): Plugin {
   return {
     name: "site-seo",
     transformIndexHtml(html) {
+      // Rewrite og:image and twitter:image to the correct deployment domain
+      html = html.replace(
+        /content="https:\/\/equinebodywork\.com\/opengraph\.jpg"/g,
+        `content="${SITE_URL}/opengraph.jpg"`,
+      );
+
       const tags: string[] = [];
       if (GSC_VERIFICATION) {
         tags.push(
