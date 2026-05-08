@@ -5,6 +5,171 @@ import { desc, isNotNull, max } from "drizzle-orm";
 import { db, pvSurveyResponsesTable, pvSurveyFollowupsTable } from "@workspace/db";
 import { getUncachableResendClient } from "../lib/resend";
 
+const SURVEY_NOTIFY_EMAIL = process.env["SURVEY_NOTIFY_EMAIL"] ?? "Theworthyhorse@gmail.com";
+
+// ---------------------------------------------------------------------------
+// Email builders
+// ---------------------------------------------------------------------------
+
+function escHtmlLocal(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function buildThankYouEmail(recipientName: string | null): { subject: string; html: string; text: string } {
+  const first = recipientName ? recipientName.split(/\s+/)[0] : null;
+  const safeName = first ? escHtmlLocal(first) : null;
+  const greeting = safeName ? `Hi ${safeName},` : "Hi there,";
+  const textGreeting = first ? `Hi ${first},\n\n` : "Hi there,\n\n";
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Thank you for your survey response</title>
+  </head>
+  <body style="margin:0;padding:0;background:#f6f1ea;font-family:Georgia,'Times New Roman',serif;color:#2b2522;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f6f1ea;padding:32px 0;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.04);">
+            <tr>
+              <td style="padding:28px 32px;background:#5b3a29;color:#fff;">
+                <div style="font-size:11px;letter-spacing:0.22em;text-transform:uppercase;opacity:0.85;">Equine Bodywork &amp; Wellness</div>
+                <div style="font-size:20px;margin-top:6px;font-style:italic;">PV Horse Keeping Survey</div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:32px;font-size:16px;line-height:1.65;color:#2b2522;">
+                <p style="margin:0 0 16px;">${greeting}</p>
+                <p style="margin:0 0 16px;">Thank you for taking the time to share your perspective on horse keeping in Palos Verdes. Your voice matters — it's community insight like yours that helps shape the future of equestrian life on the Peninsula.</p>
+                <p style="margin:0 0 16px;">I'll be reviewing all responses and may share aggregated findings with local advocates and organizations working to protect equestrian access in the area.</p>
+                <p style="margin:0 0 16px;">If you have any questions or would like to continue the conversation, feel free to reply directly to this email.</p>
+                <p style="margin:0;">Warmly,<br /><strong>Susie H. Lytal, MS</strong><br /><span style="font-size:13px;color:#6e6359;">Equine Biomechanist &mdash; (310) 488-4389</span></p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:20px 32px 28px;border-top:1px solid #ece4d9;font-size:12px;color:#6e6359;text-align:center;line-height:1.6;">
+                You're receiving this because you left your email address on the PV Horse Keeping survey.<br />
+                If you have questions, simply reply to this email.
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`;
+
+  const text =
+    textGreeting +
+    "Thank you for taking the time to share your perspective on horse keeping in Palos Verdes. Your voice matters — it's community insight like yours that helps shape the future of equestrian life on the Peninsula.\n\n" +
+    "I'll be reviewing all responses and may share aggregated findings with local advocates and organizations working to protect equestrian access in the area.\n\n" +
+    "If you have any questions or would like to continue the conversation, feel free to reply directly to this email.\n\n" +
+    "Warmly,\nSusie H. Lytal, MS\nEquine Biomechanist — (310) 488-4389";
+
+  return { subject: "Thank you for your PV Horse Keeping survey response", html, text };
+}
+
+function buildNotificationEmail(data: {
+  name?: string | null;
+  email?: string | null;
+  yearsInvolved?: string | null;
+  qualityRating?: number | null;
+  futureConcernLevel?: number | null;
+  valuedAspects?: string | null;
+  challenges?: string | null;
+  preservationIdeas?: string | null;
+  memberOfOrg?: string | null;
+  comments?: string | null;
+}): { subject: string; html: string; text: string } {
+  const nameDisplay = data.name || "Anonymous";
+  const emailDisplay = data.email || "Not provided";
+  const yearsDisplay = data.yearsInvolved || "Not specified";
+  const qualityDisplay = data.qualityRating ? `${data.qualityRating}/5` : "Not rated";
+  const concernDisplay = data.futureConcernLevel ? `${data.futureConcernLevel}/5` : "Not rated";
+  const memberDisplay = data.memberOfOrg ? (data.memberOfOrg === "yes" ? "Yes" : "No") : "Not answered";
+
+  let challengeList = "Not specified";
+  if (data.challenges) {
+    try {
+      const arr = JSON.parse(data.challenges) as unknown;
+      if (Array.isArray(arr) && arr.length > 0) challengeList = (arr as string[]).join(", ");
+    } catch { /* ignore */ }
+  }
+
+  const rows: [string, string][] = [
+    ["Name", nameDisplay],
+    ["Email", emailDisplay],
+    ["Years involved", yearsDisplay],
+    ["Member of local org", memberDisplay],
+    ["Quality rating", qualityDisplay],
+    ["Future concern level", concernDisplay],
+    ["Challenges selected", challengeList],
+    ["What they value", data.valuedAspects || "Not provided"],
+    ["Preservation ideas", data.preservationIdeas || "Not provided"],
+    ["Additional comments", data.comments || "Not provided"],
+  ];
+
+  const tableRows = rows
+    .map(
+      ([label, value]) =>
+        `<tr>
+          <td style="padding:8px 12px;font-size:13px;font-weight:bold;color:#5b3a29;white-space:nowrap;vertical-align:top;border-bottom:1px solid #f0e8df;">${escHtmlLocal(label)}</td>
+          <td style="padding:8px 12px;font-size:13px;color:#2b2522;vertical-align:top;border-bottom:1px solid #f0e8df;">${escHtmlLocal(value)}</td>
+        </tr>`,
+    )
+    .join("\n");
+
+  const textRows = rows.map(([label, value]) => `${label}: ${value}`).join("\n");
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>New PV Survey Response</title>
+  </head>
+  <body style="margin:0;padding:0;background:#f6f1ea;font-family:Georgia,'Times New Roman',serif;color:#2b2522;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f6f1ea;padding:32px 0;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.04);">
+            <tr>
+              <td style="padding:28px 32px;background:#5b3a29;color:#fff;">
+                <div style="font-size:11px;letter-spacing:0.22em;text-transform:uppercase;opacity:0.85;">PV Horse Keeping Survey</div>
+                <div style="font-size:20px;margin-top:6px;font-style:italic;">New response submitted</div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:24px 32px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-radius:8px;overflow:hidden;border:1px solid #ece4d9;">
+                  ${tableRows}
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:12px 32px 28px;font-size:12px;color:#6e6359;text-align:center;">
+                View all responses at /admin/survey
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`;
+
+  const text = `New PV Horse Keeping Survey Response\n\n${textRows}\n\nView all responses at /admin/survey`;
+
+  return { subject: `New PV Survey Response — ${nameDisplay}`, html, text };
+}
+
 const router: IRouter = Router();
 
 const surveySchema = z.object({
@@ -95,6 +260,60 @@ router.post("/survey/pv-horse-keeping", async (req, res, next) => {
 
     req.log.info({ ip }, "pv survey response submitted");
     res.status(201).json({ ok: true });
+
+    // Fire-and-forget: send emails after response is already sent.
+    // Errors here are logged but never bubble up to the respondent.
+    void (async () => {
+      let resend;
+      try {
+        resend = await getUncachableResendClient();
+      } catch (err) {
+        req.log.error({ err }, "survey emails skipped — resend unavailable");
+        return;
+      }
+
+      const sends: Promise<unknown>[] = [];
+
+      // 1. Thank-you to respondent (only if they provided an email)
+      if (d.email) {
+        const thankYou = buildThankYouEmail(d.name ?? null);
+        sends.push(
+          resend.client.emails
+            .send({
+              from: resend.fromEmail,
+              to: d.email,
+              subject: thankYou.subject,
+              html: thankYou.html,
+              text: thankYou.text,
+            })
+            .then((r) => {
+              if (r.error) req.log.error({ err: r.error }, "survey thank-you send failed");
+              else req.log.info({ to: d.email }, "survey thank-you sent");
+            })
+            .catch((err: unknown) => req.log.error({ err }, "survey thank-you threw")),
+        );
+      }
+
+      // 2. Notification to Susie with a full summary of the submission
+      const notification = buildNotificationEmail(d);
+      sends.push(
+        resend.client.emails
+          .send({
+            from: resend.fromEmail,
+            to: SURVEY_NOTIFY_EMAIL,
+            subject: notification.subject,
+            html: notification.html,
+            text: notification.text,
+          })
+          .then((r) => {
+            if (r.error) req.log.error({ err: r.error }, "survey notification send failed");
+            else req.log.info({ to: SURVEY_NOTIFY_EMAIL }, "survey notification sent");
+          })
+          .catch((err: unknown) => req.log.error({ err }, "survey notification threw")),
+      );
+
+      await Promise.allSettled(sends);
+    })();
   } catch (err) {
     next(err);
   }
