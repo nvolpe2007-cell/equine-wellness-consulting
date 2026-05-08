@@ -9,7 +9,7 @@ import { Testimonials } from "@/components/sections/Testimonials";
 import { CountUp } from "@/components/ui/CountUp";
 import { useMagneticEffect } from "@/hooks/useMagneticEffect";
 import { spring } from "@/lib/motion";
-import barnHero from "@assets/stock_images/barn-hero.jpg?w=640;1024;1600;2400&picture";
+import massageHero from "@assets/0629_LOC_Horse02_CBH_t1170_1776529181857.jpg?w=640;1024;1600;2400&picture";
 import barnExterior from "@assets/stock_images/barn-exterior.jpg?w=400;800;1200;1600&picture";
 import horsePortrait from "@assets/stock_images/horse-portrait.jpg?w=400;800;1200&picture";
 import massageHands from "@assets/0629_LOC_Horse02_CBH_t1170_1776529181857.jpg?w=400;800;1200&picture";
@@ -108,13 +108,13 @@ export default function Home() {
       <section ref={heroRef} className="relative h-screen min-h-[760px] flex items-center justify-center overflow-hidden">
         <motion.div style={{ y: heroY, opacity: heroOpacity }} className="absolute inset-0 z-0">
           <ResponsiveImage
-            image={barnHero}
-            alt="Sunlit barn aisle at dawn — equine bodywork session setting"
+            image={massageHero}
+            alt="Hands-on equine sports massage — Susie H. Lytal performing bodywork on a horse's back"
             fetchPriority="high"
             decoding="async"
             sizes="100vw"
             pictureClassName="block w-full h-full"
-            className="w-full h-full object-cover object-center animate-ken-burns"
+            className="w-full h-full object-cover object-[center_35%] animate-ken-burns"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/70" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]" />
