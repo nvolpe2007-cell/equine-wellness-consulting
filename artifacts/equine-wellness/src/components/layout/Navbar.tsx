@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { spring, ease as easing } from "@/lib/motion";
 import { cn } from "@/lib/utils";
+import { useIntroVisibility } from "@/components/intro/IntroVisibilityContext";
 
 const links = [
   { href: "/", label: "Home" },
@@ -20,6 +21,8 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const reduce = useReducedMotion();
+  const { introActive, navRevealed } = useIntroVisibility();
+  const hidden = introActive && !navRevealed;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -31,8 +34,13 @@ export function Navbar() {
   return (
     <motion.header
       initial={reduce ? false : { y: -24, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.5, ease: easing.out }}
+      animate={{
+        y: hidden ? -16 : 0,
+        opacity: hidden ? 0 : 1,
+      }}
+      transition={{ duration: hidden ? 0.35 : 0.6, ease: easing.out }}
+      style={{ pointerEvents: hidden ? "none" : "auto" }}
+      aria-hidden={hidden ? "true" : undefined}
       className={cn(
         "sticky top-0 z-50 w-full border-b backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300",
         scrolled

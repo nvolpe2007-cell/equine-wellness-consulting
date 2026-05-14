@@ -11,3 +11,8 @@ declare module "*?picture" {
   const value: PictureData;
   export default value;
 }
+
+declare module "*.mp4" {
+  const src: string;
+  export default src;
+}

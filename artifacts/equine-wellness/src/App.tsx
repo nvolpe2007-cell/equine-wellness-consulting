@@ -10,6 +10,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { FloatingCallCta } from "@/components/FloatingCallCta";
 import { CookieConsent } from "@/components/CookieConsent";
+import { IntroVisibilityProvider } from "@/components/intro/IntroVisibilityContext";
 
 import Home from "@/pages/home";
 import Bio from "@/pages/bio";
@@ -277,9 +278,11 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-          <Router />
-        </WouterRouter>
+        <IntroVisibilityProvider>
+          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+            <Router />
+          </WouterRouter>
+        </IntroVisibilityProvider>
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>

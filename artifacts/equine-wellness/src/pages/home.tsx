@@ -1,15 +1,14 @@
-import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "wouter";
 import { ArrowRight, CheckCircle2, Phone } from "lucide-react";
-import { useRef } from "react";
-import { WordReveal, LineReveal, AnimatedHeading, AccentFlourish } from "@/components/ui/AnimatedText";
+import { WordReveal, LineReveal, AnimatedHeading } from "@/components/ui/AnimatedText";
 import { ResponsiveImage } from "@/components/ui/ResponsiveImage";
 import { ServiceArea } from "@/components/sections/ServiceArea";
 import { Testimonials } from "@/components/sections/Testimonials";
+import { BarnDoorIntro } from "@/components/sections/BarnDoorIntro";
 import { CountUp } from "@/components/ui/CountUp";
 import { useMagneticEffect } from "@/hooks/useMagneticEffect";
 import { spring } from "@/lib/motion";
-import massageHero from "@assets/0629_LOC_Horse02_CBH_t1170_1776529181857.jpg?w=640;1024;1600;2400&picture";
 import barnExterior from "@assets/stock_images/barn-exterior.jpg?w=400;800;1200;1600&picture";
 import horsePortrait from "@assets/stock_images/horse-portrait.jpg?w=400;800;1200&picture";
 import massageHands from "@assets/0629_LOC_Horse02_CBH_t1170_1776529181857.jpg?w=400;800;1200&picture";
@@ -93,96 +92,14 @@ function MagneticLink({
 }
 
 export default function Home() {
-  const heroRef = useRef<HTMLElement | null>(null);
   const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ["start start", "end start"],
-  });
-  const heroY = useTransform(scrollYProgress, [0, 1], [0, 120]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 1], [1, 0.4]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Hero Section */}
-      <section ref={heroRef} className="relative h-screen min-h-[760px] flex items-center justify-center overflow-hidden">
-        <motion.div style={{ y: heroY, opacity: heroOpacity }} className="absolute inset-0 z-0">
-          <ResponsiveImage
-            image={massageHero}
-            alt="Hands-on equine sports massage — Susie H. Lytal performing bodywork on a horse's back"
-            fetchPriority="high"
-            decoding="async"
-            sizes="100vw"
-            pictureClassName="block w-full h-full"
-            className="w-full h-full object-cover object-[center_35%] animate-ken-burns"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/70" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]" />
-        </motion.div>
-
-        <div className="container relative z-10 mx-auto px-4 text-center">
-          <motion.div
-            variants={stagger}
-            initial="hidden"
-            animate="visible"
-            className="max-w-3xl mx-auto"
-          >
-            <motion.p variants={fadeUp} transition={{ duration: 0.6 }} className="text-[0.7rem] font-sans tracking-[0.28em] text-white/65 uppercase mb-5">
-              Susie H. Lytal, MS · Equine Biomechanist
-            </motion.p>
-            <motion.span
-              variants={fadeUp}
-              transition={{ duration: 0.6 }}
-              className="block mx-auto mb-8 gold-rule"
-              aria-hidden="true"
-            />
-            <h1 className="text-6xl md:text-8xl font-serif text-white mb-8 leading-[1.02] tracking-tight">
-              <WordReveal
-                text="Elevating equine performance"
-                as="span"
-                className="block"
-                delay={0.25}
-                stagger={0.07}
-                duration={0.8}
-              />
-              <span className="relative inline-block">
-                <WordReveal
-                  text="through science and care."
-                  as="span"
-                  className="italic text-accent/90 inline-block"
-                  delay={0.85}
-                  stagger={0.06}
-                  duration={0.8}
-                />
-                <AccentFlourish delay={1.6} />
-              </span>
-            </h1>
-            <motion.p variants={fadeUp} transition={{ duration: 0.6 }} className="text-lg md:text-xl text-white/85 mb-10 font-light max-w-2xl mx-auto leading-relaxed">
-              Professional equine bodywork and wellness consulting, grounded in graduate-level biomechanics expertise.
-            </motion.p>
-            <motion.div variants={fadeUp} transition={{ duration: 0.6 }} className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <MagneticLink
-                href="/modalities"
-                className="group bg-gold-metallic shadow-gold-glow inline-flex h-12 items-center justify-center rounded-full px-8 text-base font-medium hover:shadow-gold-glow-lg w-full sm:w-auto"
-                data-testid="link-hero-modalities"
-              >
-                Explore Modalities
-                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </MagneticLink>
-              <MagneticLink
-                href="/bio"
-                className="inline-flex h-12 items-center justify-center rounded-full bg-white/10 px-8 text-base font-medium text-white backdrop-blur-md hover:bg-white/20 w-full sm:w-auto border border-white/20"
-                data-testid="link-hero-bio"
-              >
-                Meet Susie
-              </MagneticLink>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
+      <BarnDoorIntro />
 
       {/* Credentials Band */}
-      <section className="bg-gold-metallic-band border-y border-[hsl(var(--gold-deep))]/40">
+      <section id="after-intro" className="bg-gold-metallic-band border-y border-[hsl(var(--gold-deep))]/40">
         <motion.div
           className="container mx-auto px-4 py-5"
           initial={{ opacity: 0 }}
