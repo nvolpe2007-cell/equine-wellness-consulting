@@ -194,11 +194,11 @@ export function BarnDoorIntro() {
         <motion.div
           aria-hidden="true"
           style={{ opacity: vignetteOpacity }}
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(0,0,0,0.85)_100%)]"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.65)_100%)]"
         />
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-black/40"
         />
 
         {/* Beat 1 */}
@@ -206,11 +206,13 @@ export function BarnDoorIntro() {
           style={{ opacity: beat1Opacity, y: beat1Y }}
           className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center will-change-transform"
         >
-          <p className="text-[0.65rem] sm:text-[0.7rem] font-sans tracking-[0.32em] text-white/85 uppercase mb-5">
+          <p className="text-[0.65rem] sm:text-[0.7rem] font-sans tracking-[0.32em] text-white/85 uppercase mb-5"
+            style={{ textShadow: "0 1px 8px rgba(0,0,0,0.9)" }}>
             Susie H. Lytal, MS · Equine Biomechanist
           </p>
           <span className="block mx-auto mb-6 gold-rule" aria-hidden="true" />
-          <h2 className="text-4xl sm:text-5xl md:text-7xl font-serif text-white leading-[1.05] tracking-tight max-w-4xl">
+          <h2 className="text-4xl sm:text-5xl md:text-7xl font-serif text-white leading-[1.05] tracking-tight max-w-4xl"
+            style={{ textShadow: "0 2px 24px rgba(0,0,0,0.85), 0 1px 4px rgba(0,0,0,0.95)" }}>
             For the horses
             <span className="block italic text-accent/90">you love most.</span>
           </h2>
@@ -222,13 +224,15 @@ export function BarnDoorIntro() {
           className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center will-change-transform"
         >
           <span className="block mx-auto mb-6 gold-rule" aria-hidden="true" />
-          <h2 className="text-3xl sm:text-4xl md:text-6xl font-serif text-white leading-[1.08] tracking-tight max-w-4xl">
+          <h2 className="text-3xl sm:text-4xl md:text-6xl font-serif text-white leading-[1.08] tracking-tight max-w-4xl"
+            style={{ textShadow: "0 2px 24px rgba(0,0,0,0.85), 0 1px 4px rgba(0,0,0,0.95)" }}>
             Graduate-level biomechanics.
             <span className="block italic text-accent/90 mt-1">
               Hands that listen.
             </span>
           </h2>
-          <p className="mt-6 max-w-xl text-base md:text-lg text-white/80 font-light leading-relaxed">
+          <p className="mt-6 max-w-xl text-base md:text-lg text-white/80 font-light leading-relaxed"
+            style={{ textShadow: "0 1px 12px rgba(0,0,0,0.9)" }}>
             Wellness sessions in partnership with your veterinarian — grounded
             in science, delivered with compassion.
           </p>
@@ -239,17 +243,20 @@ export function BarnDoorIntro() {
           style={{ opacity: beat3Opacity, y: beat3Y }}
           className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center will-change-transform"
         >
-          <p className="text-[0.65rem] sm:text-[0.7rem] font-sans tracking-[0.32em] text-white/85 uppercase mb-5">
+          <p className="text-[0.65rem] sm:text-[0.7rem] font-sans tracking-[0.32em] text-white/85 uppercase mb-5"
+            style={{ textShadow: "0 1px 8px rgba(0,0,0,0.9)" }}>
             Welcome
           </p>
           <span className="block mx-auto mb-6 gold-rule" aria-hidden="true" />
-          <h1 className="text-4xl sm:text-6xl md:text-8xl font-serif text-white leading-[1.02] tracking-tight max-w-5xl">
+          <h1 className="text-4xl sm:text-6xl md:text-8xl font-serif text-white leading-[1.02] tracking-tight max-w-5xl"
+            style={{ textShadow: "0 2px 32px rgba(0,0,0,0.9), 0 1px 6px rgba(0,0,0,0.95)" }}>
             Equine Bodywork
             <span className="block italic text-gold-gradient">
               & Wellness Consulting
             </span>
           </h1>
-          <p className="mt-6 max-w-2xl text-base md:text-lg text-white/85 font-light leading-relaxed">
+          <p className="mt-6 max-w-2xl text-base md:text-lg text-white/85 font-light leading-relaxed"
+            style={{ textShadow: "0 1px 12px rgba(0,0,0,0.9)" }}>
             Sports massage, PEMF, red light, cold laser, TENS, and TECAR —
             tailored to your horse.
           </p>
