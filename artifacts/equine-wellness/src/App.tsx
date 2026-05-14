@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ease as easing } from "@/lib/motion";
 import { useEffect, useRef } from "react";
+import { useIntroVisibility } from "@/components/intro/IntroVisibilityContext";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
@@ -187,6 +188,14 @@ function Router() {
   const [location] = useLocation();
   const prevLocationRef = useRef<string>(location);
   const directionRef = useRef<"forward" | "back" | "none">("none");
+  const { setIntroActive } = useIntroVisibility();
+
+  // Defensive: any navigation away from "/" must restore the navbar,
+  // even if BarnDoorIntro's unmount effect somehow misses (e.g. fast
+  // consecutive route changes during AnimatePresence transitions).
+  useEffect(() => {
+    if (location !== "/") setIntroActive(false);
+  }, [location, setIntroActive]);
 
   // Compute direction synchronously during render so PageWrapper always
   // receives the correct value for the current navigation (not the previous one).
@@ -278,11 +287,11 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <IntroVisibilityProvider>
-          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+          <IntroVisibilityProvider>
             <Router />
-          </WouterRouter>
-        </IntroVisibilityProvider>
+          </IntroVisibilityProvider>
+        </WouterRouter>
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>
