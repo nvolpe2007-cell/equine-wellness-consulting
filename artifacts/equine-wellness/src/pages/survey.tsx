@@ -51,7 +51,7 @@ function StarRating({
                 "h-7 w-7 transition-colors",
                 n <= (hovered || value || 0)
                   ? "fill-[hsl(var(--gold))] text-[hsl(var(--gold))]"
-                  : "text-muted-foreground/40"
+                  : "text-muted-foreground/60"
               )}
             />
           </button>
@@ -63,7 +63,7 @@ function StarRating({
         )}
       </div>
       {labels && (
-        <div className="flex justify-between text-xs text-muted-foreground/70 max-w-[180px]">
+        <div className="flex justify-between text-xs text-muted-foreground max-w-[180px]">
           <span>{labels[0]}</span>
           <span>{labels[1]}</span>
         </div>
@@ -251,7 +251,7 @@ export default function Survey() {
                 it. All responses are anonymous; contact details are optional and
                 used only to follow up if you request it.
               </p>
-              <p className="text-xs text-muted-foreground/70">
+              <p className="text-xs text-muted-foreground">
                 Takes approximately 5 minutes. All fields are optional unless marked required.
               </p>
             </div>

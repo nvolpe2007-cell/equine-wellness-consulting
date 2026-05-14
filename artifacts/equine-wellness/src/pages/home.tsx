@@ -107,7 +107,7 @@ export default function Home() {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <p className="text-center text-[0.55rem] font-sans tracking-[0.28em] text-primary-foreground/50 uppercase mb-2">Practice at a Glance</p>
+          <p className="text-center text-[0.55rem] font-sans tracking-[0.28em] text-primary-foreground/80 uppercase mb-2">Practice at a Glance</p>
           <ul className="flex flex-wrap justify-center items-center gap-y-2 gap-x-0 text-[0.72rem] font-sans tracking-[0.18em] text-primary-foreground/85 uppercase">
             {[
               "M.S. Biology · Cal Poly Pomona",

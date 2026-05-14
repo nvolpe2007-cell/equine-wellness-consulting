@@ -131,7 +131,7 @@ export function BarnDoorIntro() {
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/35 to-black/65" />
         </div>
         <div className="container relative z-10 mx-auto flex h-full flex-col items-center justify-center px-4 text-center">
-          <p className="text-[0.7rem] font-sans tracking-[0.28em] text-white/65 uppercase mb-5">
+          <p className="text-[0.7rem] font-sans tracking-[0.28em] text-white/85 uppercase mb-5">
             Susie H. Lytal, MS · Equine Biomechanist
           </p>
           <span className="block mx-auto mb-6 gold-rule" aria-hidden="true" />
@@ -206,7 +206,7 @@ export function BarnDoorIntro() {
           style={{ opacity: beat1Opacity, y: beat1Y }}
           className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center will-change-transform"
         >
-          <p className="text-[0.65rem] sm:text-[0.7rem] font-sans tracking-[0.32em] text-white/70 uppercase mb-5">
+          <p className="text-[0.65rem] sm:text-[0.7rem] font-sans tracking-[0.32em] text-white/85 uppercase mb-5">
             Susie H. Lytal, MS · Equine Biomechanist
           </p>
           <span className="block mx-auto mb-6 gold-rule" aria-hidden="true" />
@@ -239,7 +239,7 @@ export function BarnDoorIntro() {
           style={{ opacity: beat3Opacity, y: beat3Y }}
           className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center will-change-transform"
         >
-          <p className="text-[0.65rem] sm:text-[0.7rem] font-sans tracking-[0.32em] text-white/70 uppercase mb-5">
+          <p className="text-[0.65rem] sm:text-[0.7rem] font-sans tracking-[0.32em] text-white/85 uppercase mb-5">
             Welcome
           </p>
           <span className="block mx-auto mb-6 gold-rule" aria-hidden="true" />
@@ -278,7 +278,7 @@ export function BarnDoorIntro() {
           style={{
             opacity: useTransform(scrollYProgress, [0, 0.06], [1, 0]),
           }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[0.6rem] font-sans tracking-[0.32em] text-white/60 uppercase"
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[0.6rem] font-sans tracking-[0.32em] text-white/85 uppercase"
         >
           Scroll
         </motion.div>

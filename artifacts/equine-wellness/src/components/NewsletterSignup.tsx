@@ -410,7 +410,7 @@ export function NewsletterSignup({
             <p
               className={cn(
                 "text-xs",
-                isFooter ? "text-primary-foreground/60" : "text-muted-foreground",
+                isFooter ? "text-primary-foreground/85" : "text-muted-foreground",
               )}
             >
               One thoughtful dispatch a month. Unsubscribe any time.

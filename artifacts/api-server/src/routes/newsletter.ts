@@ -272,6 +272,7 @@ router.post("/newsletter/admin/dispatch", requireAdmin, async (req, res) => {
 
   let sent = 0;
   let failed = 0;
+  let firstError: string | null = null;
   for (const sub of recipients) {
     const email = buildDispatchEmail({
       subject,
@@ -290,19 +291,28 @@ router.post("/newsletter/admin/dispatch", requireAdmin, async (req, res) => {
       });
       if (result.error) {
         failed += 1;
+        if (!firstError) firstError = result.error.message ?? "unknown";
         req.log?.error({ err: result.error, email: sub.email }, "dispatch send failed");
       } else {
         sent += 1;
       }
     } catch (err) {
       failed += 1;
+      if (!firstError) firstError = err instanceof Error ? err.message : "unknown";
       req.log?.error({ err, email: sub.email }, "dispatch send threw");
     }
     // Light pacing to stay under provider rate limits.
     await new Promise((r) => setTimeout(r, 60));
   }
 
-  return res.json({ ok: true, mode: "broadcast", sent, failed, total: recipients.length });
+  return res.json({
+    ok: true,
+    mode: "broadcast",
+    sent,
+    failed,
+    total: recipients.length,
+    ...(firstError ? { firstError } : {}),
+  });
 });
 
 // --- Persisted dispatches (drafts, scheduled, history) -----------------------
