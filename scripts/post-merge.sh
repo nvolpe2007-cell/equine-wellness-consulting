@@ -12,3 +12,14 @@ if ! pnpm --filter db run check-drift; then
   echo "[post-merge] to apply the schema, then re-run the post-merge setup."
   exit 1
 fi
+
+# Re-extract the video poster from frame 0 so it stays in sync whenever
+# barn-door-intro-web.mp4 is updated. Then wipe the vite-imagetools cache
+# so the new JPEG is picked up on the next dev/build run.
+echo ""
+echo "[post-merge] Extracting intro video poster..."
+pnpm --filter @workspace/scripts run extract-video-poster
+
+echo "[post-merge] Clearing vite-imagetools cache..."
+rm -rf artifacts/equine-wellness/node_modules/.cache/imagetools
+echo "[post-merge] Done."
