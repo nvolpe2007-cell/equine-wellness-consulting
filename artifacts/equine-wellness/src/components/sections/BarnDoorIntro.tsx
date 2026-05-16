@@ -1,7 +1,6 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import {
   motion,
-  useMotionValueEvent,
   useReducedMotion,
   useScroll,
   useTransform,
@@ -75,44 +74,62 @@ export function BarnDoorIntro() {
     };
   }, [reduce, setIntroActive, setNavRevealed]);
 
-  // Reveal navbar at >=92% scroll progress
-  useMotionValueEvent(scrollYProgress, "change", (v) => {
-    if (reduce) return;
-    setNavRevealed(v >= NAV_REVEAL_AT);
-  });
+  // Native scroll handler — drives video seek + navbar reveal.
+  // A direct window "scroll" listener is more reliable than FM12 motion-value
+  // change callbacks when the page runs inside an iframe (Replit preview pane,
+  // canvas embed), where compositor-thread timing can cause FM12 change events
+  // to lag or be skipped.
+  const handleScroll = useCallback(() => {
+    const el = trackRef.current;
+    if (!el) return;
 
-  // Drive video.currentTime from scroll progress, coalesced via rAF
-  useMotionValueEvent(scrollYProgress, "change", (v) => {
-    if (reduce) return;
+    const rect = el.getBoundingClientRect();
+    const viewH = window.innerHeight;
+    const trackH = el.offsetHeight; // ≈ TRACK_HEIGHT_VH * viewH
+    // progress: 0 when trackRef top == viewport top
+    //           1 when trackRef bottom == viewport bottom
+    const progress = Math.max(0, Math.min(1, -rect.top / (trackH - viewH)));
+
+    // Navbar reveal
+    setNavRevealed(progress >= NAV_REVEAL_AT);
+
+    // Video seek — coalesced via rAF to avoid thrashing the media decoder
     const video = videoRef.current;
     if (!video) return;
     const duration = Number.isFinite(video.duration) ? video.duration : 0;
     if (!duration) return;
-    const clamped = Math.max(0, Math.min(1, v));
-    pendingTimeRef.current = clamped * duration;
-    if (rafRef.current != null) return;
+    const target = progress * duration;
+    if (Math.abs(video.currentTime - target) < 0.016) return; // sub-frame, skip
+    pendingTimeRef.current = target;
+    if (rafRef.current != null) return; // rAF already pending, it will pick up the latest pendingTime
     rafRef.current = requestAnimationFrame(() => {
       rafRef.current = null;
-      const target = pendingTimeRef.current;
+      const t = pendingTimeRef.current;
       pendingTimeRef.current = null;
-      if (target == null) return;
+      if (t == null) return;
       const vid = videoRef.current;
       if (!vid) return;
-      // Avoid pointless seeks for sub-frame deltas
-      if (Math.abs(vid.currentTime - target) < 0.016) return;
+      if (Math.abs(vid.currentTime - t) < 0.016) return;
       try {
-        vid.currentTime = target;
+        vid.currentTime = t;
       } catch {
         /* ignore seek errors during teardown */
       }
     });
-  });
+  }, [setNavRevealed]);
 
   useEffect(() => {
+    if (reduce) return;
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll(); // sync immediately in case the page already has scroll offset
     return () => {
-      if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
+      window.removeEventListener("scroll", handleScroll);
+      if (rafRef.current != null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
     };
-  }, []);
+  }, [reduce, handleScroll]);
 
   // ---------- Reduced motion: static composition, no scroll spacer ----------
   if (reduce) {
