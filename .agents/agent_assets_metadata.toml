@@ -119,3 +119,9 @@ id = "bnsRkGjs-KpWut6zLcJ0W"
 uri = "file://artifacts/equine-wellness/public/icon-512.png"
 type = "image"
 title = "Favicon at 512px"
+
+[[outputs]]
+id = "b_I3j_kfrYTuXc42_0AA2"
+uri = "file://attached_assets/barn-door-intro-final-frame.jpg"
+type = "image"
+title = "New final frame (t=14.4s)"
