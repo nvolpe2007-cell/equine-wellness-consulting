@@ -198,7 +198,7 @@ export function NewsletterSignup({
               className={cn(
                 "font-serif",
                 isHero ? "text-2xl md:text-3xl text-foreground" : "text-xl",
-                isFooter && "text-primary-foreground",
+                isFooter && "text-primary",
               )}
             >
               {heading}
@@ -208,7 +208,7 @@ export function NewsletterSignup({
             <p
               className={cn(
                 "mt-2 leading-relaxed",
-                isFooter ? "text-primary-foreground/80 text-sm" : "text-muted-foreground",
+                isFooter ? "text-primary/80 text-sm" : "text-muted-foreground",
               )}
             >
               {subheading}
@@ -410,7 +410,7 @@ export function NewsletterSignup({
             <p
               className={cn(
                 "text-xs",
-                isFooter ? "text-primary-foreground/85" : "text-muted-foreground",
+                isFooter ? "text-primary/70" : "text-muted-foreground",
               )}
             >
               One thoughtful dispatch a month. Unsubscribe any time.

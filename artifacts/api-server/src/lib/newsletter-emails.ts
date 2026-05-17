@@ -19,8 +19,9 @@ export function unsubscribeUrl(token: string): string {
   return `${getSiteBaseUrl()}/api/newsletter/unsubscribe?token=${encodeURIComponent(token)}`;
 }
 
-const BRAND_COLOR = "#5b3a29";
-const ACCENT = "#8a6a4f";
+const BRAND_COLOR = "#1a1208";
+const HEADER_BG = "#c9963b";
+const ACCENT = "#a87830";
 
 function shellHtml(opts: {
   title: string;
@@ -43,9 +44,9 @@ function shellHtml(opts: {
         <td align="center">
           <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.04);">
             <tr>
-              <td style="padding:28px 32px;background:${BRAND_COLOR};color:#fff;">
-                <div style="font-size:11px;letter-spacing:0.22em;text-transform:uppercase;opacity:0.85;">The Worthy Horse News</div>
-                <div style="font-size:22px;margin-top:6px;font-style:italic;">A monthly dispatch for thoughtful horse owners</div>
+              <td style="padding:28px 32px;background:${HEADER_BG};color:${BRAND_COLOR};">
+                <div style="font-size:11px;letter-spacing:0.22em;text-transform:uppercase;opacity:0.75;">The Worthy Horse News</div>
+                <div style="font-size:22px;margin-top:6px;font-style:italic;font-weight:600;">A monthly dispatch for thoughtful horse owners</div>
               </td>
             </tr>
             <tr>
@@ -76,11 +77,13 @@ export function buildWelcomeEmail(name: string, token: string): {
   const unsub = unsubscribeUrl(token);
   const bodyHtml = `
     <p>Hi ${safeName},</p>
-    <p>Welcome to <em>The Worthy Horse News</em>. Once a month, you'll receive a thoughtful dispatch with industry notes, state-by-state legislative updates, petitions worth following, and seasonal care reminders — written for owners who want to be informed partners in their horse's wellness.</p>
-    <p>No fluff, no spam. Just one quiet email a month.</p>
-    <p>Warmly,<br/>Susie H. Lytal, MS<br/><span style="color:#6e6359;font-size:13px;">Equine Biomechanist</span></p>
+    <p>Welcome to <em>The Worthy Horse News</em> — and thank you for trusting me with a spot in your inbox.</p>
+    <p>Once a month I'll send one thoughtful note covering the kinds of things I think about every day with horses: how the body holds tension and releases it, what biomechanics actually look like in a living animal, seasonal care considerations, and the quieter signals most people miss. The goal is always the same — to help you be a more informed, attentive partner in your horse's wellbeing.</p>
+    <p>No sales pitches, no filler. Just one careful email a month, written the way I'd talk to you after a session.</p>
+    <p>I'm glad you're here.</p>
+    <p>Warmly,<br/>Susie H. Lytal, MS<br/><span style="color:#6e6359;font-size:13px;">Equine Biomechanist &amp; Bodywork Practitioner</span></p>
   `;
-  const text = `Hi ${name.split(/\s+/)[0] ?? name},\n\nWelcome to The Worthy Horse News. Once a month you'll receive a thoughtful dispatch with industry notes, state-by-state legislative updates, petitions worth following, and seasonal care reminders.\n\nNo fluff, no spam. Just one quiet email a month.\n\nWarmly,\nSusie H. Lytal, MS — Equine Biomechanist\n\nUnsubscribe: ${unsub}\n`;
+  const text = `Hi ${name.split(/\s+/)[0] ?? name},\n\nWelcome to The Worthy Horse News — and thank you for trusting me with a spot in your inbox.\n\nOnce a month I'll send one thoughtful note covering the kinds of things I think about every day with horses: how the body holds tension and releases it, what biomechanics actually look like in a living animal, seasonal care considerations, and the quieter signals most people miss. The goal is always the same — to help you be a more informed, attentive partner in your horse's wellbeing.\n\nNo sales pitches, no filler. Just one careful email a month, written the way I'd talk to you after a session.\n\nI'm glad you're here.\n\nWarmly,\nSusie H. Lytal, MS\nEquine Biomechanist & Bodywork Practitioner\n\nUnsubscribe: ${unsub}\n`;
   return {
     subject: "Welcome to The Worthy Horse News",
     html: shellHtml({
