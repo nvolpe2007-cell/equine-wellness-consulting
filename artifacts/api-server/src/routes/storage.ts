@@ -1,5 +1,4 @@
 import { Router, type IRouter, type Request, type Response } from "express";
-import { Readable } from "stream";
 import {
   RequestUploadUrlBody,
   RequestUploadUrlResponse,
@@ -47,7 +46,8 @@ router.post("/storage/uploads/request-url", async (req: Request, res: Response) 
  *
  * Serve public assets from PUBLIC_OBJECT_SEARCH_PATHS.
  * These are unconditionally public — no authentication or ACL checks.
- * IMPORTANT: Always provide this endpoint when object storage is set up.
+ * Supports HTTP Range requests (206 partial content) so browsers can seek
+ * into video files without downloading the entire file first.
  */
 router.get("/storage/public-objects/*filePath", async (req: Request, res: Response) => {
   try {
@@ -59,18 +59,35 @@ router.get("/storage/public-objects/*filePath", async (req: Request, res: Respon
       return;
     }
 
-    const response = await objectStorageService.downloadObject(file);
+    const [metadata] = await file.getMetadata();
+    const contentType = (metadata.contentType as string) || "application/octet-stream";
+    const totalSize = Number(metadata.size) || 0;
 
-    res.status(response.status);
-    response.headers.forEach((value, key) => res.setHeader(key, value));
-    // Public assets are immutable — let browsers and CDN edges cache them for a year.
+    res.setHeader("Accept-Ranges", "bytes");
+    res.setHeader("Content-Type", contentType);
     res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
 
-    if (response.body) {
-      const nodeStream = Readable.fromWeb(response.body as ReadableStream<Uint8Array>);
+    const rangeHeader = req.headers.range;
+    if (rangeHeader) {
+      const match = rangeHeader.match(/bytes=(\d*)-(\d*)/);
+      if (!match) {
+        res.status(416).setHeader("Content-Range", `bytes */${totalSize}`).end();
+        return;
+      }
+      const start = match[1] ? parseInt(match[1], 10) : 0;
+      const end = match[2] ? parseInt(match[2], 10) : totalSize - 1;
+      const chunkSize = end - start + 1;
+
+      res.status(206);
+      res.setHeader("Content-Range", `bytes ${start}-${end}/${totalSize}`);
+      res.setHeader("Content-Length", String(chunkSize));
+
+      const nodeStream = file.createReadStream({ start, end });
       nodeStream.pipe(res);
     } else {
-      res.end();
+      if (totalSize) res.setHeader("Content-Length", String(totalSize));
+      const nodeStream = file.createReadStream();
+      nodeStream.pipe(res);
     }
   } catch (error) {
     req.log.error({ err: error }, "Error serving public object");
