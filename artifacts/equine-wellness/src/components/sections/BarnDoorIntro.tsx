@@ -183,7 +183,14 @@ export function BarnDoorIntro() {
     <div
       ref={trackRef}
       className="relative w-full bg-black"
-      style={{ height: `${TRACK_HEIGHT_VH}vh` }}
+      style={{
+        // Pull the track up by the navbar height (h-20 = 5rem) so the sticky
+        // video panel covers the full viewport from y=0 immediately, with no
+        // black gap at the top. Height is extended by the same amount so the
+        // total scroll distance stays the same.
+        marginTop: "-5rem",
+        height: `calc(${TRACK_HEIGHT_VH}vh + 5rem)`,
+      }}
       data-testid="barn-door-intro"
     >
       <div className="sticky top-0 h-screen w-full overflow-hidden">
