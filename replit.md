@@ -163,6 +163,24 @@ The `.dark {}` block in `index.css` is currently unused (no theme toggle in
 the app). If a system-preference dark mode is ever enabled, mirror the
 `:root` values into it or delete the block.
 
+## CDN-hosted video assets (equine-wellness)
+
+The barn-door intro video and its poster frame are stored in Replit Object Storage (GCS-backed) and served via the API server's public-objects endpoint, keeping large binary files out of the Vite build.
+
+- **Video**: `GET /api/storage/public-objects/barn-door-intro-web.mp4`
+- **Poster**: `GET /api/storage/public-objects/barn-door-intro-first-frame.jpg`
+- Stored at `gs://replit-objstore-0c828156-1f3b-495d-853b-3d4123d54ddb/public/`
+- Cache-Control: `public, max-age=31536000, immutable` set on the objects in GCS
+- Component: `artifacts/equine-wellness/src/components/sections/BarnDoorIntro.tsx` — references the CDN paths as plain string constants (no Vite asset import)
+- If you ever need to re-upload the assets (e.g. new video cut), run:
+  ```
+  # 1. Add a POST /internal/cdn-upload route to the API server (see task #67 history)
+  # 2. Start the API server workflow
+  # 3. curl -X POST http://localhost:80/api/internal/cdn-upload
+  # 4. Remove the route
+  ```
+- Object storage routes are mounted at `/api/storage/*` by `artifacts/api-server/src/routes/storage.ts`
+
 ## Schema drift detection
 
 The signup flow once 500'd because `lib/db/src/schema/subscribers.ts` had

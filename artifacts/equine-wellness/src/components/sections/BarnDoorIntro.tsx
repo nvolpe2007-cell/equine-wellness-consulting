@@ -8,9 +8,10 @@ import {
 import { Phone } from "lucide-react";
 import { ResponsiveImage } from "@/components/ui/ResponsiveImage";
 import { useIntroVisibility } from "@/components/intro/IntroVisibilityContext";
-import barnVideoSrc from "@assets/barn-door-intro-web.mp4";
-import barnFirstFrame from "@assets/barn-door-intro-first-frame.jpg?w=640;1024;1600;2400&picture";
 import barnFinalFrame from "@assets/barn-door-intro-final-frame.jpg?w=640;1024;1600;2400&picture";
+
+const barnVideoSrc = "/api/storage/public-objects/barn-door-intro-web.mp4";
+const barnFirstFrameSrc = "/api/storage/public-objects/barn-door-intro-first-frame.jpg";
 
 const TRACK_HEIGHT_VH = 350;
 const NAV_REVEAL_AT = 0.92;
@@ -198,7 +199,7 @@ export function BarnDoorIntro() {
         <video
           ref={videoRef}
           src={barnVideoSrc}
-          poster={(barnFirstFrame as { img: { src: string } }).img.src}
+          poster={barnFirstFrameSrc}
           muted
           playsInline
           autoPlay={false}
