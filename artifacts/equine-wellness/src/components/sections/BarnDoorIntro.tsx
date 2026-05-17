@@ -196,10 +196,10 @@ export function BarnDoorIntro() {
           disableRemotePlayback
           aria-hidden="true"
           onLoadedMetadata={(e) => {
-            // Ensure the first painted frame is t=0, not whatever the
-            // browser decided to decode while seeking the poster.
+            // Seek to the first fully-visible frame (matches the poster).
+            // t=0 is a brief dark fade-in; 0.5s is the first barn frame.
             try {
-              e.currentTarget.currentTime = 0;
+              e.currentTarget.currentTime = 0.5;
             } catch {
               /* ignore */
             }

@@ -15,16 +15,16 @@ if (!existsSync(videoPath)) {
   process.exit(1);
 }
 
-console.log("[extract-video-poster] Extracting frame 0 from video...");
+console.log("[extract-video-poster] Extracting frame at t=0.5s from video...");
 
 execFileSync(
   "ffmpeg",
   [
     "-y",
     "-loglevel", "error",
+    "-ss", "0.5",
     "-i", videoPath,
     "-vframes", "1",
-    "-ss", "0",
     "-q:v", "2",
     "-update", "1",
     posterPath,
