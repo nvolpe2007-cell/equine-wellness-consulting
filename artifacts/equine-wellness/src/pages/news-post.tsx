@@ -95,7 +95,7 @@ export default function NewsPost() {
                   </span>
                 </span>
               </div>
-              <h1 className="font-serif text-4xl md:text-6xl text-foreground leading-[1.05] tracking-tight">
+              <h1 className="font-serif font-[500] text-4xl md:text-6xl text-foreground leading-[1.02] tracking-tight">
                 {post.title}
               </h1>
             </div>

@@ -1,7 +1,6 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { ExternalLink } from "lucide-react";
 import { LineReveal } from "@/components/ui/AnimatedText";
-import { StaggerReveal, StaggerItem } from "@/components/ui/AnimatedText";
 import { spring } from "@/lib/motion";
 
 export default function Partners() {
@@ -48,7 +47,7 @@ export default function Partners() {
                 Trusted Partners
               </p>
               <motion.h1
-                className="text-5xl md:text-7xl font-serif text-foreground leading-[1.02] tracking-tight"
+                className="text-5xl md:text-7xl font-serif font-[500] text-foreground leading-[1.0] tracking-tight"
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
@@ -79,12 +78,18 @@ export default function Partners() {
             </p>
           </aside>
 
-          <StaggerReveal
-            className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8"
-            staggerChildren={0.1}
-          >
-            {partners.map((partner) => (
-              <StaggerItem key={partner.name}>
+          {/* Partner cards float in from alternating horizontal offsets */}
+          <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+            {partners.map((partner, i) => {
+              const xOffset = i % 2 === 0 ? -24 : 24;
+              return (
+              <motion.div
+                key={partner.name}
+                initial={{ opacity: 0, x: xOffset, y: 16 }}
+                whileInView={{ opacity: 1, x: 0, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.6, delay: i * 0.1 }}
+              >
                 <motion.div
                   className="bg-card border rounded-2xl p-8 shadow-sm flex flex-col h-full cursor-default"
                   initial="rest"
@@ -128,9 +133,10 @@ export default function Partners() {
                     </a>
                   </div>
                 </motion.div>
-              </StaggerItem>
-            ))}
-          </StaggerReveal>
+              </motion.div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>

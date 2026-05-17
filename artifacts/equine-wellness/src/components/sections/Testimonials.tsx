@@ -1,5 +1,4 @@
 import { motion, useReducedMotion } from "framer-motion";
-import { Quote } from "lucide-react";
 import { AnimatedHeading } from "@/components/ui/AnimatedText";
 import { StaggerReveal, StaggerItem } from "@/components/ui/AnimatedText";
 import { spring } from "@/lib/motion";
@@ -60,15 +59,16 @@ export function Testimonials() {
           />
         </motion.div>
 
+        {/* Staggered masonry: first and third at baseline, center card offset up */}
         <StaggerReveal
-          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+          className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start"
           staggerChildren={0.1}
           viewportMargin="-50px"
         >
           {testimonials.map((t, i) => (
             <StaggerItem key={`${t.name}-${t.horse}`}>
               <motion.figure
-                className="relative bg-card border border-border rounded-2xl p-8 shadow-sm flex flex-col h-full"
+                className={`relative bg-card border border-border rounded-2xl p-8 shadow-sm flex flex-col h-full${i === 1 ? " md:mt-8" : ""}`}
                 data-testid={`testimonial-${i}`}
                 initial="rest"
                 whileHover={reduce ? undefined : "hover"}
@@ -86,12 +86,16 @@ export function Testimonials() {
                   },
                 }}
               >
-                <Quote
+                {/* Large italic opening quotation mark in Cormorant Garamond gold */}
+                <span
                   aria-hidden="true"
-                  className="absolute -top-4 left-6 h-8 w-8 text-accent bg-card p-1.5 rounded-full border border-border"
-                />
+                  className="block font-serif italic text-[6rem] leading-none text-primary/70 select-none -mt-4 -mb-6"
+                  style={{ fontFamily: "var(--app-font-serif)" }}
+                >
+                  &ldquo;
+                </span>
                 <blockquote className="font-serif italic text-xl md:text-2xl leading-snug text-foreground flex-1">
-                  &ldquo;{t.quote}&rdquo;
+                  {t.quote}
                 </blockquote>
                 <span
                   aria-hidden="true"

@@ -1,4 +1,5 @@
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
 import { Link } from "wouter";
 import { ArrowRight, CheckCircle2, Phone } from "lucide-react";
 import { WordReveal, LineReveal, AnimatedHeading } from "@/components/ui/AnimatedText";
@@ -14,6 +15,24 @@ import horsePortrait from "@assets/stock_images/horse-portrait.jpg?w=400;800;120
 import massageHands from "@assets/0629_LOC_Horse02_CBH_t1170_1776529181857.jpg?w=400;800;1200&picture";
 import pemfWhiteHorse from "@assets/20260407_121449_1776528702902.jpg?w=400;800&picture";
 import redLightLeg from "@assets/image_1776880244507.jpeg?w=400;800&picture";
+
+function DotGridParallax() {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const y = useTransform(scrollYProgress, [0, 1], ["-60px", "60px"]);
+  return (
+    <motion.div
+      ref={ref}
+      aria-hidden="true"
+      className="absolute inset-0 opacity-[0.05] pointer-events-none"
+      style={{
+        backgroundImage: "radial-gradient(circle at 1px 1px, hsl(var(--primary-foreground)) 1px, transparent 0)",
+        backgroundSize: "28px 28px",
+        y,
+      }}
+    />
+  );
+}
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -126,81 +145,112 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* Stats Strip */}
+      {/* Stats Strip — staggered wave layout */}
       <section className="bg-card border-b border-border">
-        <div className="container mx-auto px-4 py-10 md:py-12">
+        <div className="container mx-auto px-4 py-10 md:py-14">
           <motion.ul
             className="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-16 md:gap-24"
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.6 }}
           >
-            {stats.map((stat, i) => (
-              <li key={stat.label} className="text-center">
-                <p className="text-4xl md:text-5xl font-serif text-primary leading-none mb-1">
-                  <CountUp to={stat.value} suffix={stat.suffix} duration={1.4 + i * 0.15} />
-                </p>
-                <p className="text-xs font-sans tracking-[0.22em] text-muted-foreground uppercase mt-2">
-                  {stat.label}
-                </p>
-              </li>
-            ))}
+            {stats.map((stat, i) => {
+              const yOffset = i === 0 ? -12 : i === 1 ? 0 : 12;
+              return (
+                <motion.li
+                  key={stat.label}
+                  className="text-center"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: yOffset }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{ duration: 0.7, delay: i * 0.12 }}
+                >
+                  <p className={`font-serif text-primary leading-none mb-1 ${i === 1 ? "text-5xl md:text-6xl" : "text-4xl md:text-5xl"}`}>
+                    <CountUp to={stat.value} suffix={stat.suffix} duration={1.4 + i * 0.15} />
+                  </p>
+                  <p className="text-xs font-sans tracking-[0.22em] text-muted-foreground uppercase mt-2">
+                    {stat.label}
+                  </p>
+                </motion.li>
+              );
+            })}
           </motion.ul>
         </div>
       </section>
 
-      {/* Intro / Philosophy */}
+      {/* Intro / Philosophy — asymmetric editorial layout */}
       <section className="py-32 md:py-40 bg-card relative">
         <div className="absolute top-0 inset-x-0 divider-gold" />
         <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.7 }}
-            className="max-w-3xl mx-auto text-center"
-          >
-            <span className="block mx-auto mb-5 gold-rule" aria-hidden="true" />
-            <LineReveal
-              text="Philosophy"
-              as="span"
-              className="inline-block text-xs font-sans tracking-[0.3em] text-primary uppercase mb-4"
-            />
-            <h2 className="text-3xl md:text-5xl font-serif text-foreground mb-6 leading-tight">
-              <WordReveal
-                text="Grounded in knowledge."
-                as="span"
-                whileInView
-                delay={0.18}
-                className="block"
-              />
-              <WordReveal
-                text="Delivered with compassion."
-                as="span"
-                whileInView
-                delay={0.55}
-                className="block italic"
-              />
-            </h2>
-            <p className="text-lg text-muted-foreground leading-relaxed mb-10">
-              Every horse is a complex athlete, whether they are performing at the highest levels of competition or carrying you safely down the trail. My approach to equine wellness combines a deep, scientific understanding of biomechanics with highly attuned, hands-on application. We don't just look at the symptoms; we support the whole horse.
-            </p>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start mb-12">
+            {/* Left col: heading anchored left */}
             <motion.div
-              whileHover={reduce ? undefined : { scale: 1.01 }}
-              transition={spring.gentle}
-              className="overflow-hidden rounded-2xl shadow-xl"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.7 }}
+              className="lg:col-span-7"
             >
-              <ResponsiveImage
-                image={barnExterior}
-                alt="Quiet stable exterior at golden hour where Susie conducts equine wellness sessions"
-                loading="lazy"
-                decoding="async"
-                sizes="(min-width: 1024px) 720px, 100vw"
-                pictureClassName="block w-full"
-                className="w-full h-auto max-h-[420px] object-cover"
+              <span className="block mb-5 gold-rule" aria-hidden="true" />
+              <LineReveal
+                text="Philosophy"
+                as="span"
+                className="inline-block text-xs font-sans tracking-[0.3em] text-primary uppercase mb-4"
               />
+              <h2 className="text-3xl md:text-5xl font-serif text-foreground mb-6 leading-[1.04]">
+                <WordReveal
+                  text="Grounded in knowledge."
+                  as="span"
+                  whileInView
+                  delay={0.18}
+                  className="block"
+                />
+                <WordReveal
+                  text="Delivered with compassion."
+                  as="span"
+                  whileInView
+                  delay={0.55}
+                  className="block italic"
+                />
+              </h2>
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                Every horse is a complex athlete, whether they are performing at the highest levels of competition or carrying you safely down the trail. My approach to equine wellness combines a deep, scientific understanding of biomechanics with highly attuned, hands-on application. We don't just look at the symptoms; we support the whole horse.
+              </p>
             </motion.div>
+
+            {/* Right col: italic pull-quote offset */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.7, delay: 0.2 }}
+              className="lg:col-span-4 lg:col-start-9 lg:pt-24"
+            >
+              <blockquote className="text-2xl font-serif italic text-foreground/75 leading-snug border-l-2 border-primary/40 pl-5">
+                We don&rsquo;t just look at the symptoms; we support the whole horse.
+              </blockquote>
+            </motion.div>
+          </div>
+
+          {/* Full-width barn image, slightly oversized bleeding right */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.8, delay: 0.15 }}
+            whileHover={reduce ? undefined : { scale: 1.008 }}
+            className="overflow-hidden rounded-2xl shadow-xl lg:-mr-8 xl:-mr-16"
+          >
+            <ResponsiveImage
+              image={barnExterior}
+              alt="Quiet stable exterior at golden hour where Susie conducts equine wellness sessions"
+              loading="lazy"
+              decoding="async"
+              sizes="(min-width: 1024px) 90vw, 100vw"
+              pictureClassName="block w-full"
+              className="w-full h-auto max-h-[480px] object-cover"
+            />
           </motion.div>
         </div>
       </section>
@@ -363,7 +413,7 @@ export default function Home() {
 
       {/* The Difference Section */}
       <section className="py-32 md:py-40 bg-gold-metallic-band relative overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.05] pointer-events-none" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, hsl(var(--primary-foreground)) 1px, transparent 0)", backgroundSize: "28px 28px" }} />
+        <DotGridParallax />
         <div className="container mx-auto px-4 relative">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <motion.div
@@ -445,6 +495,18 @@ export default function Home() {
       {/* CTA */}
       <section id="contact" className="py-32 md:py-40 bg-card relative overflow-hidden">
         <div className="absolute top-0 inset-x-0 divider-gold" />
+        {/* Decorative typographic ghost word behind CTA */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden"
+        >
+          <span
+            className="font-serif italic text-[10rem] md:text-[16rem] leading-none text-primary/[0.04] whitespace-nowrap"
+            style={{ fontFamily: "var(--app-font-serif)" }}
+          >
+            Wellness
+          </span>
+        </div>
         <div className="container mx-auto px-4 text-center max-w-3xl relative">
           <motion.div
             initial={{ opacity: 0, y: 30 }}

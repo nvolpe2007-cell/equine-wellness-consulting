@@ -1,17 +1,24 @@
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
 import { MapPin } from "lucide-react";
 import { AnimatedHeading } from "@/components/ui/AnimatedText";
 
 export function ServiceArea() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
+  const auroraY = useTransform(scrollYProgress, [0, 1], ["-60px", "60px"]);
+
   return (
     <section
+      ref={sectionRef}
       aria-label="Service area"
       className="relative overflow-hidden bg-gold-aurora py-28 md:py-40"
     >
-      {/* Soft aurora veils for depth */}
-      <div
+      {/* Soft aurora veils for depth — parallax on scroll */}
+      <motion.div
         aria-hidden="true"
         className="absolute inset-0 pointer-events-none"
+        style={{ y: auroraY }}
       >
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -46,6 +53,9 @@ export function ServiceArea() {
               "radial-gradient(closest-side, hsl(var(--gold-light) / 0.36), hsl(var(--gold) / 0.18), transparent 72%)",
           }}
         />
+      </motion.div>
+      {/* Static overlays stay outside the parallax container */}
+      <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
         {/* Top + bottom hairline gold rules */}
         <div className="absolute top-0 inset-x-0 divider-gold" />
         <div className="absolute bottom-0 inset-x-0 divider-gold" />

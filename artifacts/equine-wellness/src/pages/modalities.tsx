@@ -408,10 +408,18 @@ export default function Modalities() {
               transition={{ duration: 0.6 }}
               className="scroll-mt-32"
             >
-              <div
+              {/* Alternating tilt angles for the card wrapper on desktop */}
+              {(() => {
+                const tilts = [1.2, -1.2, 0.6, -0.8, 1.0, -0.6];
+                const tiltDeg = tilts[index % tilts.length];
+                return (
+              <motion.div
                 className={`flex flex-col ${
                   index % 2 === 1 ? "lg:flex-row-reverse" : "lg:flex-row"
                 } gap-12 lg:gap-20 items-start`}
+                whileHover={reduce ? undefined : { rotate: tiltDeg }}
+                transition={{ type: "spring", stiffness: 200, damping: 24 }}
+                style={{ transformOrigin: "center bottom" }}
               >
                 <div className="w-full lg:w-1/2">
                   <motion.div
@@ -477,7 +485,9 @@ export default function Modalities() {
                     </ul>
                   </div>
                 </div>
-              </div>
+              </motion.div>
+              );
+              })()}
 
               {/* Per-modality common questions — AnimatePresence accordions */}
               <div className="mt-12 lg:mt-16 max-w-4xl mx-auto bg-card border border-border rounded-2xl p-6 md:p-10">

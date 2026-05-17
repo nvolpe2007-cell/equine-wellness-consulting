@@ -247,7 +247,7 @@ export function BarnDoorIntro() {
             is never exposed; fades out once the seeked event fires. */}
         <img
           ref={posterImgRef}
-          src={BARN_LQIP}
+          src={barnFirstFrameFallback}
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 h-full w-full object-cover transition-opacity duration-300"
           style={{ opacity: 1 }}

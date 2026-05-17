@@ -61,13 +61,13 @@ export default function Bio() {
         className="scroll-mt-28 container mx-auto px-4 pt-24 md:pt-32 max-w-5xl"
       >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
-          {/* Image */}
+          {/* Image — portrait bleeds slightly outside grid column on desktop */}
           <div className="lg:col-span-5">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2, duration: 0.6, ease: easing.out }}
-              className="rounded-2xl overflow-hidden shadow-xl aspect-[3/4]"
+              className="rounded-2xl overflow-hidden shadow-xl aspect-[3/4] lg:-mr-12 xl:-mr-20 rotate-[0.8deg]"
             >
               <ResponsiveImage
                 image={horsePortrait}
