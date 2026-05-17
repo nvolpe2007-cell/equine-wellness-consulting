@@ -12,6 +12,10 @@ import barnFinalFrame from "@assets/barn-door-intro-final-frame.jpg?w=640;1024;1
 import barnFirstFrameFallback from "@assets/barn-door-intro-first-frame.jpg";
 
 const barnVideoSrc = "/api/storage/public-objects/barn-door-intro-web.mp4";
+// 80×45 px LQIP (405 bytes) — hardcoded so it's in the JS bundle with
+// zero additional network requests. Shown as a blurred background the instant
+// the component mounts, before any image or video fetch completes.
+const BARN_LQIP = "data:image/jpeg;base64,/9j//gAQTGF2YzYwLjMxLjEwMgD/2wBDAAg+Pkk+SVVVVVVVVWRdZGhoaGRkZGRoaGhwcHCDg4NwcHBoaHBwfHyDg4+Tj4eHg4eTk5ubm7q6srLZ2eD/////xABiAAADAQEBAQEAAAAAAAAAAAAFBgQDAgEABwEBAQEBAAAAAAAAAAAAAAAAAwIBABAAAgEEAgIDAQAAAAAAAAAAAAEREiExAkEDgXFhUTKREQEAAAAAAAAAAAAAAAAAAAAA/8AAEQgALQBQAwEiAAIRAAMRAP/aAAwDAQACEQMRAD8A/BSxGcHcBkHP0vkmSg71wwzFRCwiDqkdtEpUx5Znur8eDmkpqYKvyvkItU+4Am2EY4GMCqJPoEGaOtJ76p4kKduq12hYFJSErkKbQhppSWcSKeApCzcEy6XVBvsqXlP+gBXaj7Gul1uU+Q1lhoEOyHZ6q+bOBaiecCje9SW26TNOxKvZLEgSh/Z4lHscKUvkCFhqVHIyoAJSGgyDisFKmLcnchEat5FhO7DYEaLSpBTOCRiDf//Z";
 
 const TRACK_HEIGHT_VH = 350;
 const NAV_REVEAL_AT = 0.92;
@@ -22,6 +26,7 @@ export function BarnDoorIntro() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const rafRef = useRef<number | null>(null);
   const pendingTimeRef = useRef<number | null>(null);
+  const posterImgRef = useRef<HTMLImageElement | null>(null);
   const { setIntroActive, setNavRevealed } = useIntroVisibility();
 
   const { scrollYProgress } = useScroll({
@@ -194,7 +199,14 @@ export function BarnDoorIntro() {
       }}
       data-testid="barn-door-intro"
     >
-      <div className="sticky top-0 h-screen w-full overflow-hidden">
+      <div
+        className="sticky top-0 h-screen w-full overflow-hidden"
+        style={{
+          backgroundImage: `url(${BARN_LQIP})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
         {/* Video layer */}
         <video
           ref={videoRef}
@@ -210,13 +222,35 @@ export function BarnDoorIntro() {
           onLoadedMetadata={(e) => {
             // Seek to the first fully-visible frame (matches the poster).
             // t=0 is a brief dark fade-in; 0.5s is the first barn frame.
+            // We hide the poster overlay only once the seek completes so there
+            // is never a black flash between "poster removed" and "frame ready".
             try {
-              e.currentTarget.currentTime = 0.5;
+              const vid = e.currentTarget;
+              const onSeeked = () => {
+                vid.removeEventListener("seeked", onSeeked);
+                if (posterImgRef.current) {
+                  posterImgRef.current.style.opacity = "0";
+                }
+              };
+              vid.addEventListener("seeked", onSeeked);
+              vid.currentTime = 0.5;
             } catch {
               /* ignore */
             }
           }}
           className="absolute inset-0 h-full w-full object-cover"
+          style={{ backgroundColor: "transparent" }}
+        />
+
+        {/* Poster overlay — visible until the initial seek to t=0.5 completes.
+            Sits above the video element so the browser's black "seeking" frame
+            is never exposed; fades out once the seeked event fires. */}
+        <img
+          ref={posterImgRef}
+          src={BARN_LQIP}
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover transition-opacity duration-300"
+          style={{ opacity: 1 }}
         />
 
         {/* Cinematic vignette on top of the video */}
