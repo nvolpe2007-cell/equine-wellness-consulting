@@ -98,7 +98,11 @@ export function BarnDoorIntro() {
     if (!video) return;
     const duration = Number.isFinite(video.duration) ? video.duration : 0;
     if (!duration) return;
-    const target = progress * duration;
+    // t=0 of the trimmed clip is still a brief dark fade-in; the barn is
+    // fully visible at t=0.5s.  Map scroll progress 0→1 onto 0.5s→end so
+    // the first frame the user ever sees is the lit barn interior.
+    const FIRST_VISIBLE_T = 0.5;
+    const target = FIRST_VISIBLE_T + progress * (duration - FIRST_VISIBLE_T);
     if (Math.abs(video.currentTime - target) < 0.016) return; // sub-frame, skip
     pendingTimeRef.current = target;
     if (rafRef.current != null) return; // rAF already pending, it will pick up the latest pendingTime
