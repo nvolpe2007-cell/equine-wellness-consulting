@@ -19,7 +19,7 @@ export function unsubscribeUrl(token: string): string {
   return `${getSiteBaseUrl()}/api/newsletter/unsubscribe?token=${encodeURIComponent(token)}`;
 }
 
-const BRAND_COLOR = "#1a1208";
+const BRAND_COLOR = "#1a1a1a";
 const HEADER_BG = "#c9963b";
 const ACCENT = "#a87830";
 
