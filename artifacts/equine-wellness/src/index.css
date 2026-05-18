@@ -87,8 +87,8 @@
   --primary-foreground: 0 0% 6%;
 
   /* Metallic gold gradient stops */
-  --gold-light: 48 100% 78%;
-  --gold: 46 92% 62%;
+  --gold-light: 52 100% 84%;
+  --gold: 46 96% 64%;
   --gold-deep: 38 80% 44%;
 
   /* Bronze/muted-gold secondary */
@@ -316,6 +316,15 @@
   100% { transform: translateX(200%); }
 }
 
+/* Gold shimmer sweep — bright highlight crosses left→right, then pauses.
+   Duration 4.5s: sweep ≈1.6s, pause ≈2.9s before next loop. */
+@keyframes gold-shimmer {
+  0%   { transform: translateX(-120%) skewX(-15deg); opacity: 0; }
+  6%   { opacity: 0.75; }
+  36%  { transform: translateX(230%) skewX(-15deg); opacity: 0; }
+  100% { transform: translateX(230%) skewX(-15deg); opacity: 0; }
+}
+
 @layer utilities {
   .animate-ken-burns {
     animation: ken-burns 24s ease-out forwards;
@@ -323,6 +332,8 @@
 
   /* Metallic gold surfaces and treatments */
   .bg-gold-metallic {
+    position: relative;
+    overflow: hidden;
     background-image: linear-gradient(
       135deg,
       hsl(var(--gold-light)) 0%,
@@ -339,11 +350,43 @@
       hsl(var(--gold-deep)) 100%
     );
   }
+  /* Shimmer sweep overlay — inert to pointer events, clipped by parent overflow */
+  .bg-gold-metallic::after {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      100deg,
+      transparent 20%,
+      hsl(var(--gold-light) / 0.65) 50%,
+      transparent 80%
+    );
+    animation: gold-shimmer 4.5s ease-in-out infinite;
+    border-radius: inherit;
+  }
   .bg-gold-metallic-band {
+    position: relative;
+    overflow: hidden;
     background-image:
       linear-gradient(180deg, hsl(var(--gold-light) / 0.18) 0%, transparent 35%),
       linear-gradient(135deg, hsl(var(--gold-light)) 0%, hsl(var(--gold)) 50%, hsl(var(--gold-deep)) 100%);
     color: hsl(var(--primary-foreground));
+  }
+  /* Shimmer sweep overlay for full-width band */
+  .bg-gold-metallic-band::after {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      100deg,
+      transparent 20%,
+      hsl(var(--gold-light) / 0.45) 50%,
+      transparent 80%
+    );
+    animation: gold-shimmer 4.5s ease-in-out infinite;
+    animation-delay: 0.8s;
   }
   .text-gold-gradient {
     background-image: linear-gradient(
@@ -359,13 +402,17 @@
   }
   .shadow-gold-glow {
     box-shadow:
-      0 10px 32px -10px hsl(var(--gold) / 0.55),
-      0 0 0 1px hsl(var(--gold-light) / 0.18);
+      0 0 18px 2px hsl(var(--gold) / 0.30),
+      0 12px 42px -8px hsl(var(--gold) / 0.65),
+      inset 0 1px 0 hsl(var(--gold-light) / 0.55),
+      0 0 0 1px hsl(var(--gold-light) / 0.22);
   }
   .shadow-gold-glow-lg {
     box-shadow:
-      0 20px 60px -16px hsl(var(--gold) / 0.6),
-      0 0 0 1px hsl(var(--gold-light) / 0.22);
+      0 0 28px 4px hsl(var(--gold) / 0.38),
+      0 22px 72px -12px hsl(var(--gold) / 0.72),
+      inset 0 1px 0 hsl(var(--gold-light) / 0.65),
+      0 0 0 1px hsl(var(--gold-light) / 0.30);
   }
   .divider-gold {
     height: 1px;
