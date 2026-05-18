@@ -17,7 +17,6 @@ const barnVideoSrc = "/api/storage/public-objects/barn-door-intro-web.mp4";
 // mounts, before any image or video fetch completes.
 const BARN_LQIP = "data:image/jpeg;base64,/9j//gAQTGF2YzYwLjMxLjEwMgD/2wBDAAg+Pkk+SVVVVVVVVWRdZGhoaGRkZGRoaGhwcHCDg4NwcHBoaHBwfHyDg4+Tj4eHg4eTk5ubm7q6srLZ2eD/////xABiAAADAQEBAQEAAAAAAAAAAAAFBgQDAgEABwEBAQEBAAAAAAAAAAAAAAAAAwIBABAAAgEEAgIDAQAAAAAAAAAAAAEREiExAkEDgXFhUTKREQEAAAAAAAAAAAAAAAAAAAAA/8AAEQgALQBQAwEiAAIRAAMRAP/aAAwDAQACEQMRAD8A/BSxGcHcBkHP0vkmSg71wwzFRCwiDqkdtEpUx5Znur8eDmkpqYKvyvkItU+4Am2EY4GMCqJPoEGaOtJ76p4kKduq12hYFJSErkKbQhppSWcSKeApCzcEy6XVBvsqXlP+gBXaj7Gul1uU+Q1lhoEOyHZ6q+bOBaiecCje9SW26TNOxKvZLEgSh/Z4lHscKUvkCFhqVHIyoAJSGgyDisFKmLcnchEat5FhO7DYEaLSpBTOCRiDf//Z";
 
-const TRACK_HEIGHT_VH = 450;
 const NAV_REVEAL_AT = 0.92;
 
 const TEXT_SHADOW_BODY = "0 1px 8px rgba(0,0,0,0.9)";
@@ -34,15 +33,20 @@ export function BarnDoorIntro() {
   const posterImgRef = useRef<HTMLImageElement | null>(null);
   const { setIntroActive, setNavRevealed } = useIntroVisibility();
 
-  // Responsive horizontal slide distance: ~30px mobile (<768px), ~60px desktop
-  const [slidePx, setSlidePx] = useState<number>(() =>
-    typeof window !== "undefined" && window.innerWidth < 768 ? 30 : 60,
-  );
+  // Responsive values: slide distance and track height change at the md breakpoint
+  const isMd = typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches;
+  const [slidePx, setSlidePx] = useState<number>(() => (isMd ? 60 : 30));
+  const [trackHeightVh, setTrackHeightVh] = useState<number>(() => (isMd ? 450 : 380));
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 768px)");
-    const update = (e: MediaQueryListEvent) => setSlidePx(e.matches ? 60 : 30);
+    const update = (e: MediaQueryListEvent) => {
+      setSlidePx(e.matches ? 60 : 30);
+      setTrackHeightVh(e.matches ? 450 : 380);
+    };
     mq.addEventListener("change", update);
+    // Sync on mount in case SSR/hydration differed
     setSlidePx(mq.matches ? 60 : 30);
+    setTrackHeightVh(mq.matches ? 450 : 380);
     return () => mq.removeEventListener("change", update);
   }, []);
 
@@ -262,7 +266,7 @@ export function BarnDoorIntro() {
       className="relative w-full bg-black"
       style={{
         marginTop: "-5rem",
-        height: `calc(${TRACK_HEIGHT_VH}vh + 5rem)`,
+        height: `calc(${trackHeightVh}vh + 5rem)`,
       }}
       data-testid="barn-door-intro"
     >
@@ -369,10 +373,10 @@ export function BarnDoorIntro() {
           className="absolute inset-0 grid grid-cols-12 items-center will-change-transform px-6 md:px-16 lg:px-24"
         >
           {/* Columns 5–12 (right ~67% of viewport) */}
-          <div className="col-span-12 md:col-span-8 md:col-start-5 text-left md:text-right">
+          <div className="col-span-12 md:col-span-8 md:col-start-5 text-center md:text-right">
             <motion.span
               style={{ x: beat2HeadX }}
-              className="block mb-6 gold-rule md:ml-auto will-change-transform"
+              className="block mb-6 gold-rule mx-auto md:ml-auto will-change-transform"
               aria-hidden="true"
             />
             <motion.div
@@ -386,7 +390,7 @@ export function BarnDoorIntro() {
             </motion.div>
             <motion.p
               style={{ x: beat2BodyX, textShadow: TEXT_SHADOW_PARA }}
-              className="mt-6 max-w-lg text-base md:text-lg text-white/80 font-light leading-relaxed will-change-transform md:ml-auto"
+              className="mt-6 max-w-lg text-base md:text-lg text-white/80 font-light leading-relaxed will-change-transform mx-auto md:ml-auto"
             >
               Wellness sessions in partnership with your veterinarian — grounded
               in science, delivered with compassion.
