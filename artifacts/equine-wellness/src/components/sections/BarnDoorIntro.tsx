@@ -16,9 +16,9 @@ const BARN_LQIP = "data:image/jpeg;base64,/9j//gAQTGF2YzYwLjMxLjEwMgD/2wBDAAg+Pk
 const NAV_REVEAL_AT = 0.92;
 
 const TEXT_SHADOW_BODY = "0 1px 8px rgba(0,0,0,0.9)";
-const TEXT_SHADOW_HEAD = "0 2px 24px rgba(0,0,0,0.85), 0 1px 4px rgba(0,0,0,0.95)";
-const TEXT_SHADOW_HERO = "0 2px 32px rgba(0,0,0,0.9), 0 1px 6px rgba(0,0,0,0.95)";
-const TEXT_SHADOW_PARA = "0 1px 12px rgba(0,0,0,0.9)";
+const TEXT_SHADOW_HEAD = "0 2px 24px rgba(0,0,0,0.9), 0 1px 4px rgba(0,0,0,0.98), 0 0 48px rgba(0,0,0,0.6)";
+const TEXT_SHADOW_HERO = "0 2px 32px rgba(0,0,0,0.95), 0 1px 6px rgba(0,0,0,0.98), 0 0 64px rgba(0,0,0,0.7)";
+const TEXT_SHADOW_PARA = "0 1px 16px rgba(0,0,0,0.95)";
 
 export function BarnDoorIntro() {
   const reduce = useReducedMotion();
@@ -86,7 +86,7 @@ export function BarnDoorIntro() {
   const beat4ButtonsOpacity = useTransform(scrollYProgress, [0.86, 0.94], [0, 1]);
   const beat4ButtonsY = useTransform(scrollYProgress, [0.86, 0.96], [20, 0]);
 
-  const vignetteOpacity = useTransform(scrollYProgress, [0, 0.7, 1], [0.25, 0.35, 0.55]);
+  const vignetteOpacity = useTransform(scrollYProgress, [0, 0.7, 1], [0.40, 0.50, 0.70]);
   const scrollHintOpacity = useTransform(scrollYProgress, [0, 0.08], [1, 0]);
 
   // Fallback: clear LQIP overlay after 2s in case video seek never fires on mobile
@@ -272,7 +272,29 @@ export function BarnDoorIntro() {
         />
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-black/40"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/35 via-black/15 to-black/55"
+        />
+
+        {/* ── Per-beat directional scrims ── */}
+        <motion.div
+          aria-hidden="true"
+          style={{ opacity: beat1Opacity }}
+          className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-transparent will-change-transform"
+        />
+        <motion.div
+          aria-hidden="true"
+          style={{ opacity: beat2Opacity }}
+          className="pointer-events-none absolute inset-0 bg-gradient-to-l from-black/70 via-black/35 to-transparent will-change-transform"
+        />
+        <motion.div
+          aria-hidden="true"
+          style={{ opacity: beat3Opacity, background: "radial-gradient(ellipse at center, rgba(0,0,0,0.55) 30%, transparent 75%)" }}
+          className="pointer-events-none absolute inset-0 will-change-transform"
+        />
+        <motion.div
+          aria-hidden="true"
+          style={{ opacity: beat4ContainerOpacity }}
+          className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/20 via-black/50 to-black/20 will-change-transform"
         />
 
         {/* ── Beat 1: left-anchored ── */}
