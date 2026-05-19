@@ -391,7 +391,7 @@ export function BarnDoorIntro() {
         {/* ── Beat 4: final brand mark ── */}
         <motion.div
           style={{ opacity: beat4ContainerOpacity }}
-          className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center will-change-transform"
+          className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center translate-y-5 will-change-transform"
         >
           <motion.p
             style={{ opacity: beat4EyebrowOpacity, y: beat4EyebrowY, textShadow: TEXT_SHADOW_BODY }}
