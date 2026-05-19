@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  animate,
   motion,
+  useMotionValue,
   useReducedMotion,
   useScroll,
   useTransform,
@@ -12,9 +14,6 @@ import barnFinalFrame from "@assets/barn-door-intro-final-frame.jpg?w=640;1024;1
 import barnFirstFrameFallback from "@assets/barn-door-intro-first-frame.jpg";
 
 const barnVideoSrc = "/api/storage/public-objects/barn-door-intro-web.mp4";
-// 80×45 px LQIP — hardcoded so it's in the JS bundle with zero additional
-// network requests. Shown as a blurred background the instant the component
-// mounts, before any image or video fetch completes.
 const BARN_LQIP = "data:image/jpeg;base64,/9j//gAQTGF2YzYwLjMxLjEwMgD/2wBDAAg+Pkk+SVVVVVVVVWRdZGhoaGRkZGRoaGhwcHCDg4NwcHBoaHBwfHyDg4+Tj4eHg4eTk5ubm7q6srLZ2eD/////xABiAAADAQEBAQEAAAAAAAAAAAAFBgQDAgEABwEBAQEBAAAAAAAAAAAAAAAAAwIBABAAAgEEAgIDAQAAAAAAAAAAAAEREiExAkEDgXFhUTKREQEAAAAAAAAAAAAAAAAAAAAA/8AAEQgALQBQAwEiAAIRAAMRAP/aAAwDAQACEQMRAD8A/BSxGcHcBkHP0vkmSg71wwzFRCwiDqkdtEpUx5Znur8eDmkpqYKvyvkItU+4Am2EY4GMCqJPoEGaOtJ76p4kKduq12hYFJSErkKbQhppSWcSKeApCzcEy6XVBvsqXlP+gBXaj7Gul1uU+Q1lhoEOyHZ6q+bOBaiecCje9SW26TNOxKvZLEgSh/Z4lHscKUvkCFhqVHIyoAJSGgyDisFKmLcnchEat5FhO7DYEaLSpBTOCRiDf//Z";
 
 const NAV_REVEAL_AT = 0.92;
@@ -24,8 +23,25 @@ const TEXT_SHADOW_HEAD = "0 2px 24px rgba(0,0,0,0.85), 0 1px 4px rgba(0,0,0,0.95
 const TEXT_SHADOW_HERO = "0 2px 32px rgba(0,0,0,0.9), 0 1px 6px rgba(0,0,0,0.95)";
 const TEXT_SHADOW_PARA = "0 1px 12px rgba(0,0,0,0.9)";
 
+// Progress values at which each beat is fully in view for the tap-advance mode
+const STEP_PROGRESS = [0.13, 0.42, 0.65, 0.95] as const;
+const NUM_STEPS = STEP_PROGRESS.length;
+
+function useIsTouchDevice() {
+  const [isTouch, setIsTouch] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(pointer: coarse)");
+    setIsTouch(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsTouch(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  return isTouch;
+}
+
 export function BarnDoorIntro() {
   const reduce = useReducedMotion();
+  const isTouch = useIsTouchDevice();
   const trackRef = useRef<HTMLDivElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const rafRef = useRef<number | null>(null);
@@ -33,7 +49,12 @@ export function BarnDoorIntro() {
   const posterImgRef = useRef<HTMLImageElement | null>(null);
   const { setIntroActive, setNavRevealed } = useIntroVisibility();
 
-  // Responsive values: slide distance and track height change at the md breakpoint
+  // ── Touch-step state ────────────────────────────────────────────────────────
+  const [step, setStep] = useState(0);
+  const touchStartY = useRef<number | null>(null);
+  const touchStartX = useRef<number | null>(null);
+
+  // ── Responsive values for the scroll-scrub (desktop only) ──────────────────
   const isMd = typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches;
   const [slidePx, setSlidePx] = useState<number>(() => (isMd ? 60 : 30));
   const [trackHeightVh, setTrackHeightVh] = useState<number>(() => (isMd ? 450 : 380));
@@ -44,113 +65,96 @@ export function BarnDoorIntro() {
       setTrackHeightVh(e.matches ? 450 : 380);
     };
     mq.addEventListener("change", update);
-    // Sync on mount in case SSR/hydration differed
     setSlidePx(mq.matches ? 60 : 30);
     setTrackHeightVh(mq.matches ? 450 : 380);
     return () => mq.removeEventListener("change", update);
   }, []);
+
+  // ── Unified progress motion value ───────────────────────────────────────────
+  // On desktop this mirrors scrollYProgress; on touch we animate it manually.
+  const effectiveProgress = useMotionValue(0);
 
   const { scrollYProgress } = useScroll({
     target: trackRef,
     offset: ["start start", "end end"],
   });
 
-  // Video parallax: subtle pull-in scale across the full scroll range
-  const videoScale = useTransform(scrollYProgress, [0, 1], [1.0, 1.06]);
+  // Sync scrollYProgress → effectiveProgress on desktop
+  useEffect(() => {
+    if (isTouch || reduce) return;
+    return scrollYProgress.on("change", (v) => effectiveProgress.set(v));
+  }, [isTouch, reduce, scrollYProgress, effectiveProgress]);
 
-  // ── Beat 1 (0–28%): left-anchored ──────────────────────────────────────────
-  const beat1Opacity = useTransform(
-    scrollYProgress,
-    [0, 0.04, 0.22, 0.28],
-    [1, 1, 1, 0],
-  );
-  const beat1Y = useTransform(scrollYProgress, [0, 0.28], [0, -10]);
-  // Beat 1 is visible from scroll=0 — start in place, drift apart on exit
-  const beat1HeadX = useTransform(
-    scrollYProgress,
-    [0.10, 0.28],
-    reduce ? [0, 0] : [0, -slidePx * 0.5],
-  );
-  // Italic line drifts the opposite direction on exit
-  const beat1ItalicX = useTransform(
-    scrollYProgress,
-    [0.10, 0.28],
-    reduce ? [0, 0] : [0, slidePx * 0.5],
-  );
+  // Animate effectiveProgress to the target when the touch step changes
+  useEffect(() => {
+    if (!isTouch || reduce) return;
+    void animate(effectiveProgress, STEP_PROGRESS[step], {
+      duration: 0.55,
+      ease: [0.32, 0, 0.67, 0],
+    });
+  }, [isTouch, reduce, step, effectiveProgress]);
 
-  // ── Beat 2 (28–54%): right-offset ──────────────────────────────────────────
-  const beat2Opacity = useTransform(
-    scrollYProgress,
-    [0.28, 0.34, 0.50, 0.54],
-    [0, 1, 1, 0],
-  );
-  const beat2Y = useTransform(scrollYProgress, [0.28, 0.54], [12, -8]);
-  // Headline slides in from the right
-  const beat2HeadX = useTransform(
-    scrollYProgress,
-    [0.28, 0.38],
-    reduce ? [0, 0] : [slidePx, 0],
-  );
-  // Body paragraph slides in from the left
-  const beat2BodyX = useTransform(
-    scrollYProgress,
-    [0.30, 0.40],
-    reduce ? [0, 0] : [-slidePx, 0],
-  );
-
-  // ── Beat 3 (54–76%): collision beat ────────────────────────────────────────
-  const beat3Opacity = useTransform(
-    scrollYProgress,
-    [0.54, 0.60, 0.72, 0.76],
-    [0, 1, 1, 0],
-  );
-  const beat3Y = useTransform(scrollYProgress, [0.54, 0.76], [10, -8]);
-  // Left phrase slides in from the left
-  const beat3LeftX = useTransform(
-    scrollYProgress,
-    [0.54, 0.65],
-    reduce ? [0, 0] : [-slidePx, 0],
-  );
-  // Right phrase slides in from the right — they collide at center
-  const beat3RightX = useTransform(
-    scrollYProgress,
-    [0.54, 0.65],
-    reduce ? [0, 0] : [slidePx, 0],
+  // ── Video seek driven by effectiveProgress ──────────────────────────────────
+  const seekVideo = useCallback(
+    (progress: number) => {
+      const video = videoRef.current;
+      if (!video) return;
+      const duration = Number.isFinite(video.duration) ? video.duration : 0;
+      if (!duration) return;
+      const FIRST_VISIBLE_T = 0.5;
+      const target = FIRST_VISIBLE_T + progress * (duration - FIRST_VISIBLE_T);
+      if (Math.abs(video.currentTime - target) < 0.016) return;
+      pendingTimeRef.current = target;
+      if (rafRef.current != null) return;
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = null;
+        const t = pendingTimeRef.current;
+        pendingTimeRef.current = null;
+        if (t == null) return;
+        const vid = videoRef.current;
+        if (!vid) return;
+        if (Math.abs(vid.currentTime - t) < 0.016) return;
+        try {
+          vid.currentTime = t;
+        } catch {
+          /* ignore seek errors during teardown */
+        }
+      });
+    },
+    [],
   );
 
-  // ── Beat 4 (76–100%): staggered per-element reveals ────────────────────────
-  const beat4ContainerOpacity = useTransform(
-    scrollYProgress,
-    [0.76, 0.84, 1],
-    [0, 1, 1],
-  );
-  const beat4EyebrowOpacity = useTransform(scrollYProgress, [0.76, 0.82], [0, 1]);
-  const beat4EyebrowY = useTransform(scrollYProgress, [0.76, 0.84], [16, 0]);
+  // Native scroll handler for desktop
+  const handleScroll = useCallback(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const viewH = window.innerHeight;
+    const trackH = el.offsetHeight;
+    const progress = Math.max(0, Math.min(1, -rect.top / (trackH - viewH)));
+    setNavRevealed(progress >= NAV_REVEAL_AT);
+    seekVideo(progress);
+  }, [setNavRevealed, seekVideo]);
 
-  const beat4RuleOpacity = useTransform(scrollYProgress, [0.78, 0.84], [0, 1]);
-  const beat4RuleY = useTransform(scrollYProgress, [0.78, 0.86], [16, 0]);
+  useEffect(() => {
+    if (isTouch || reduce) return;
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (rafRef.current != null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+    };
+  }, [isTouch, reduce, handleScroll]);
 
-  const beat4H1Line1Opacity = useTransform(scrollYProgress, [0.80, 0.86], [0, 1]);
-  const beat4H1Line1Y = useTransform(scrollYProgress, [0.80, 0.88], [16, 0]);
-
-  const beat4H1Line2Opacity = useTransform(scrollYProgress, [0.82, 0.88], [0, 1]);
-  const beat4H1Line2Y = useTransform(scrollYProgress, [0.82, 0.90], [16, 0]);
-
-  const beat4ParaOpacity = useTransform(scrollYProgress, [0.84, 0.90], [0, 1]);
-  const beat4ParaY = useTransform(scrollYProgress, [0.84, 0.92], [16, 0]);
-
-  const beat4ButtonsOpacity = useTransform(scrollYProgress, [0.86, 0.94], [0, 1]);
-  const beat4ButtonsY = useTransform(scrollYProgress, [0.86, 0.96], [20, 0]);
-
-  // Vignette intensifies at the end so text reads on the final frame
-  const vignetteOpacity = useTransform(
-    scrollYProgress,
-    [0, 0.7, 1],
-    [0.25, 0.35, 0.55],
-  );
-
-  // Scroll hint fades out immediately
-  const scrollHintOpacity = useTransform(scrollYProgress, [0, 0.06], [1, 0]);
+  // Seek video when step changes on touch
+  useEffect(() => {
+    if (!isTouch || reduce) return;
+    seekVideo(STEP_PROGRESS[step]);
+    setNavRevealed(step === NUM_STEPS - 1);
+  }, [isTouch, reduce, step, setNavRevealed, seekVideo]);
 
   // Fallback: clear LQIP overlay after 2s in case the video seek never fires
   // (common on iOS Safari with cellular connections or slow servers).
@@ -164,7 +168,7 @@ export function BarnDoorIntro() {
     return () => window.clearTimeout(t);
   }, [reduce]);
 
-  // Mark intro as active for navbar hiding
+  // ── Intro active state ──────────────────────────────────────────────────────
   useEffect(() => {
     if (reduce) {
       setIntroActive(false);
@@ -178,57 +182,83 @@ export function BarnDoorIntro() {
     };
   }, [reduce, setIntroActive, setNavRevealed]);
 
-  // Native scroll handler — drives video seek + navbar reveal.
-  const handleScroll = useCallback(() => {
-    const el = trackRef.current;
-    if (!el) return;
+  // ── Touch gesture handlers ──────────────────────────────────────────────────
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY;
+    touchStartX.current = e.touches[0].clientX;
+  }, []);
 
-    const rect = el.getBoundingClientRect();
-    const viewH = window.innerHeight;
-    const trackH = el.offsetHeight;
-    const progress = Math.max(0, Math.min(1, -rect.top / (trackH - viewH)));
+  const handleTouchEnd = useCallback(
+    (e: React.TouchEvent) => {
+      if (touchStartY.current == null) return;
+      const dy = touchStartY.current - e.changedTouches[0].clientY;
+      const dx = Math.abs(e.changedTouches[0].clientX - (touchStartX.current ?? 0));
+      touchStartY.current = null;
+      touchStartX.current = null;
 
-    setNavRevealed(progress >= NAV_REVEAL_AT);
+      const isHorizontalSwipe = dx > Math.abs(dy) && dx > 20;
+      if (isHorizontalSwipe) return;
 
-    const video = videoRef.current;
-    if (!video) return;
-    const duration = Number.isFinite(video.duration) ? video.duration : 0;
-    if (!duration) return;
-    const FIRST_VISIBLE_T = 0.5;
-    const target = FIRST_VISIBLE_T + progress * (duration - FIRST_VISIBLE_T);
-    if (Math.abs(video.currentTime - target) < 0.016) return;
-    pendingTimeRef.current = target;
-    if (rafRef.current != null) return;
-    rafRef.current = requestAnimationFrame(() => {
-      rafRef.current = null;
-      const t = pendingTimeRef.current;
-      pendingTimeRef.current = null;
-      if (t == null) return;
-      const vid = videoRef.current;
-      if (!vid) return;
-      if (Math.abs(vid.currentTime - t) < 0.016) return;
-      try {
-        vid.currentTime = t;
-      } catch {
-        /* ignore seek errors during teardown */
+      if (dy > 30) {
+        // Swipe up → advance
+        setStep((s) => Math.min(s + 1, NUM_STEPS - 1));
+      } else if (dy < -30) {
+        // Swipe down → go back
+        setStep((s) => Math.max(s - 1, 0));
+      } else {
+        // Tap → advance
+        setStep((s) => Math.min(s + 1, NUM_STEPS - 1));
       }
-    });
-  }, [setNavRevealed]);
+    },
+    [],
+  );
 
-  useEffect(() => {
-    if (reduce) return;
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      if (rafRef.current != null) {
-        cancelAnimationFrame(rafRef.current);
-        rafRef.current = null;
-      }
-    };
-  }, [reduce, handleScroll]);
+  // ── Motion values (all driven by effectiveProgress) ─────────────────────────
+  const videoScale = useTransform(effectiveProgress, [0, 1], [1.0, 1.06]);
 
-  // ---------- Reduced motion: static composition, no scroll spacer ----------
+  const beat1Opacity = useTransform(effectiveProgress, [0, 0.04, 0.22, 0.28], [1, 1, 1, 0]);
+  const beat1Y = useTransform(effectiveProgress, [0, 0.28], [0, -10]);
+  // Beat 1 is visible from progress=0 — start in place, drift apart on exit
+  const beat1HeadX = useTransform(
+    effectiveProgress,
+    [0.10, 0.28],
+    reduce ? [0, 0] : [0, -slidePx * 0.5],
+  );
+  // Italic line drifts the opposite direction on exit
+  const beat1ItalicX = useTransform(
+    effectiveProgress,
+    [0.10, 0.28],
+    reduce ? [0, 0] : [0, slidePx * 0.5],
+  );
+
+  const beat2Opacity = useTransform(effectiveProgress, [0.28, 0.34, 0.50, 0.54], [0, 1, 1, 0]);
+  const beat2Y = useTransform(effectiveProgress, [0.28, 0.54], [12, -8]);
+  const beat2HeadX = useTransform(effectiveProgress, [0.28, 0.38], reduce ? [0, 0] : [slidePx, 0]);
+  const beat2BodyX = useTransform(effectiveProgress, [0.30, 0.40], reduce ? [0, 0] : [-slidePx, 0]);
+
+  const beat3Opacity = useTransform(effectiveProgress, [0.54, 0.60, 0.72, 0.76], [0, 1, 1, 0]);
+  const beat3Y = useTransform(effectiveProgress, [0.54, 0.76], [10, -8]);
+  const beat3LeftX = useTransform(effectiveProgress, [0.54, 0.65], reduce ? [0, 0] : [-slidePx, 0]);
+  const beat3RightX = useTransform(effectiveProgress, [0.54, 0.65], reduce ? [0, 0] : [slidePx, 0]);
+
+  const beat4ContainerOpacity = useTransform(effectiveProgress, [0.76, 0.84, 1], [0, 1, 1]);
+  const beat4EyebrowOpacity = useTransform(effectiveProgress, [0.76, 0.82], [0, 1]);
+  const beat4EyebrowY = useTransform(effectiveProgress, [0.76, 0.84], [16, 0]);
+  const beat4RuleOpacity = useTransform(effectiveProgress, [0.78, 0.84], [0, 1]);
+  const beat4RuleY = useTransform(effectiveProgress, [0.78, 0.86], [16, 0]);
+  const beat4H1Line1Opacity = useTransform(effectiveProgress, [0.80, 0.86], [0, 1]);
+  const beat4H1Line1Y = useTransform(effectiveProgress, [0.80, 0.88], [16, 0]);
+  const beat4H1Line2Opacity = useTransform(effectiveProgress, [0.82, 0.88], [0, 1]);
+  const beat4H1Line2Y = useTransform(effectiveProgress, [0.82, 0.90], [16, 0]);
+  const beat4ParaOpacity = useTransform(effectiveProgress, [0.84, 0.90], [0, 1]);
+  const beat4ParaY = useTransform(effectiveProgress, [0.84, 0.92], [16, 0]);
+  const beat4ButtonsOpacity = useTransform(effectiveProgress, [0.86, 0.94], [0, 1]);
+  const beat4ButtonsY = useTransform(effectiveProgress, [0.86, 0.96], [20, 0]);
+
+  const vignetteOpacity = useTransform(effectiveProgress, [0, 0.7, 1], [0.25, 0.35, 0.55]);
+  const scrollHintOpacity = useTransform(effectiveProgress, [0, 0.06], [1, 0]);
+
+  // ── Reduced-motion: static composition ─────────────────────────────────────
   if (reduce) {
     return (
       <section className="relative h-screen min-h-[760px] w-full overflow-hidden bg-black">
@@ -271,7 +301,293 @@ export function BarnDoorIntro() {
     );
   }
 
-  // ---------- Full scroll-scrubbed cinematic intro ----------
+  // ── Shared sticky stage (used by both scroll and touch paths) ───────────────
+  const stage = (
+    <div
+      className="sticky top-0 h-screen h-svh w-full overflow-hidden bg-black"
+    >
+      {/* High-quality static fallback — always visible under the video */}
+      <div className="absolute inset-0">
+        <ResponsiveImage
+          image={barnFinalFrame}
+          alt=""
+          aria-hidden="true"
+          fetchPriority="high"
+          decoding="async"
+          sizes="100vw"
+          pictureClassName="block w-full h-full"
+          className="w-full h-full object-cover"
+        />
+      </div>
+
+      {/* Video layer with parallax scale */}
+      <motion.div
+        style={{ scale: videoScale }}
+        className="absolute inset-0 will-change-transform"
+      >
+        <video
+          ref={videoRef}
+          src={barnVideoSrc}
+          muted
+          playsInline
+          autoPlay={false}
+          preload="metadata"
+          disablePictureInPicture
+          disableRemotePlayback
+          aria-hidden="true"
+          onLoadedMetadata={(e) => {
+            try {
+              const vid = e.currentTarget;
+              const onSeeked = () => {
+                vid.removeEventListener("seeked", onSeeked);
+                if (posterImgRef.current) {
+                  posterImgRef.current.style.transition = "opacity 0.4s";
+                  posterImgRef.current.style.opacity = "0";
+                }
+              };
+              vid.addEventListener("seeked", onSeeked);
+              vid.currentTime = 0.5;
+            } catch {
+              /* ignore */
+            }
+          }}
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{ backgroundColor: "transparent" }}
+        />
+      </motion.div>
+
+      {/* LQIP overlay — shows instantly on mount, cleared by seek or 2s timeout */}
+      <img
+        ref={posterImgRef}
+        src={BARN_LQIP}
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+        style={{ opacity: 1, transition: "opacity 0.6s" }}
+      />
+
+      {/* Cinematic vignette */}
+      <motion.div
+        aria-hidden="true"
+        style={{ opacity: vignetteOpacity }}
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.65)_100%)]"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-black/40"
+      />
+
+      {/* ── Beat 1 ── */}
+      <motion.div
+        style={{ opacity: beat1Opacity, y: beat1Y }}
+        className="absolute inset-0 grid grid-cols-12 items-center will-change-transform px-6 md:px-16 lg:px-24"
+      >
+        <div className="col-span-12 md:col-span-7 md:col-start-1">
+          <motion.p
+            style={{ x: beat1HeadX, textShadow: TEXT_SHADOW_BODY }}
+            className="text-[0.65rem] sm:text-[0.7rem] font-sans tracking-[0.32em] text-white/85 uppercase mb-5 will-change-transform"
+          >
+            Susie H. Lytal, MS · Equine Biomechanist
+          </motion.p>
+          <motion.span
+            style={{ x: beat1HeadX }}
+            className="block mb-6 gold-rule will-change-transform"
+            aria-hidden="true"
+          />
+          <motion.div
+            style={{ x: beat1HeadX, textShadow: TEXT_SHADOW_HEAD }}
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-white leading-[1.05] tracking-tight will-change-transform"
+          >
+            For the horses
+          </motion.div>
+          <motion.div
+            style={{ x: beat1ItalicX, textShadow: TEXT_SHADOW_HEAD }}
+            className="italic text-accent/90 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif leading-[1.05] tracking-tight will-change-transform"
+          >
+            you love most.
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* ── Beat 2 ── */}
+      <motion.div
+        style={{ opacity: beat2Opacity, y: beat2Y }}
+        className="absolute inset-0 grid grid-cols-12 items-center will-change-transform px-6 md:px-16 lg:px-24"
+      >
+        <div className="col-span-12 md:col-span-8 md:col-start-5 text-center md:text-right">
+          <motion.span
+            style={{ x: beat2HeadX }}
+            className="block mb-6 gold-rule mx-auto md:ml-auto will-change-transform"
+            aria-hidden="true"
+          />
+          <motion.div
+            style={{ x: beat2HeadX, textShadow: TEXT_SHADOW_HEAD }}
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif text-white leading-[1.08] tracking-tight will-change-transform"
+          >
+            Graduate-level biomechanics.
+            <span className="block italic text-accent/90 mt-1">
+              Hands that listen.
+            </span>
+          </motion.div>
+          <motion.p
+            style={{ x: beat2BodyX, textShadow: TEXT_SHADOW_PARA }}
+            className="mt-6 max-w-lg text-base md:text-lg text-white/80 font-light leading-relaxed will-change-transform mx-auto md:ml-auto"
+          >
+            Wellness sessions in partnership with your veterinarian — grounded
+            in science, delivered with compassion.
+          </motion.p>
+        </div>
+      </motion.div>
+
+      {/* ── Beat 3: collision ── */}
+      <motion.div
+        style={{ opacity: beat3Opacity, y: beat3Y }}
+        className="absolute inset-0 flex items-center justify-center will-change-transform px-6"
+      >
+        <div className="text-center" aria-label="Where science meets the horse.">
+          <div className="flex flex-wrap items-baseline justify-center gap-x-3 gap-y-0">
+            <motion.span
+              style={{ x: beat3LeftX }}
+              className="inline-block font-serif text-white leading-[1.0] tracking-tight will-change-transform"
+            >
+              <span
+                style={{
+                  fontSize: "clamp(2.5rem, 7vw, 6rem)",
+                  textShadow: TEXT_SHADOW_HERO,
+                  display: "block",
+                }}
+              >
+                Where science
+              </span>
+            </motion.span>
+            <motion.span
+              style={{ x: beat3RightX }}
+              className="inline-block font-serif italic text-gold-gradient leading-[1.0] tracking-tight will-change-transform"
+            >
+              <span
+                style={{
+                  fontSize: "clamp(2.5rem, 7vw, 6rem)",
+                  display: "block",
+                }}
+              >
+                meets the horse.
+              </span>
+            </motion.span>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* ── Beat 4: final brand mark ── */}
+      <motion.div
+        style={{ opacity: beat4ContainerOpacity }}
+        className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center will-change-transform"
+      >
+        <motion.p
+          style={{ opacity: beat4EyebrowOpacity, y: beat4EyebrowY, textShadow: TEXT_SHADOW_BODY }}
+          className="text-[0.65rem] sm:text-[0.7rem] font-sans tracking-[0.32em] text-white/85 uppercase mb-5 will-change-transform"
+        >
+          Welcome
+        </motion.p>
+
+        <motion.span
+          aria-hidden="true"
+          style={{ opacity: beat4RuleOpacity, y: beat4RuleY }}
+          className="block mx-auto mb-6 gold-rule will-change-transform"
+        />
+
+        <h1
+          className="font-serif text-white leading-[1.02] tracking-tight max-w-5xl"
+          style={{ fontSize: "clamp(2.75rem, 8vw, 6.5rem)" }}
+        >
+          <motion.span
+            style={{ opacity: beat4H1Line1Opacity, y: beat4H1Line1Y, textShadow: TEXT_SHADOW_HERO }}
+            className="block will-change-transform"
+          >
+            Equine Bodywork
+          </motion.span>
+          <motion.span
+            style={{ opacity: beat4H1Line2Opacity, y: beat4H1Line2Y }}
+            className="block italic text-gold-gradient will-change-transform"
+          >
+            & Wellness Consulting
+          </motion.span>
+        </h1>
+
+        <motion.p
+          style={{ opacity: beat4ParaOpacity, y: beat4ParaY, textShadow: TEXT_SHADOW_PARA }}
+          className="mt-6 max-w-2xl text-base md:text-lg text-white/85 font-light leading-relaxed will-change-transform"
+        >
+          Sports massage, PEMF, red light, cold laser, TENS, and TECAR —
+          tailored to your horse.
+        </motion.p>
+
+        <motion.div
+          style={{ opacity: beat4ButtonsOpacity, y: beat4ButtonsY }}
+          className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 will-change-transform"
+        >
+          <a
+            href="tel:+13104884389"
+            className="bg-gold-metallic shadow-gold-glow inline-flex h-12 items-center justify-center gap-2 rounded-full px-8 text-base font-medium hover:shadow-gold-glow-lg"
+            data-testid="link-intro-call"
+          >
+            <Phone className="h-4 w-4" />
+            (310) 488-4389
+          </a>
+          <a
+            href="#after-intro"
+            className="inline-flex h-12 items-center justify-center rounded-full bg-white/10 px-8 text-base font-medium text-white backdrop-blur-md hover:bg-white/20 border border-white/20"
+            data-testid="link-intro-continue"
+          >
+            Continue
+          </a>
+        </motion.div>
+      </motion.div>
+
+      {/* Hint — "Scroll" on desktop, "Tap to continue" on touch */}
+      <motion.div
+        aria-hidden="true"
+        style={{ opacity: scrollHintOpacity }}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[0.6rem] font-sans tracking-[0.32em] text-white/85 uppercase pointer-events-none"
+      >
+        {isTouch ? "Tap to continue" : "Scroll"}
+      </motion.div>
+
+      {/* Touch-mode step dots */}
+      {isTouch && (
+        <div
+          aria-hidden="true"
+          className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2"
+        >
+          {STEP_PROGRESS.map((_, i) => (
+            <div
+              key={i}
+              className="h-1.5 w-1.5 rounded-full transition-all duration-300"
+              style={{
+                backgroundColor: i === step ? "hsl(var(--primary))" : "rgba(255,255,255,0.35)",
+                transform: i === step ? "scale(1.4)" : "scale(1)",
+              }}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  // ── Touch path: single-screen, gesture-driven ───────────────────────────────
+  if (isTouch) {
+    return (
+      <div
+        data-testid="barn-door-intro"
+        className="relative w-full bg-black"
+        style={{ marginTop: "-5rem", height: "calc(100vh + 5rem)" }}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        {stage}
+      </div>
+    );
+  }
+
+  // ── Desktop path: scroll-scrubbed ──────────────────────────────────────────
   return (
     <div
       ref={trackRef}
@@ -282,256 +598,7 @@ export function BarnDoorIntro() {
       }}
       data-testid="barn-door-intro"
     >
-      <div
-        className="sticky top-0 h-screen h-svh w-full overflow-hidden bg-black"
-      >
-        {/* High-quality static fallback — always visible under the video */}
-        <div className="absolute inset-0">
-          <ResponsiveImage
-            image={barnFinalFrame}
-            alt=""
-            aria-hidden="true"
-            fetchPriority="high"
-            decoding="async"
-            sizes="100vw"
-            pictureClassName="block w-full h-full"
-            className="w-full h-full object-cover"
-          />
-        </div>
-
-        {/* Video layer with parallax scale */}
-        <motion.div
-          style={{ scale: videoScale }}
-          className="absolute inset-0 will-change-transform"
-        >
-          <video
-            ref={videoRef}
-            src={barnVideoSrc}
-            muted
-            playsInline
-            autoPlay={false}
-            preload="metadata"
-            disablePictureInPicture
-            disableRemotePlayback
-            aria-hidden="true"
-            onLoadedMetadata={(e) => {
-              try {
-                const vid = e.currentTarget;
-                const onSeeked = () => {
-                  vid.removeEventListener("seeked", onSeeked);
-                  if (posterImgRef.current) {
-                    posterImgRef.current.style.transition = "opacity 0.4s";
-                    posterImgRef.current.style.opacity = "0";
-                  }
-                };
-                vid.addEventListener("seeked", onSeeked);
-                vid.currentTime = 0.5;
-              } catch {
-                /* ignore */
-              }
-            }}
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ backgroundColor: "transparent" }}
-          />
-        </motion.div>
-
-        {/* LQIP overlay — shows instantly on mount, cleared by seek or 2s timeout */}
-        <img
-          ref={posterImgRef}
-          src={BARN_LQIP}
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 h-full w-full object-cover"
-          style={{ opacity: 1, transition: "opacity 0.6s" }}
-        />
-
-        {/* Cinematic vignette */}
-        <motion.div
-          aria-hidden="true"
-          style={{ opacity: vignetteOpacity }}
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.65)_100%)]"
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-black/40"
-        />
-
-        {/* ── Beat 1: left-anchored grid — col 1–7, text slides left↔right ── */}
-        <motion.div
-          style={{ opacity: beat1Opacity, y: beat1Y }}
-          className="absolute inset-0 grid grid-cols-12 items-center will-change-transform px-6 md:px-16 lg:px-24"
-        >
-          {/* Columns 1–7 (left ~58% of viewport) */}
-          <div className="col-span-12 md:col-span-7 md:col-start-1">
-            <motion.p
-              style={{ x: beat1HeadX, textShadow: TEXT_SHADOW_BODY }}
-              className="text-[0.65rem] sm:text-[0.7rem] font-sans tracking-[0.32em] text-white/85 uppercase mb-5 will-change-transform"
-            >
-              Susie H. Lytal, MS · Equine Biomechanist
-            </motion.p>
-            <motion.span
-              style={{ x: beat1HeadX }}
-              className="block mb-6 gold-rule will-change-transform"
-              aria-hidden="true"
-            />
-            <motion.div
-              style={{ x: beat1HeadX, textShadow: TEXT_SHADOW_HEAD }}
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-white leading-[1.05] tracking-tight will-change-transform"
-            >
-              For the horses
-            </motion.div>
-            <motion.div
-              style={{ x: beat1ItalicX, textShadow: TEXT_SHADOW_HEAD }}
-              className="italic text-accent/90 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif leading-[1.05] tracking-tight will-change-transform"
-            >
-              you love most.
-            </motion.div>
-          </div>
-        </motion.div>
-
-        {/* ── Beat 2: right-anchored grid — col 5–12, headline right, body left ── */}
-        <motion.div
-          style={{ opacity: beat2Opacity, y: beat2Y }}
-          className="absolute inset-0 grid grid-cols-12 items-center will-change-transform px-6 md:px-16 lg:px-24"
-        >
-          {/* Columns 5–12 (right ~67% of viewport) */}
-          <div className="col-span-12 md:col-span-8 md:col-start-5 text-center md:text-right">
-            <motion.span
-              style={{ x: beat2HeadX }}
-              className="block mb-6 gold-rule mx-auto md:ml-auto will-change-transform"
-              aria-hidden="true"
-            />
-            <motion.div
-              style={{ x: beat2HeadX, textShadow: TEXT_SHADOW_HEAD }}
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif text-white leading-[1.08] tracking-tight will-change-transform"
-            >
-              Graduate-level biomechanics.
-              <span className="block italic text-accent/90 mt-1">
-                Hands that listen.
-              </span>
-            </motion.div>
-            <motion.p
-              style={{ x: beat2BodyX, textShadow: TEXT_SHADOW_PARA }}
-              className="mt-6 max-w-lg text-base md:text-lg text-white/80 font-light leading-relaxed will-change-transform mx-auto md:ml-auto"
-            >
-              Wellness sessions in partnership with your veterinarian — grounded
-              in science, delivered with compassion.
-            </motion.p>
-          </div>
-        </motion.div>
-
-        {/* ── Beat 3: collision beat — two phrases enter from opposite sides ── */}
-        <motion.div
-          style={{ opacity: beat3Opacity, y: beat3Y }}
-          className="absolute inset-0 flex items-center justify-center will-change-transform px-6"
-        >
-          <div className="text-center" aria-label="Where science meets the horse.">
-            <div className="flex flex-wrap items-baseline justify-center gap-x-3 gap-y-0">
-              <motion.span
-                style={{ x: beat3LeftX }}
-                className="inline-block font-serif text-white leading-[1.0] tracking-tight will-change-transform"
-              >
-                <span
-                  style={{
-                    fontSize: "clamp(2.5rem, 7vw, 6rem)",
-                    textShadow: TEXT_SHADOW_HERO,
-                    display: "block",
-                  }}
-                >
-                  Where science
-                </span>
-              </motion.span>
-              <motion.span
-                style={{ x: beat3RightX }}
-                className="inline-block font-serif italic text-gold-gradient leading-[1.0] tracking-tight will-change-transform"
-              >
-                <span
-                  style={{
-                    fontSize: "clamp(2.5rem, 7vw, 6rem)",
-                    display: "block",
-                  }}
-                >
-                  meets the horse.
-                </span>
-              </motion.span>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* ── Beat 4: final brand mark — each element staggers up ── */}
-        <motion.div
-          style={{ opacity: beat4ContainerOpacity }}
-          className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center will-change-transform"
-        >
-          <motion.p
-            style={{ opacity: beat4EyebrowOpacity, y: beat4EyebrowY, textShadow: TEXT_SHADOW_BODY }}
-            className="text-[0.65rem] sm:text-[0.7rem] font-sans tracking-[0.32em] text-white/85 uppercase mb-5 will-change-transform"
-          >
-            Welcome
-          </motion.p>
-
-          <motion.span
-            aria-hidden="true"
-            style={{ opacity: beat4RuleOpacity, y: beat4RuleY }}
-            className="block mx-auto mb-6 gold-rule will-change-transform"
-          />
-
-          <h1
-            className="font-serif text-white leading-[1.02] tracking-tight max-w-5xl"
-            style={{ fontSize: "clamp(2.75rem, 8vw, 6.5rem)" }}
-          >
-            <motion.span
-              style={{ opacity: beat4H1Line1Opacity, y: beat4H1Line1Y, textShadow: TEXT_SHADOW_HERO }}
-              className="block will-change-transform"
-            >
-              Equine Bodywork
-            </motion.span>
-            <motion.span
-              style={{ opacity: beat4H1Line2Opacity, y: beat4H1Line2Y }}
-              className="block italic text-gold-gradient will-change-transform"
-            >
-              & Wellness Consulting
-            </motion.span>
-          </h1>
-
-          <motion.p
-            style={{ opacity: beat4ParaOpacity, y: beat4ParaY, textShadow: TEXT_SHADOW_PARA }}
-            className="mt-6 max-w-2xl text-base md:text-lg text-white/85 font-light leading-relaxed will-change-transform"
-          >
-            Sports massage, PEMF, red light, cold laser, TENS, and TECAR —
-            tailored to your horse.
-          </motion.p>
-
-          <motion.div
-            style={{ opacity: beat4ButtonsOpacity, y: beat4ButtonsY }}
-            className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 will-change-transform"
-          >
-            <a
-              href="tel:+13104884389"
-              className="bg-gold-metallic shadow-gold-glow inline-flex h-12 items-center justify-center gap-2 rounded-full px-8 text-base font-medium hover:shadow-gold-glow-lg"
-              data-testid="link-intro-call"
-            >
-              <Phone className="h-4 w-4" />
-              (310) 488-4389
-            </a>
-            <a
-              href="#after-intro"
-              className="inline-flex h-12 items-center justify-center rounded-full bg-white/10 px-8 text-base font-medium text-white backdrop-blur-md hover:bg-white/20 border border-white/20"
-              data-testid="link-intro-continue"
-            >
-              Continue
-            </a>
-          </motion.div>
-        </motion.div>
-
-        {/* Scroll hint — visible only at the very start */}
-        <motion.div
-          aria-hidden="true"
-          style={{ opacity: scrollHintOpacity }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[0.6rem] font-sans tracking-[0.32em] text-white/85 uppercase"
-        >
-          Scroll
-        </motion.div>
-      </div>
+      {stage}
     </div>
   );
 }
