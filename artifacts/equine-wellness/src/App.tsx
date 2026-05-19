@@ -166,7 +166,7 @@ function PageWrapper({
   const reduce = useReducedMotion();
 
   if (reduce) {
-    return <div>{children}</div>;
+    return <div className="relative">{children}</div>;
   }
 
   const xEnter = direction === "back" ? -28 : direction === "forward" ? 28 : 0;
@@ -174,6 +174,7 @@ function PageWrapper({
 
   return (
     <motion.div
+      className="relative"
       initial={{ opacity: 0, x: xEnter }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: xExit }}
@@ -258,7 +259,7 @@ function Router() {
   return (
     <div className="flex flex-col min-h-[100dvh]">
       <Navbar />
-      <main className="flex-1">
+      <main className="relative flex-1">
         <AnimatePresence mode="wait" initial={false}>
           <PageWrapper key={location} direction={directionRef.current}>
             <Switch location={location}>

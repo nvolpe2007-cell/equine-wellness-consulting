@@ -65,17 +65,17 @@ export function BarnDoorIntro() {
     [1, 1, 1, 0],
   );
   const beat1Y = useTransform(scrollYProgress, [0, 0.28], [0, -10]);
-  // Headline slides in from the left
+  // Beat 1 is visible from scroll=0 — start in place, drift apart on exit
   const beat1HeadX = useTransform(
     scrollYProgress,
-    [0, 0.08],
-    reduce ? [0, 0] : [-slidePx, 0],
+    [0.10, 0.28],
+    reduce ? [0, 0] : [0, -slidePx * 0.5],
   );
-  // Italic line slides in from the right (slight scroll delay)
+  // Italic line drifts the opposite direction on exit
   const beat1ItalicX = useTransform(
     scrollYProgress,
-    [0.03, 0.12],
-    reduce ? [0, 0] : [slidePx, 0],
+    [0.10, 0.28],
+    reduce ? [0, 0] : [0, slidePx * 0.5],
   );
 
   // ── Beat 2 (28–54%): right-offset ──────────────────────────────────────────
@@ -271,7 +271,7 @@ export function BarnDoorIntro() {
       data-testid="barn-door-intro"
     >
       <div
-        className="sticky top-0 h-screen w-full overflow-hidden"
+        className="sticky top-0 h-screen h-svh w-full overflow-hidden"
         style={{
           backgroundImage: `url(${BARN_LQIP})`,
           backgroundSize: "cover",
@@ -290,7 +290,7 @@ export function BarnDoorIntro() {
             muted
             playsInline
             autoPlay={false}
-            preload="auto"
+            preload="metadata"
             disablePictureInPicture
             disableRemotePlayback
             aria-hidden="true"
