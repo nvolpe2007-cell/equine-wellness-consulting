@@ -3,6 +3,7 @@ import {
   motion,
   useReducedMotion,
   useScroll,
+  useSpring,
   useTransform,
 } from "framer-motion";
 import { ChevronDown, Phone } from "lucide-react";
@@ -50,44 +51,53 @@ export function BarnDoorIntro() {
     offset: ["start start", "end end"],
   });
 
+  // Spring-smoothed progress — gives the "heavy" cinematic inertia feel.
+  // Text animations lag slightly behind scroll then ease into place.
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 50,
+    damping: 20,
+    mass: 1.8,
+    restDelta: 0.0005,
+  });
+
   // Video parallax: subtle pull-in scale
-  const videoScale = useTransform(scrollYProgress, [0, 1], [1.0, 1.06]);
+  const videoScale = useTransform(smoothProgress, [0, 1], [1.0, 1.06]);
 
   // ── Beat 1 (0–28%): left-anchored ──────────────────────────────────────────
-  const beat1Opacity = useTransform(scrollYProgress, [0, 0.04, 0.22, 0.28], [1, 1, 1, 0]);
-  const beat1Y = useTransform(scrollYProgress, [0, 0.28], [0, -10]);
-  const beat1HeadX = useTransform(scrollYProgress, [0.10, 0.28], reduce ? [0, 0] : [0, -slidePx * 0.5]);
-  const beat1ItalicX = useTransform(scrollYProgress, [0.10, 0.28], reduce ? [0, 0] : [0, slidePx * 0.5]);
+  const beat1Opacity = useTransform(smoothProgress, [0, 0.04, 0.22, 0.28], [1, 1, 1, 0]);
+  const beat1Y = useTransform(smoothProgress, [0, 0.28], [0, -10]);
+  const beat1HeadX = useTransform(smoothProgress, [0.10, 0.28], reduce ? [0, 0] : [0, -slidePx * 0.5]);
+  const beat1ItalicX = useTransform(smoothProgress, [0.10, 0.28], reduce ? [0, 0] : [0, slidePx * 0.5]);
 
   // ── Beat 2 (28–54%): right-offset ──────────────────────────────────────────
-  const beat2Opacity = useTransform(scrollYProgress, [0.28, 0.34, 0.50, 0.54], [0, 1, 1, 0]);
-  const beat2Y = useTransform(scrollYProgress, [0.28, 0.54], [12, -8]);
-  const beat2HeadX = useTransform(scrollYProgress, [0.28, 0.38], reduce ? [0, 0] : [slidePx, 0]);
-  const beat2BodyX = useTransform(scrollYProgress, [0.30, 0.40], reduce ? [0, 0] : [-slidePx, 0]);
+  const beat2Opacity = useTransform(smoothProgress, [0.28, 0.34, 0.50, 0.54], [0, 1, 1, 0]);
+  const beat2Y = useTransform(smoothProgress, [0.28, 0.54], [12, -8]);
+  const beat2HeadX = useTransform(smoothProgress, [0.28, 0.38], reduce ? [0, 0] : [slidePx, 0]);
+  const beat2BodyX = useTransform(smoothProgress, [0.30, 0.40], reduce ? [0, 0] : [-slidePx, 0]);
 
   // ── Beat 3 (54–76%): collision ─────────────────────────────────────────────
-  const beat3Opacity = useTransform(scrollYProgress, [0.54, 0.60, 0.72, 0.76], [0, 1, 1, 0]);
-  const beat3Y = useTransform(scrollYProgress, [0.54, 0.76], [10, -8]);
-  const beat3LeftX = useTransform(scrollYProgress, [0.54, 0.65], reduce ? [0, 0] : [-slidePx, 0]);
-  const beat3RightX = useTransform(scrollYProgress, [0.54, 0.65], reduce ? [0, 0] : [slidePx, 0]);
+  const beat3Opacity = useTransform(smoothProgress, [0.54, 0.60, 0.72, 0.76], [0, 1, 1, 0]);
+  const beat3Y = useTransform(smoothProgress, [0.54, 0.76], [10, -8]);
+  const beat3LeftX = useTransform(smoothProgress, [0.54, 0.65], reduce ? [0, 0] : [-slidePx, 0]);
+  const beat3RightX = useTransform(smoothProgress, [0.54, 0.65], reduce ? [0, 0] : [slidePx, 0]);
 
   // ── Beat 4 (76–100%): staggered brand mark ─────────────────────────────────
-  const beat4ContainerOpacity = useTransform(scrollYProgress, [0.76, 0.84, 1], [0, 1, 1]);
-  const beat4EyebrowOpacity = useTransform(scrollYProgress, [0.76, 0.82], [0, 1]);
-  const beat4EyebrowY = useTransform(scrollYProgress, [0.76, 0.84], [16, 0]);
-  const beat4RuleOpacity = useTransform(scrollYProgress, [0.78, 0.84], [0, 1]);
-  const beat4RuleY = useTransform(scrollYProgress, [0.78, 0.86], [16, 0]);
-  const beat4H1Line1Opacity = useTransform(scrollYProgress, [0.80, 0.86], [0, 1]);
-  const beat4H1Line1Y = useTransform(scrollYProgress, [0.80, 0.88], [16, 0]);
-  const beat4H1Line2Opacity = useTransform(scrollYProgress, [0.82, 0.88], [0, 1]);
-  const beat4H1Line2Y = useTransform(scrollYProgress, [0.82, 0.90], [16, 0]);
-  const beat4ParaOpacity = useTransform(scrollYProgress, [0.84, 0.90], [0, 1]);
-  const beat4ParaY = useTransform(scrollYProgress, [0.84, 0.92], [16, 0]);
-  const beat4ButtonsOpacity = useTransform(scrollYProgress, [0.86, 0.94], [0, 1]);
-  const beat4ButtonsY = useTransform(scrollYProgress, [0.86, 0.96], [20, 0]);
+  const beat4ContainerOpacity = useTransform(smoothProgress, [0.76, 0.84, 1], [0, 1, 1]);
+  const beat4EyebrowOpacity = useTransform(smoothProgress, [0.76, 0.82], [0, 1]);
+  const beat4EyebrowY = useTransform(smoothProgress, [0.76, 0.84], [16, 0]);
+  const beat4RuleOpacity = useTransform(smoothProgress, [0.78, 0.84], [0, 1]);
+  const beat4RuleY = useTransform(smoothProgress, [0.78, 0.86], [16, 0]);
+  const beat4H1Line1Opacity = useTransform(smoothProgress, [0.80, 0.86], [0, 1]);
+  const beat4H1Line1Y = useTransform(smoothProgress, [0.80, 0.88], [16, 0]);
+  const beat4H1Line2Opacity = useTransform(smoothProgress, [0.82, 0.88], [0, 1]);
+  const beat4H1Line2Y = useTransform(smoothProgress, [0.82, 0.90], [16, 0]);
+  const beat4ParaOpacity = useTransform(smoothProgress, [0.84, 0.90], [0, 1]);
+  const beat4ParaY = useTransform(smoothProgress, [0.84, 0.92], [16, 0]);
+  const beat4ButtonsOpacity = useTransform(smoothProgress, [0.86, 0.94], [0, 1]);
+  const beat4ButtonsY = useTransform(smoothProgress, [0.86, 0.96], [20, 0]);
 
-  const vignetteOpacity = useTransform(scrollYProgress, [0, 0.7, 1], [0.25, 0.35, 0.55]);
-  const scrollHintOpacity = useTransform(scrollYProgress, [0, 0.08], [1, 0]);
+  const vignetteOpacity = useTransform(smoothProgress, [0, 0.7, 1], [0.25, 0.35, 0.55]);
+  const scrollHintOpacity = useTransform(smoothProgress, [0, 0.08], [1, 0]);
 
   // Fallback: clear LQIP overlay after 2s in case video seek never fires on mobile
   useEffect(() => {
@@ -114,7 +124,9 @@ export function BarnDoorIntro() {
     };
   }, [reduce, setIntroActive, setNavRevealed]);
 
-  // Scroll handler — drives video seek + navbar reveal on all devices
+  // Scroll handler — updates target time + navbar reveal on all devices.
+  // The actual seek happens in a continuous RAF lerp loop so the video
+  // scrubs smoothly rather than jumping frame-to-frame on each scroll event.
   const handleScroll = useCallback(() => {
     const el = trackRef.current;
     if (!el) return;
@@ -129,20 +141,25 @@ export function BarnDoorIntro() {
     const duration = Number.isFinite(video.duration) ? video.duration : 0;
     if (!duration) return;
     const FIRST_VISIBLE_T = 0.5;
-    const target = FIRST_VISIBLE_T + progress * (duration - FIRST_VISIBLE_T);
-    if (Math.abs(video.currentTime - target) < 0.016) return;
-    pendingTimeRef.current = target;
+    pendingTimeRef.current = FIRST_VISIBLE_T + progress * (duration - FIRST_VISIBLE_T);
+
+    // Kick off the lerp loop if it isn't already running
     if (rafRef.current != null) return;
-    rafRef.current = requestAnimationFrame(() => {
-      rafRef.current = null;
-      const t = pendingTimeRef.current;
-      pendingTimeRef.current = null;
-      if (t == null) return;
+    const LERP = 0.12; // closes ~12% of the gap per 60fps frame
+    const step = () => {
       const vid = videoRef.current;
-      if (!vid) return;
-      if (Math.abs(vid.currentTime - t) < 0.016) return;
-      try { vid.currentTime = t; } catch { /* ignore */ }
-    });
+      const target = pendingTimeRef.current;
+      if (!vid || target === null) { rafRef.current = null; return; }
+      const diff = target - vid.currentTime;
+      if (Math.abs(diff) < 0.012) {
+        try { vid.currentTime = target; } catch { /* ignore */ }
+        rafRef.current = null;
+        return;
+      }
+      try { vid.currentTime = vid.currentTime + diff * LERP; } catch { /* ignore */ }
+      rafRef.current = requestAnimationFrame(step);
+    };
+    rafRef.current = requestAnimationFrame(step);
   }, [setNavRevealed]);
 
   useEffect(() => {
