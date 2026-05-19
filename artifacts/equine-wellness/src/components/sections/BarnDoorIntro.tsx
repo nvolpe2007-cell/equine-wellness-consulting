@@ -152,6 +152,18 @@ export function BarnDoorIntro() {
   // Scroll hint fades out immediately
   const scrollHintOpacity = useTransform(scrollYProgress, [0, 0.06], [1, 0]);
 
+  // Fallback: clear LQIP overlay after 2s in case the video seek never fires
+  // (common on iOS Safari with cellular connections or slow servers).
+  useEffect(() => {
+    if (reduce) return;
+    const t = window.setTimeout(() => {
+      if (posterImgRef.current && parseFloat(posterImgRef.current.style.opacity) > 0) {
+        posterImgRef.current.style.opacity = "0";
+      }
+    }, 2000);
+    return () => window.clearTimeout(t);
+  }, [reduce]);
+
   // Mark intro as active for navbar hiding
   useEffect(() => {
     if (reduce) {
@@ -271,13 +283,22 @@ export function BarnDoorIntro() {
       data-testid="barn-door-intro"
     >
       <div
-        className="sticky top-0 h-screen h-svh w-full overflow-hidden"
-        style={{
-          backgroundImage: `url(${BARN_LQIP})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
+        className="sticky top-0 h-screen h-svh w-full overflow-hidden bg-black"
       >
+        {/* High-quality static fallback — always visible under the video */}
+        <div className="absolute inset-0">
+          <ResponsiveImage
+            image={barnFinalFrame}
+            alt=""
+            aria-hidden="true"
+            fetchPriority="high"
+            decoding="async"
+            sizes="100vw"
+            pictureClassName="block w-full h-full"
+            className="w-full h-full object-cover"
+          />
+        </div>
+
         {/* Video layer with parallax scale */}
         <motion.div
           style={{ scale: videoScale }}
@@ -286,7 +307,6 @@ export function BarnDoorIntro() {
           <video
             ref={videoRef}
             src={barnVideoSrc}
-            poster={barnFirstFrameFallback}
             muted
             playsInline
             autoPlay={false}
@@ -300,6 +320,7 @@ export function BarnDoorIntro() {
                 const onSeeked = () => {
                   vid.removeEventListener("seeked", onSeeked);
                   if (posterImgRef.current) {
+                    posterImgRef.current.style.transition = "opacity 0.4s";
                     posterImgRef.current.style.opacity = "0";
                   }
                 };
@@ -314,13 +335,13 @@ export function BarnDoorIntro() {
           />
         </motion.div>
 
-        {/* Poster overlay — hides until initial seek completes */}
+        {/* LQIP overlay — shows instantly on mount, cleared by seek or 2s timeout */}
         <img
           ref={posterImgRef}
           src={BARN_LQIP}
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 h-full w-full object-cover transition-opacity duration-300"
-          style={{ opacity: 1 }}
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+          style={{ opacity: 1, transition: "opacity 0.6s" }}
         />
 
         {/* Cinematic vignette */}
