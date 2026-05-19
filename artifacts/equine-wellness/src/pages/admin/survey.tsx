@@ -217,7 +217,7 @@ function LoginGate({ onLogin }: { onLogin: (token: string) => void }) {
           <button
             type="submit"
             disabled={loading || !password.trim()}
-            className="bg-gold-metallic shadow-gold-glow w-full h-10 rounded-full text-sm font-medium transition-all hover:shadow-gold-glow-lg disabled:opacity-60 disabled:cursor-not-allowed"
+            className={cn("bg-gold-metallic shadow-gold-glow w-full h-10 rounded-full text-sm font-medium transition-all hover:shadow-gold-glow-lg disabled:opacity-60 disabled:cursor-not-allowed", loading && "shimmer-paused")}
           >
             {loading ? "Checking…" : "Sign in"}
           </button>
@@ -630,7 +630,7 @@ function FollowUpModal({
                 type="button"
                 onClick={() => send(false)}
                 disabled={isBusy || !subject.trim() || !body.trim() || emailCount === 0}
-                className="ml-auto inline-flex items-center gap-2 px-5 py-2 rounded-full bg-gold-metallic shadow-gold-glow text-sm font-medium hover:shadow-gold-glow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className={cn("ml-auto inline-flex items-center gap-2 px-5 py-2 rounded-full bg-gold-metallic shadow-gold-glow text-sm font-medium hover:shadow-gold-glow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed", isBusy && "shimmer-paused")}
               >
                 <Send className="h-4 w-4" />
                 {isBusy

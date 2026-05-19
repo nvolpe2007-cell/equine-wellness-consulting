@@ -454,7 +454,7 @@ export default function Survey() {
                 disabled={status === "submitting"}
                 whileHover={{ translateY: -2 }}
                 whileTap={{ scale: 0.98 }}
-                className="bg-gold-metallic shadow-gold-glow w-full sm:w-auto sm:min-w-[200px] h-12 rounded-full px-8 text-sm font-medium transition-all hover:shadow-gold-glow-lg disabled:opacity-60 disabled:cursor-not-allowed"
+                className={cn("bg-gold-metallic shadow-gold-glow w-full sm:w-auto sm:min-w-[200px] h-12 rounded-full px-8 text-sm font-medium transition-all hover:shadow-gold-glow-lg disabled:opacity-60 disabled:cursor-not-allowed", status === "submitting" && "shimmer-paused")}
               >
                 {status === "submitting" ? "Submitting…" : "Submit Response"}
               </motion.button>
