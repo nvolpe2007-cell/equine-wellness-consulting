@@ -20,10 +20,10 @@ const sortedPosts: NewsletterPost[] = [...newsletterPosts].sort(
 
 const ALL_CATEGORIES: NewsletterCategory[] = [
   "Legislation",
-  "State Law",
-  "Petition",
   "Seasonal Care",
   "Industry",
+  "Session Guide",
+  "Wellness",
 ];
 
 const presentCategories = ALL_CATEGORIES.filter((cat) =>
@@ -223,7 +223,7 @@ export default function News() {
           variant="hero"
           source="news_page"
           heading="Subscribe to The Worthy Horse News"
-          subheading="One thoughtful note a month — legislation, seasonal care, and petitions worth following. No spam, unsubscribe anytime."
+          subheading="One thoughtful note a month — seasonal care, session guides, industry notes, and wellness tips for horse owners. No spam, unsubscribe anytime."
         />
       </div>
 
