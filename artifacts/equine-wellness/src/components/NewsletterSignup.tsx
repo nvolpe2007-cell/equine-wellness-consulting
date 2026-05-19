@@ -374,7 +374,7 @@ export function NewsletterSignup({
                 "disabled:cursor-not-allowed",
                 isFooter
                   ? "bg-primary-foreground text-primary hover:bg-primary-foreground/90"
-                  : "bg-gold-metallic shadow-gold-glow hover:shadow-gold-glow-lg",
+                  : cn("bg-gold-metallic shadow-gold-glow hover:shadow-gold-glow-lg", isSubmitting && "shimmer-paused"),
               )}
               data-testid="button-newsletter-subscribe"
             >

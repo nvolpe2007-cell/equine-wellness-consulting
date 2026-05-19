@@ -350,6 +350,10 @@
       hsl(var(--gold-deep)) 100%
     );
   }
+  /* Pause shimmer on any gold-metallic surface (e.g. button while submitting) */
+  .shimmer-paused::after {
+    animation-play-state: paused;
+  }
   /* Shimmer sweep overlay — inert to pointer events, clipped by parent overflow */
   .bg-gold-metallic::after {
     content: "";
