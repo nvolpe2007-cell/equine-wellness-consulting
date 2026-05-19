@@ -2,16 +2,39 @@ import { useEffect } from "react";
 import { Link, useRoute } from "wouter";
 import { motion } from "framer-motion";
 import { ArrowLeft, Calendar, Tag } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
-import { getPostBySlug, formatPostDate } from "@/content/newsletter-posts";
+import {
+  newsletterPosts,
+  formatPostDate,
+  type NewsletterPost,
+} from "@/content/newsletter-posts";
 import NotFound from "@/pages/not-found";
 
 const SCHEMA_SCRIPT_ID = "newsletter-article-schema";
 
+async function fetchPosts(): Promise<NewsletterPost[]> {
+  const res = await fetch("/api/newsletter/posts");
+  if (!res.ok) throw new Error("Failed to fetch posts");
+  const json = (await res.json()) as { ok: boolean; posts: NewsletterPost[] };
+  if (!json.ok || !Array.isArray(json.posts) || json.posts.length === 0) {
+    return newsletterPosts;
+  }
+  return json.posts;
+}
+
 export default function NewsPost() {
   const [, params] = useRoute("/news/:slug");
   const slug = params?.slug;
-  const post = slug ? getPostBySlug(slug) : undefined;
+
+  const { data: posts = newsletterPosts } = useQuery<NewsletterPost[]>({
+    queryKey: ["newsletter-posts"],
+    queryFn: fetchPosts,
+    placeholderData: newsletterPosts,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const post = slug ? posts.find((p) => p.slug === slug) : undefined;
 
   useEffect(() => {
     if (!post) return;

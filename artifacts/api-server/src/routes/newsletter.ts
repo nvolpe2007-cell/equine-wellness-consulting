@@ -6,6 +6,7 @@ import {
   db,
   subscribersTable,
   dispatchesTable,
+  generatedPostsTable,
   type Subscriber,
 } from "@workspace/db";
 import { getUncachableResendClient } from "../lib/resend";
@@ -16,6 +17,7 @@ import {
 } from "../lib/newsletter-emails";
 import { draftNewsletter } from "../lib/draft-newsletter";
 import { sendDispatch } from "../lib/send-dispatch";
+import { runWeeklyNewsletter } from "../lib/weekly-newsletter";
 
 const router: IRouter = Router();
 
@@ -482,6 +484,45 @@ router.post("/newsletter/admin/dispatches/:id/send", requireAdmin, async (req, r
     failed: result.failed,
     total: result.total,
   });
+});
+
+// --- Public: generated posts -------------------------------------------------
+
+router.get("/newsletter/posts", async (_req, res) => {
+  const rows = await db
+    .select()
+    .from(generatedPostsTable)
+    .orderBy(desc(generatedPostsTable.date));
+
+  const posts = rows.map((row) => ({
+    id: row.postId,
+    slug: row.slug,
+    title: row.title,
+    date: row.date,
+    category: row.category,
+    excerpt: row.excerpt,
+    metaDescription: row.metaDescription,
+    body: row.body,
+  }));
+
+  return res.json({ ok: true, posts });
+});
+
+// --- Admin: manual weekly trigger --------------------------------------------
+
+router.post("/newsletter/admin/run-weekly", requireAdmin, async (req, res) => {
+  req.log?.info("admin: manually triggering weekly newsletter run");
+  try {
+    const result = await runWeeklyNewsletter();
+    if (result.ok) {
+      return res.json({ ...result, ok: true });
+    }
+    return res.status(502).json({ ...result, ok: false });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Weekly run failed";
+    req.log?.error({ err }, "admin: weekly newsletter run threw");
+    return res.status(502).json({ ok: false, error: message });
+  }
 });
 
 export default router;

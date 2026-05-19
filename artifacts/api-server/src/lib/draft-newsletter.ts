@@ -1,5 +1,6 @@
-import type { Tool, TextBlock } from "@anthropic-ai/sdk/resources/messages/messages";
+import type { TextBlock } from "@anthropic-ai/sdk/resources/messages/messages";
 import { getAnthropicClient } from "./anthropic";
+import { webSearchTool } from "./anthropic-tools";
 
 export type DraftedNewsletter = {
   subject: string;
@@ -60,13 +61,7 @@ export async function draftNewsletter(): Promise<DraftedNewsletter> {
     model: "claude-sonnet-4-6",
     max_tokens: 8192,
     system: SYSTEM_PROMPT,
-    tools: [
-      {
-        type: "web_search_20250305",
-        name: "web_search",
-        max_uses: 8,
-      } as unknown as Tool,
-    ],
+    tools: [webSearchTool(8)],
     messages: [
       {
         role: "user",

@@ -12,11 +12,8 @@ import {
   type NewsletterCategory,
 } from "@/content/newsletter-posts";
 import { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useStickyVisible } from "@/hooks/useStickyVisible";
-
-const sortedPosts: NewsletterPost[] = [...newsletterPosts].sort(
-  (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-);
 
 const ALL_CATEGORIES: NewsletterCategory[] = [
   "Legislation",
@@ -26,9 +23,15 @@ const ALL_CATEGORIES: NewsletterCategory[] = [
   "Wellness",
 ];
 
-const presentCategories = ALL_CATEGORIES.filter((cat) =>
-  sortedPosts.some((p) => p.category === cat),
-);
+async function fetchPosts(): Promise<NewsletterPost[]> {
+  const res = await fetch("/api/newsletter/posts");
+  if (!res.ok) throw new Error("Failed to fetch posts");
+  const json = (await res.json()) as { ok: boolean; posts: NewsletterPost[] };
+  if (!json.ok || !Array.isArray(json.posts) || json.posts.length === 0) {
+    return newsletterPosts;
+  }
+  return json.posts;
+}
 
 function PostCard({ post }: { post: NewsletterPost }) {
   const reduce = useReducedMotion();
@@ -82,26 +85,23 @@ function PostCard({ post }: { post: NewsletterPost }) {
   );
 }
 
-const FILTER_PILLS: Array<NewsletterCategory | "All"> = [
-  "All",
-  ...presentCategories,
-];
-
 function FilterPills({
   active,
   onChange,
   ariaLabel,
+  pills,
 }: {
   active: NewsletterCategory | "All";
   onChange: (cat: NewsletterCategory | "All") => void;
   ariaLabel: string;
+  pills: Array<NewsletterCategory | "All">;
 }) {
   return (
     <nav
       aria-label={ariaLabel}
       className="flex items-center gap-2 py-2.5 overflow-x-auto"
     >
-      {FILTER_PILLS.map((cat) => (
+      {pills.map((cat) => (
         <button
           key={cat}
           onClick={() => onChange(cat)}
@@ -123,16 +123,17 @@ function FilterPills({
 function CategoryFilterStrip({
   active,
   onChange,
+  pills,
 }: {
   active: NewsletterCategory | "All";
   onChange: (cat: NewsletterCategory | "All") => void;
+  pills: Array<NewsletterCategory | "All">;
 }) {
   const reduce = useReducedMotion();
   const show = useStickyVisible("news-hero");
 
   return (
     <>
-      {/* Inline strip — always visible below signup */}
       <div className="container mx-auto px-4 max-w-3xl mt-10">
         <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-3 font-medium">
           Filter by topic
@@ -141,11 +142,11 @@ function CategoryFilterStrip({
           active={active}
           onChange={onChange}
           ariaLabel="Filter by category"
+          pills={pills}
         />
         <div className="divider-gold mt-4" />
       </div>
 
-      {/* Sticky strip — separate instance, appears after hero scrolls out */}
       <AnimatePresence>
         {show && (
           <motion.div
@@ -161,6 +162,7 @@ function CategoryFilterStrip({
                 active={active}
                 onChange={onChange}
                 ariaLabel="Filter by category (sticky)"
+                pills={pills}
               />
             </div>
           </motion.div>
@@ -175,12 +177,34 @@ export default function News() {
     NewsletterCategory | "All"
   >("All");
 
+  const { data: posts = newsletterPosts } = useQuery<NewsletterPost[]>({
+    queryKey: ["newsletter-posts"],
+    queryFn: fetchPosts,
+    placeholderData: newsletterPosts,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const sortedPosts = useMemo(
+    () => [...posts].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+    [posts],
+  );
+
+  const presentCategories = useMemo(
+    () => ALL_CATEGORIES.filter((cat) => sortedPosts.some((p) => p.category === cat)),
+    [sortedPosts],
+  );
+
+  const filterPills: Array<NewsletterCategory | "All"> = useMemo(
+    () => ["All", ...presentCategories],
+    [presentCategories],
+  );
+
   const filteredPosts = useMemo(
     () =>
       activeCategory === "All"
         ? sortedPosts
         : sortedPosts.filter((p) => p.category === activeCategory),
-    [activeCategory],
+    [activeCategory, sortedPosts],
   );
 
   return (
@@ -231,6 +255,7 @@ export default function News() {
       <CategoryFilterStrip
         active={activeCategory}
         onChange={setActiveCategory}
+        pills={filterPills}
       />
 
       {/* Posts */}
