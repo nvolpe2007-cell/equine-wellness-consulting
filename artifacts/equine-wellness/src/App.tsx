@@ -278,7 +278,6 @@ function Router() {
         </AnimatePresence>
       </main>
       <Footer />
-      <FloatingCallCta />
       <CookieConsent />
     </div>
   );
