@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Outfit:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
@@ -77,54 +77,54 @@
   --elevate-1: rgba(255,255,255, .04);
   --elevate-2: rgba(255,255,255, .09);
 
-  /* Deep black background */
-  --background: 0 0% 6%;
-  /* Warm ivory foreground */
-  --foreground: 40 30% 96%;
+  /* Deep warm-black background (#0a0a0f feel, very slightly warm) */
+  --background: 240 8% 5%;
+  /* Warm parchment foreground (#f0ede8) */
+  --foreground: 36 27% 93%;
 
-  /* Bright metallic gold primary */
-  --primary: 46 92% 62%;
-  --primary-foreground: 0 0% 6%;
+  /* Warm antique gold primary (#c8a96e) */
+  --primary: 38 52% 61%;
+  --primary-foreground: 240 8% 5%;
 
-  /* Metallic gold gradient stops */
-  --gold-light: 52 100% 84%;
-  --gold: 46 96% 64%;
-  --gold-deep: 38 80% 44%;
+  /* Metallic gold gradient stops — warmer, richer */
+  --gold-light: 44 72% 78%;
+  --gold: 38 52% 61%;
+  --gold-deep: 32 55% 38%;
 
   /* Bronze/muted-gold secondary */
-  --secondary: 36 40% 30%;
-  --secondary-foreground: 40 30% 96%;
+  --secondary: 34 30% 28%;
+  --secondary-foreground: 36 27% 93%;
 
-  --card: 0 0% 10%;
-  --card-foreground: 40 30% 96%;
-  --card-border: 42 25% 22%;
+  --card: 36 12% 11%;
+  --card-foreground: 36 27% 93%;
+  --card-border: 36 18% 20%;
 
-  --popover: 0 0% 10%;
-  --popover-foreground: 40 30% 96%;
-  --popover-border: 42 25% 22%;
+  --popover: 36 12% 11%;
+  --popover-foreground: 36 27% 93%;
+  --popover-border: 36 18% 20%;
 
-  --muted: 0 0% 12%;
-  --muted-foreground: 40 15% 70%;
+  --muted: 36 10% 14%;
+  --muted-foreground: 36 12% 65%;
 
-  /* Gold accent (matches primary for cohesive metallic accent) */
-  --accent: 46 92% 62%;
-  --accent-foreground: 0 0% 6%;
+  /* Antique gold accent */
+  --accent: 38 52% 61%;
+  --accent-foreground: 240 8% 5%;
 
   --destructive: 0 70% 50%;
   --destructive-foreground: 0 0% 100%;
 
-  --border: 42 25% 22%;
-  --input: 0 0% 14%;
-  --ring: 46 92% 62%;
+  --border: 36 18% 20%;
+  --input: 36 10% 14%;
+  --ring: 38 52% 61%;
 
-  --sidebar: 0 0% 6%;
-  --sidebar-foreground: 40 30% 96%;
-  --sidebar-border: 42 25% 22%;
-  --sidebar-primary: 46 92% 62%;
-  --sidebar-primary-foreground: 0 0% 6%;
-  --sidebar-accent: 0 0% 12%;
-  --sidebar-accent-foreground: 40 30% 96%;
-  --sidebar-ring: 46 92% 62%;
+  --sidebar: 240 8% 5%;
+  --sidebar-foreground: 36 27% 93%;
+  --sidebar-border: 36 18% 20%;
+  --sidebar-primary: 38 52% 61%;
+  --sidebar-primary-foreground: 240 8% 5%;
+  --sidebar-accent: 36 10% 14%;
+  --sidebar-accent-foreground: 36 27% 93%;
+  --sidebar-ring: 38 52% 61%;
 
   --chart-1: 46 92% 62%;
   --chart-2: 36 40% 45%;
@@ -132,7 +132,7 @@
   --chart-4: 38 80% 44%;
   --chart-5: 40 15% 55%;
 
-  --app-font-sans: 'Outfit', sans-serif;
+  --app-font-sans: 'DM Sans', sans-serif;
   --app-font-serif: 'Cormorant Garamond', serif;
   --app-font-mono: Menlo, monospace;
   --radius: 0.3rem; 
