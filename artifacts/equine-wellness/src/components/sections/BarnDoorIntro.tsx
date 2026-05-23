@@ -250,7 +250,7 @@ export function BarnDoorIntro() {
             muted
             playsInline
             autoPlay={false}
-            preload="metadata"
+            preload="auto"
             disablePictureInPicture
             disableRemotePlayback
             aria-hidden="true"
