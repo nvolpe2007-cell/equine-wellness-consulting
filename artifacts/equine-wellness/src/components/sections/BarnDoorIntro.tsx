@@ -114,10 +114,12 @@ export function BarnDoorIntro() {
     return () => window.clearTimeout(t);
   }, [reduce, clearLqip]);
 
-  // Skip link: fade in after 4s if user hasn't scrolled past 5% of intro
+  // Skip link: fade in after 4s only if user is still near the top (< 5% scrolled)
   useEffect(() => {
     if (reduce) return;
-    const t = window.setTimeout(() => setShowSkip(true), 4000);
+    const t = window.setTimeout(() => {
+      if (scrollYProgress.get() <= 0.05) setShowSkip(true);
+    }, 4000);
     const unsub = scrollYProgress.on("change", (v) => {
       if (v > 0.05) setShowSkip(false);
     });
@@ -490,7 +492,7 @@ export function BarnDoorIntro() {
         {/* Skip intro — fades in after 4s for slow connections */}
         <a
           href="#after-intro"
-          className="absolute bottom-8 right-6 flex items-center gap-1.5 text-[0.6rem] font-sans tracking-[0.28em] text-white/60 uppercase hover:text-white/90 transition-colors"
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-1.5 text-[0.6rem] font-sans tracking-[0.3em] text-white/60 uppercase hover:text-white/90 transition-colors"
           style={{
             opacity: showSkip ? 1 : 0,
             transition: "opacity 0.8s",
