@@ -29,6 +29,7 @@ export function BarnDoorIntro() {
   const pendingTimeRef = useRef<number | null>(null);
   const posterImgRef = useRef<HTMLImageElement | null>(null);
   const { setIntroActive, setNavRevealed } = useIntroVisibility();
+  const [showSkip, setShowSkip] = useState(false);
 
   // Responsive values — slide distance and track height change at md breakpoint
   const isMd = typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches;
@@ -99,16 +100,32 @@ export function BarnDoorIntro() {
   const vignetteOpacity = useTransform(smoothProgress, [0, 0.7, 1], [0.25, 0.35, 0.55]);
   const scrollHintOpacity = useTransform(smoothProgress, [0, 0.08], [1, 0]);
 
-  // Fallback: clear LQIP overlay after 2s in case video seek never fires on mobile
+  // Helper: fade out the LQIP overlay
+  const clearLqip = useCallback(() => {
+    if (posterImgRef.current) {
+      posterImgRef.current.style.opacity = "0";
+    }
+  }, []);
+
+  // Fallback: clear LQIP overlay after 2s in case static image / video seek never fires
   useEffect(() => {
     if (reduce) return;
-    const t = window.setTimeout(() => {
-      if (posterImgRef.current && parseFloat(posterImgRef.current.style.opacity) > 0) {
-        posterImgRef.current.style.opacity = "0";
-      }
-    }, 2000);
+    const t = window.setTimeout(clearLqip, 2000);
     return () => window.clearTimeout(t);
-  }, [reduce]);
+  }, [reduce, clearLqip]);
+
+  // Skip link: fade in after 4s if user hasn't scrolled past 5% of intro
+  useEffect(() => {
+    if (reduce) return;
+    const t = window.setTimeout(() => setShowSkip(true), 4000);
+    const unsub = scrollYProgress.on("change", (v) => {
+      if (v > 0.05) setShowSkip(false);
+    });
+    return () => {
+      window.clearTimeout(t);
+      unsub();
+    };
+  }, [reduce, scrollYProgress]);
 
   // Mark intro as active for navbar hiding
   useEffect(() => {
@@ -236,6 +253,7 @@ export function BarnDoorIntro() {
             sizes="100vw"
             pictureClassName="block w-full h-full"
             className="w-full h-full object-cover"
+            onLoad={clearLqip}
           />
         </div>
 
@@ -259,9 +277,7 @@ export function BarnDoorIntro() {
                 const vid = e.currentTarget;
                 const onSeeked = () => {
                   vid.removeEventListener("seeked", onSeeked);
-                  if (posterImgRef.current) {
-                    posterImgRef.current.style.opacity = "0";
-                  }
+                  clearLqip();
                 };
                 vid.addEventListener("seeked", onSeeked);
                 vid.currentTime = 0.5;
@@ -470,6 +486,21 @@ export function BarnDoorIntro() {
             <ChevronDown className="h-5 w-5 text-white/60" strokeWidth={1.5} />
           </motion.div>
         </motion.div>
+
+        {/* Skip intro — fades in after 4s for slow connections */}
+        <a
+          href="#after-intro"
+          className="absolute bottom-8 right-6 flex items-center gap-1.5 text-[0.6rem] font-sans tracking-[0.28em] text-white/60 uppercase hover:text-white/90 transition-colors"
+          style={{
+            opacity: showSkip ? 1 : 0,
+            transition: "opacity 0.8s",
+            pointerEvents: showSkip ? "auto" : "none",
+          }}
+          aria-label="Skip intro"
+        >
+          Skip intro
+          <ChevronDown className="h-3.5 w-3.5 -rotate-90" strokeWidth={1.5} />
+        </a>
       </div>
     </div>
   );
