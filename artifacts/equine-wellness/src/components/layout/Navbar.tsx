@@ -115,7 +115,7 @@ export function Navbar() {
           })}
           <motion.a
             href="tel:+13104884389"
-            className="bg-gold-metallic shadow-gold-glow inline-flex h-10 items-center justify-center gap-2 rounded-full px-5 py-2 text-sm font-medium transition-shadow hover:shadow-gold-glow-lg focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            className="bg-gold-metallic shadow-gold-glow inline-flex h-10 items-center justify-center gap-2 rounded-full px-6 py-2 text-sm font-medium whitespace-nowrap transition-shadow hover:shadow-gold-glow-lg focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             data-testid="link-nav-contact"
             whileHover={reduce ? undefined : { y: -2, scale: 1.03 }}
             whileTap={reduce ? undefined : { scale: 0.97 }}
