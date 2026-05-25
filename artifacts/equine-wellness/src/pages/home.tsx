@@ -360,6 +360,7 @@ export default function Home() {
                       <Link
                         href="/modalities"
                         className="mt-6 inline-flex items-center text-sm font-medium text-primary group/link"
+                        aria-label={`Learn more about ${feature.title}`}
                       >
                         Learn more
                         <ArrowRight className="ml-1.5 h-3.5 w-3.5 transition-transform group-hover/link:translate-x-1" />
@@ -396,6 +397,7 @@ export default function Home() {
                           <Link
                             href="/modalities"
                             className="mt-4 inline-flex items-center text-sm font-medium text-primary group/link"
+                            aria-label={`Learn more about ${service.title}`}
                           >
                             Learn more
                             <ArrowRight className="ml-1.5 h-3.5 w-3.5 transition-transform group-hover/link:translate-x-1" />

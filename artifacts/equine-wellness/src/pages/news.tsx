@@ -75,6 +75,7 @@ function PostCard({ post }: { post: NewsletterPost }) {
             href={`/news/${post.slug}`}
             className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors group"
             data-testid={`link-read-full-${post.id}`}
+            aria-label={`Read full article: ${post.title}`}
           >
             Read full dispatch
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

@@ -294,6 +294,7 @@ export default function Bio() {
             <a
               href="tel:+13104884389"
               className="inline-flex items-center gap-3 bg-gold-metallic text-primary-foreground px-8 py-4 rounded-full font-sans font-semibold text-lg shadow-gold-glow hover:opacity-90 transition-opacity"
+              aria-label="Call Susie at (310) 488-4389"
             >
               <Phone className="h-5 w-5" />
               (310) 488-4389

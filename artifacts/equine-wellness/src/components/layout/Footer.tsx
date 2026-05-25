@@ -65,7 +65,7 @@ export function Footer() {
           <h3 className="font-serif text-lg mb-4 text-foreground">Contact</h3>
           <ul className="space-y-3 text-sm text-muted-foreground">
             <li>
-              <a href="tel:+13104884389" className="hover:text-primary transition-colors" data-testid="link-footer-phone">
+              <a href="tel:+13104884389" className="hover:text-primary transition-colors" data-testid="link-footer-phone" aria-label="Call Susie at (310) 488-4389">
                 (310) 488-4389
               </a>
             </li>

@@ -466,6 +466,7 @@ export function BarnDoorIntro() {
               href="#after-intro"
               className="inline-flex h-12 items-center justify-center rounded-full bg-white/10 px-8 text-base font-medium text-white backdrop-blur-md hover:bg-white/20 border border-white/20"
               data-testid="link-intro-continue"
+              aria-label="Continue to main content"
             >
               Continue
             </a>
