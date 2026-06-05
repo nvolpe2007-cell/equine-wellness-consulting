@@ -9,6 +9,7 @@ import horseOnPad from "@assets/20260320_141245_1776528671943.jpg?w=400;800;1200
 import pemfRear from "@assets/20260407_112708_1776528693859.jpg?w=400;800;1200&picture";
 import pemfWhiteHorse from "@assets/20260407_121449_1776528702902.jpg?w=400;800;1200&picture";
 import redLightPad from "@assets/image_1776880244507.jpeg?w=400;800&picture";
+import susieInAction from "@assets/20260602_143133_1780625890792.jpeg?w=400;800;1200&picture";
 
 type GalleryImage = {
   src: PictureData;
@@ -135,9 +136,9 @@ export default function Gallery() {
       sizes: "(min-width: 768px) 66vw, 100vw",
     },
     {
-      src: susieWithHorse,
-      alt: "A quiet moment between sessions",
-      caption: "A quiet moment between sessions",
+      src: susieInAction,
+      alt: "Susie H. Lytal applying PEMF therapy loops along a horse's topline",
+      caption: "Susie applying PEMF loops along the topline — precision at work",
       colSpan: "col-span-1",
       sizes: "(min-width: 768px) 33vw, 100vw",
     },

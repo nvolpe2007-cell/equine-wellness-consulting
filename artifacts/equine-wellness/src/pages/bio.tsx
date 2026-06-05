@@ -5,6 +5,7 @@ import { WordReveal, LineReveal } from "@/components/ui/AnimatedText";
 import { StaggerReveal, StaggerItem } from "@/components/ui/AnimatedText";
 import { StickyNav } from "@/components/ui/StickyNav";
 import horsePortrait from "@assets/20260401_140719_1776529313797.jpg?w=400;800&picture";
+import susieInAction from "@assets/20260602_143133_1780625890792.jpeg?w=400;800&picture";
 import { ResponsiveImage } from "@/components/ui/ResponsiveImage";
 
 const BIO_SECTIONS = [
@@ -61,8 +62,8 @@ export default function Bio() {
         className="scroll-mt-28 container mx-auto px-4 pt-24 md:pt-32 max-w-5xl"
       >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
-          {/* Image — portrait bleeds slightly outside grid column on desktop */}
-          <div className="lg:col-span-5">
+          {/* Images — portrait + action shot stacked */}
+          <div className="lg:col-span-5 flex flex-col gap-5">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -72,6 +73,22 @@ export default function Bio() {
               <ResponsiveImage
                 image={horsePortrait}
                 alt="Susie H. Lytal, MS, on-site between equine wellness sessions in the barn aisle"
+                loading="lazy"
+                decoding="async"
+                sizes="(min-width: 1024px) 40vw, 100vw"
+                pictureClassName="block w-full h-full"
+                className="w-full h-full object-cover"
+              />
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.38, duration: 0.6, ease: easing.out }}
+              className="rounded-2xl overflow-hidden shadow-xl aspect-[4/3] lg:-mr-6 xl:-mr-10 rotate-[-0.9deg]"
+            >
+              <ResponsiveImage
+                image={susieInAction}
+                alt="Susie H. Lytal, MS, applying PEMF therapy loops along a horse's topline during an in-barn session"
                 loading="lazy"
                 decoding="async"
                 sizes="(min-width: 1024px) 40vw, 100vw"
