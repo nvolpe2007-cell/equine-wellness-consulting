@@ -71,7 +71,7 @@ export function Navbar() {
               Equine Bodywork and Wellness Consulting
             </span>
             <span className="text-[0.65rem] font-sans text-muted-foreground uppercase tracking-[0.2em]">
-              Susie H. Lytal, MS
+              Susie H. Lytal, MS · Equine Wellness Consultant
             </span>
           </span>
         </Link>
