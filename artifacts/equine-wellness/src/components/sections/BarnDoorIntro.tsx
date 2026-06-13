@@ -209,7 +209,7 @@ export function BarnDoorIntro() {
         </div>
         <div className="container relative z-10 mx-auto flex h-full flex-col items-center justify-center px-4 text-center">
           <p className="text-[0.7rem] font-sans tracking-[0.28em] text-white/85 uppercase mb-5">
-            Susie H. Lytal, MS · Equine Biomechanist
+            Susie H. Lytal, MS · Equine Wellness Consultant
           </p>
           <span className="block mx-auto mb-6 gold-rule" aria-hidden="true" />
           <h1 className="text-5xl md:text-7xl font-serif text-white leading-[1.05] tracking-tight">
@@ -327,7 +327,7 @@ export function BarnDoorIntro() {
               style={{ x: beat1HeadX, textShadow: TEXT_SHADOW_BODY }}
               className="text-[0.65rem] sm:text-[0.7rem] font-sans tracking-[0.32em] text-white/85 uppercase mb-5 will-change-transform"
             >
-              Susie H. Lytal, MS · Equine Biomechanist
+              Susie H. Lytal, MS · Equine Wellness Consultant
             </motion.p>
             <motion.span
               style={{ x: beat1HeadX }}

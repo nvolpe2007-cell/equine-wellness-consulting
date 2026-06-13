@@ -19,7 +19,7 @@ export function Footer() {
         />
         <div className="flex flex-col gap-0.5">
           <span className="font-serif text-xl text-foreground leading-tight">Equine Bodywork and Wellness Consulting</span>
-          <span className="text-[0.6rem] font-sans text-muted-foreground uppercase tracking-[0.22em]">Susie H. Lytal, MS · Equine Biomechanist</span>
+          <span className="text-[0.6rem] font-sans text-muted-foreground uppercase tracking-[0.22em]">Susie H. Lytal, MS · Equine Wellness Consultant</span>
         </div>
       </div>
 

@@ -42,7 +42,7 @@ export const newsletterPosts: NewsletterPost[] = [
     date: "2026-04-22",
     category: "Session Guide",
     excerpt:
-      "If you've never had a bodywork practitioner out before, here's exactly what happens from the moment I arrive — and what your horse will likely show you.",
+      "If you've never had an equine wellness consultant out before, here's exactly what happens from the moment I arrive — and what your horse will likely show you.",
     metaDescription:
       "A friendly walkthrough of what to expect during a first equine bodywork session with Susie H. Lytal — the assessment, the modalities, and what to watch for in the days after.",
     body: [

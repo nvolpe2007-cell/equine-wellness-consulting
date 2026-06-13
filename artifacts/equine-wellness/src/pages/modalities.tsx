@@ -131,7 +131,7 @@ const modalities: Modality[] = [
       },
       {
         q: "Is cold laser safe around the horse's eyes and joints?",
-        a: "Cold laser is non-thermal and broadly considered safe when applied by a trained practitioner. Eye-protection protocols are followed, and certain areas — such as open growth plates in young horses or known tumors — are avoided.",
+        a: "Cold laser is non-thermal and broadly considered safe when applied by a trained professional. Eye-protection protocols are followed, and certain areas — such as open growth plates in young horses or known tumors — are avoided.",
       },
       {
         q: "Will I see results from a single cold laser session?",
@@ -386,13 +386,18 @@ export default function Modalities() {
         <div className="divider-gold" />
       </section>
 
-      {/* Important Notice */}
+      {/* Scope of Practice */}
       <div className="bg-accent/10 border-y border-accent/20">
-        <div className="container mx-auto px-4 py-6 flex items-start gap-4">
+        <div className="container mx-auto px-4 py-7 flex items-start gap-4">
           <Info className="h-6 w-6 text-accent shrink-0 mt-0.5" />
-          <p className="text-sm text-foreground/80 leading-relaxed max-w-4xl">
-            <strong>Professional Disclaimer:</strong> The modalities listed below are provided to support general wellness, comfort, and athletic performance. They are not intended to replace veterinary care. Susie H. Lytal is an Equine Biomechanist and Certified Equine Sports Massage Therapist, not a veterinarian. We do not diagnose, treat, or prescribe for any medical conditions. We strongly encourage all clients to work closely with their veterinarian.
-          </p>
+          <div className="text-sm text-foreground/80 leading-relaxed max-w-4xl space-y-2">
+            <p>
+              <strong>Scope of Practice:</strong> Susie H. Lytal, MS, is an Equine Wellness Consultant — not a veterinarian. The sessions and modalities offered here are provided to support general wellness, comfort, and athletic performance. They are not intended to diagnose, prescribe for, or replace veterinary care. Susie works alongside your veterinary team as a complement to, not a substitute for, professional medical care.
+            </p>
+            <p>
+              <strong>Vet clearance required:</strong> Horses with known injuries, active conditions, or recent veterinary procedures must have clearance from their veterinarian before scheduling a session. Please mention any health history when booking.
+            </p>
+          </div>
         </div>
       </div>
 

@@ -61,10 +61,10 @@ const pageMeta: Record<string, PageMeta> = {
       "Professional equine bodywork and wellness sessions grounded in graduate-level biomechanics. Sports massage, PEMF, red light, cold laser, TENS, and TECAR.",
   },
   "/bio": {
-    title: "About Susie H. Lytal, MS — Equine Biomechanist",
+    title: "About Susie H. Lytal, MS — Equine Wellness Consultant",
     description:
-      "Meet Susie H. Lytal, MS — equine biomechanist offering bodywork and wellness sessions in partnership with your veterinarian.",
-    ogTitle: "About Susie H. Lytal, MS — Equine Biomechanist",
+      "Meet Susie H. Lytal, MS — equine wellness consultant offering bodywork and wellness sessions in partnership with your veterinarian.",
+    ogTitle: "About Susie H. Lytal, MS — Equine Wellness Consultant",
     ogDescription:
       "Graduate-level biomechanics expertise applied to hands-on equine wellness sessions in partnership with your veterinarian.",
   },

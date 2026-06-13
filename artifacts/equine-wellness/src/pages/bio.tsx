@@ -44,7 +44,7 @@ export default function Bio() {
             </div>
             <div className="lg:col-span-5 lg:pb-3 lg:pl-10 lg:border-l lg:border-border">
               <LineReveal
-                text="Equine Biomechanist & Certified Equine Sports Massage Therapist"
+                text="Equine Wellness Consultant"
                 as="p"
                 whileInView={false}
                 delay={0.55}
@@ -256,6 +256,22 @@ export default function Bio() {
               </p>
             </StaggerItem>
           </StaggerReveal>
+
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.6, ease: easing.out }}
+            className="mt-10 bg-accent/10 border border-accent/20 rounded-xl p-6 md:p-8 space-y-3 text-sm text-foreground/80 leading-relaxed"
+          >
+            <p className="text-xs font-sans tracking-[0.22em] uppercase text-primary font-medium mb-1">Scope of Practice</p>
+            <p>
+              Susie H. Lytal, MS, is an Equine Wellness Consultant — not a veterinarian. Sessions support comfort, relaxation, and movement from a wellness perspective. They do not constitute veterinary care and are not intended to diagnose, prescribe for, or replace the advice of a licensed veterinarian.
+            </p>
+            <p>
+              Horses with known injuries, active conditions, or recent veterinary procedures require clearance from their veterinarian before scheduling a session.
+            </p>
+          </motion.div>
 
           <motion.div
             initial={{ opacity: 0.4, y: 16 }}

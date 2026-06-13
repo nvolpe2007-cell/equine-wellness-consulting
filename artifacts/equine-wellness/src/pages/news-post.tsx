@@ -127,7 +127,7 @@ export default function NewsPost() {
                 {post.excerpt}
               </p>
               <p className="text-xs font-sans tracking-[0.3em] uppercase text-primary">
-                By Susie H. Lytal, MS &middot; Equine Biomechanist
+                By Susie H. Lytal, MS &middot; Equine Wellness Consultant
               </p>
             </div>
           </motion.div>
