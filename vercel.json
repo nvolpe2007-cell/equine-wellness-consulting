@@ -1,8 +1,10 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "PORT=3000 BASE_PATH=/ pnpm --filter @workspace/equine-wellness run build",
   "outputDirectory": "artifacts/equine-wellness/dist/public",
   "rewrites": [
-    { "source": "/api/:path*", "destination": "/api/index" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/sitemap.xml", "destination": "/api/sitemap" },
+    { "source": "/robots.txt", "destination": "/api/robots" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
