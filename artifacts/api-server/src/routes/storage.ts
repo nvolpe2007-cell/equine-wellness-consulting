@@ -1,4 +1,5 @@
-import { Router, type IRouter, type Request, type Response } from "express";
+import { Router, type IRouter, type Request, type Response, type NextFunction } from "express";
+import { timingSafeEqual } from "node:crypto";
 import {
   RequestUploadUrlBody,
   RequestUploadUrlResponse,
@@ -8,6 +9,40 @@ import { ObjectStorageService } from "../lib/objectStorage";
 const router: IRouter = Router();
 const objectStorageService = new ObjectStorageService();
 
+// This mints presigned upload URLs -- unauthenticated, it lets anyone mint
+// unlimited signed PUT URLs with no cost to themselves (a storage-cost/DoS
+// vector once the GCS-backed ObjectStorageService is actually wired up).
+// Gated the same way the newsletter/survey admin endpoints are: a bearer
+// token compared with timingSafeEqual.
+function constantTimeEquals(a: string, b: string): boolean {
+  const ab = Buffer.from(a);
+  const bb = Buffer.from(b);
+  if (ab.length !== bb.length) return false;
+  return timingSafeEqual(ab, bb);
+}
+
+function requireAdmin(req: Request, res: Response, next: NextFunction): void {
+  const expected = process.env["STORAGE_ADMIN_TOKEN"];
+  if (!expected) {
+    res
+      .status(503)
+      .json({ error: "Admin not configured. Set STORAGE_ADMIN_TOKEN." });
+    return;
+  }
+  const header = req.header("authorization") ?? "";
+  const provided = header.startsWith("Bearer ") ? header.slice(7) : "";
+  if (!provided || !constantTimeEquals(provided, expected)) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+  next();
+}
+
+// Presigned URLs are meant for admin-side media uploads (blog post images,
+// gallery assets), not arbitrary user uploads -- 500 MB comfortably covers
+// that while still bounding how large a single signed URL's target can be.
+const MAX_UPLOAD_SIZE_BYTES = 500 * 1024 * 1024;
+
 /**
  * POST /storage/uploads/request-url
  *
@@ -15,7 +50,7 @@ const objectStorageService = new ObjectStorageService();
  * The client sends JSON metadata (name, size, contentType) — NOT the file.
  * Then uploads the file directly to the returned presigned URL.
  */
-router.post("/storage/uploads/request-url", async (req: Request, res: Response) => {
+router.post("/storage/uploads/request-url", requireAdmin, async (req: Request, res: Response) => {
   const parsed = RequestUploadUrlBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: "Missing or invalid required fields" });
@@ -24,6 +59,11 @@ router.post("/storage/uploads/request-url", async (req: Request, res: Response) 
 
   try {
     const { name, size, contentType } = parsed.data;
+
+    if (size > MAX_UPLOAD_SIZE_BYTES) {
+      res.status(400).json({ error: "File too large" });
+      return;
+    }
 
     const uploadURL = await objectStorageService.getObjectEntityUploadURL();
     const objectPath = objectStorageService.normalizeObjectEntityPath(uploadURL);
