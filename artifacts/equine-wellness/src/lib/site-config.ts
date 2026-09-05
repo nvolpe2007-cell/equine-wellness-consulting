@@ -1,6 +1,6 @@
 export const SITE_URL: string =
   (import.meta.env.VITE_SITE_URL as string | undefined)?.replace(/\/$/, "") ??
-  "https://equinebodywork.com";
+  "https://theworthyhorse.org";
 
 export const GSC_VERIFICATION: string =
   (import.meta.env.VITE_GSC_VERIFICATION as string | undefined) ?? "";

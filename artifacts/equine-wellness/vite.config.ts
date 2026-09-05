@@ -28,7 +28,7 @@ if (!basePath) {
   );
 }
 
-const SITE_URL = (process.env.VITE_SITE_URL ?? "https://equinebodywork.com").replace(/\/$/, "");
+const SITE_URL = (process.env.VITE_SITE_URL ?? "https://theworthyhorse.org").replace(/\/$/, "");
 const GSC_VERIFICATION = process.env.VITE_GSC_VERIFICATION ?? "";
 const GA4_MEASUREMENT_ID = process.env.VITE_GA4_MEASUREMENT_ID ?? "";
 
