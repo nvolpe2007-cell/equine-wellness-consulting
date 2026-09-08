@@ -11,7 +11,7 @@ import { ResponsiveImage } from "@/components/ui/ResponsiveImage";
 import { useIntroVisibility } from "@/components/intro/IntroVisibilityContext";
 import barnFinalFrame from "@assets/barn-door-intro-final-frame.jpg?w=640;1024;1600;2400&picture";
 
-const barnVideoSrc = "/api/storage/public-objects/barn-door-intro-web.mp4";
+const barnVideoSrc = "/media/barn-door-intro-web.mp4";
 const BARN_LQIP = "data:image/jpeg;base64,/9j//gAQTGF2YzYwLjMxLjEwMgD/2wBDAAg+Pkk+SVVVVVVVVWRdZGhoaGRkZGRoaGhwcHCDg4NwcHBoaHBwfHyDg4+Tj4eHg4eTk5ubm7q6srLZ2eD/////xABiAAADAQEBAQEAAAAAAAAAAAAFBgQDAgEABwEBAQEBAAAAAAAAAAAAAAAAAwIBABAAAgEEAgIDAQAAAAAAAAAAAAEREiExAkEDgXFhUTKREQEAAAAAAAAAAAAAAAAAAAAA/8AAEQgALQBQAwEiAAIRAAMRAP/aAAwDAQACEQMRAD8A/BSxGcHcBkHP0vkmSg71wwzFRCwiDqkdtEpUx5Znur8eDmkpqYKvyvkItU+4Am2EY4GMCqJPoEGaOtJ76p4kKduq12hYFJSErkKbQhppSWcSKeApCzcEy6XVBvsqXlP+gBXaj7Gul1uU+Q1lhoEOyHZ6q+bOBaiecCje9SW26TNOxKvZLEgSh/Z4lHscKUvkCFhqVHIyoAJSGgyDisFKmLcnchEat5FhO7DYEaLSpBTOCRiDf//Z";
 
 const NAV_REVEAL_AT = 0.92;
