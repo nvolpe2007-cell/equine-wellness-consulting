@@ -7,9 +7,19 @@ function escapeHtml(value: string): string {
     .replace(/'/g, "&#39;");
 }
 
+// theworthyhorse.org 308s to www, and the page's canonical names www. A sitemap
+// or an email link on the apex therefore points at a redirect — which is what
+// stops Google settling on one version of a URL. Normalise the apex to www here
+// so everything derived from this agrees with the canonical.
+function canonicalise(url: string): string {
+  return url
+    .replace(/\/$/, "")
+    .replace(/^https?:\/\/theworthyhorse\.org$/i, "https://www.theworthyhorse.org");
+}
+
 export function getSiteBaseUrl(): string {
   const explicit = process.env["PUBLIC_SITE_URL"];
-  if (explicit) return explicit.replace(/\/$/, "");
+  if (explicit) return canonicalise(explicit);
   const dev = process.env["REPLIT_DEV_DOMAIN"];
   if (dev) return `https://${dev}`;
   return "http://localhost";
